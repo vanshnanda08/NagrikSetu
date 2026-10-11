@@ -266,6 +266,7 @@ export default function MapCanvasInner({
   return (
     <div
       ref={nodeRef}
+      data-map-canvas
       style={{ height, width: "100%", borderRadius: "var(--radius)" }}
       // The map is an interactive region; naming it stops a screen reader
       // announcing an unlabelled group of tile images.

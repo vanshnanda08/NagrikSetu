@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Photo } from "@/components/Photo";
-import { use } from "react";
+import { use, useCallback, useState, type ReactNode } from "react";
 import { PageShell } from "@/components/PageShell";
 import { StatusRule } from "@/components/StatusRule";
 import { TicketRef } from "@/components/TicketRef";
@@ -124,9 +124,13 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
         </Fact>
       </dl>
 
+      {/* On a desktop window the two columns sit side by side (see the fit-to-screen
+          block in liquid-glass.css); elsewhere the wrappers vanish. */}
+      <div className="detail-grid">
+      <div className="detail-col">
       {/* Photo strip from every member report. */}
       {reports.data && reports.data.length > 0 && (
-        <section className="mt-8">
+        <section className="mt-8 detail-photos">
           <h2 className="text-heading">Photos</h2>
           <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
             {reports.data.map((r) => (
@@ -144,29 +148,8 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
         </section>
       )}
 
-      <section className="mt-8">
-        <h2 className="text-heading">Location</h2>
-        <p className="mt-1 text-dense text-ink-muted">
-          One marker at the cluster centroid. The individual reports are on the{" "}
-          <Link href={`/issues/${i.id}/cluster`} className="text-ink underline">
-            cluster inspector
-          </Link>
-          .
-        </p>
-        <div className="mt-3">
-          <MapCanvas
-            center={{ lat: i.lat, lng: i.lng }}
-            zoom={17}
-            height={320}
-            markers={[
-              { id: i.id, lat: i.lat, lng: i.lng, kind: "centroid", color: STATUS[i.status].color, overdue, label: i.publicRef },
-            ]}
-          />
-        </div>
-      </section>
-
       {i.status === "RESOLVED" || i.resolutionPhotoUrl ? (
-        <section className="mt-8">
+        <section className="mt-8 detail-fix">
           <h2 className="text-heading">The fix</h2>
           {i.resolutionNote && <p className="mt-2 text-body">{i.resolutionNote}</p>}
           {i.resolutionPhotoUrl && (
@@ -189,36 +172,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
         </section>
       ) : null}
 
-      <section className="mt-8">
-        <h2 className="text-heading">What has happened</h2>
-        {history.isPending && <LoadingState label="Loading the timeline" />}
-        {history.data && history.data.length === 0 && (
-          <p className="mt-2 text-dense text-ink-muted">
-            Reported, and not yet picked up by the department.
-          </p>
-        )}
-        {history.data && history.data.length > 0 && (
-          <ol className="mt-3 list-none p-0 border-t border-rule">
-            {history.data.map((h, n) => (
-              <li key={n} className="border-b border-rule py-3">
-                <div className="flex flex-wrap items-center gap-x-4">
-                  <StatusRule status={h.toStatus} audience="staff" />
-                  <span className="text-meta text-ink-muted">
-                    {/* Role, never a name. */}
-                    by {h.actorRole.toLowerCase()}
-                  </span>
-                  <span className="ml-auto text-meta text-ink-muted">
-                    {absoluteDateTime(h.createdAt)}
-                  </span>
-                </div>
-                {h.note && <p className="mt-1 text-dense">{h.note}</p>}
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
-
-      <section className="mt-8">
+      <section className="mt-8 detail-cluster">
         <h2 className="text-heading">Cluster</h2>
         <p className="mt-2 text-dense text-ink-muted" style={{ maxWidth: "var(--measure-prose)" }}>
           The reports on this issue span {metres(i.clusterExtentM)} from the
@@ -239,6 +193,60 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
           )}
         </p>
       </section>
+      </div>
+      <div className="detail-col">
+      <section className="mt-8 detail-location">
+        <h2 className="text-heading">Location</h2>
+        <p className="mt-1 text-dense text-ink-muted">
+          One marker at the cluster centroid. The individual reports are on the{" "}
+          <Link href={`/issues/${i.id}/cluster`} className="text-ink underline">
+            cluster inspector
+          </Link>
+          .
+        </p>
+        <div className="mt-3">
+          <MapCanvas
+            center={{ lat: i.lat, lng: i.lng }}
+            zoom={17}
+            height={320}
+            markers={[
+              { id: i.id, lat: i.lat, lng: i.lng, kind: "centroid", color: STATUS[i.status].color, overdue, label: i.publicRef },
+            ]}
+          />
+        </div>
+      </section>
+
+      <section className="mt-8 detail-history">
+        <h2 className="text-heading">What has happened</h2>
+        {history.isPending && <LoadingState label="Loading the timeline" />}
+        {history.data && history.data.length === 0 && (
+          <p className="mt-2 text-dense text-ink-muted">
+            Reported, and not yet picked up by the department.
+          </p>
+        )}
+        {history.data && history.data.length > 0 && (
+          <Timeline>
+            {history.data.map((h, n) => (
+              <li key={n} className="border-b border-rule py-3">
+                <div className="flex flex-wrap items-center gap-x-4">
+                  <StatusRule status={h.toStatus} audience="staff" />
+                  <span className="text-meta text-ink-muted">
+                    {/* Role, never a name. */}
+                    by {h.actorRole.toLowerCase()}
+                  </span>
+                  <span className="ml-auto text-meta text-ink-muted">
+                    {absoluteDateTime(h.createdAt)}
+                  </span>
+                </div>
+                {h.note && <p className="mt-1 text-dense">{h.note}</p>}
+              </li>
+            ))}
+          </Timeline>
+        )}
+      </section>
+
+      </div>
+      </div>
     </PageShell>
   );
 }
@@ -249,5 +257,35 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
       <dt className="text-meta text-ink-muted">{label}</dt>
       <dd className="m-0 text-dense">{children}</dd>
     </>
+  );
+}
+
+/**
+ * The timeline. On a desktop window it scrolls inside its own panel, and a
+ * scrollable region must be reachable from the keyboard -- but a list that
+ * does not scroll should not add a dead tab stop, so it only becomes
+ * focusable (and named) while there is actually something to scroll.
+ */
+function Timeline({ children }: { children: ReactNode }) {
+  const [scrolls, setScrolls] = useState(false);
+  const ref = useCallback((el: HTMLOListElement | null) => {
+    if (!el) return;
+    const measure = () => setScrolls(el.scrollHeight > el.clientHeight + 1);
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    for (const child of Array.from(el.children)) observer.observe(child);
+    measure();
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <ol
+      ref={ref}
+      className="mt-3 list-none p-0 border-t border-rule detail-timeline"
+      tabIndex={scrolls ? 0 : undefined}
+      aria-label={scrolls ? "Timeline of what has happened" : undefined}
+    >
+      {children}
+    </ol>
   );
 }

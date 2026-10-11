@@ -197,7 +197,7 @@ export default function ReportComposerPage() {
       </div>
 
       {/* No action attribute and no server post: an event handler, per §6. */}
-      <form onSubmit={onSubmit} noValidate>
+      <form onSubmit={onSubmit} noValidate className="report-form">
         {/*
           `lat`, `lng`, `accuracyM`, `manualPin`, `hasPhoto` and `categoryCode`
           are form values with no visible control, so they are held in form
@@ -212,7 +212,7 @@ export default function ReportComposerPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* LEFT COLUMN: Photo & Details */}
           <div className="flex flex-col gap-8">
-            <section>
+            <section className="report-photo">
               <h2 className="text-heading mb-3">Photo</h2>
               <PhotoUploader
                 onChange={(img) => {
@@ -223,7 +223,7 @@ export default function ReportComposerPage() {
               />
             </section>
 
-            <section>
+            <section className="report-details">
               <h2 className="text-heading mb-3">Details</h2>
               
               {categories.isPending && <LoadingState label="Loading categories" />}
@@ -243,36 +243,12 @@ export default function ReportComposerPage() {
                 </p>
               )}
 
-              <div className="mt-5 flex flex-col gap-4">
-                <label className="flex flex-col gap-1">
-                  <span className="text-meta">Landmark (optional)</span>
-                  <span className="text-meta text-ink-muted">Helps a crew find the exact spot.</span>
-                  <input
-                    {...register("landmark", { onChange: (e) => patch({ landmark: e.target.value }) })}
-                    maxLength={200}
-                    placeholder="Near the bus stop"
-                    className="bg-surface-raised border border-rule px-3 text-body"
-                    style={{ minHeight: "var(--hit-min)", borderRadius: "var(--radius)" }}
-                  />
-                </label>
-
-                <label className="flex flex-col gap-1">
-                  <span className="text-meta">Description (optional)</span>
-                  <textarea
-                    {...register("description", { onChange: (e) => patch({ description: e.target.value }) })}
-                    maxLength={2000}
-                    rows={3}
-                    className="bg-surface-raised border border-rule px-3 py-2 text-body"
-                    style={{ borderRadius: "var(--radius)" }}
-                  />
-                </label>
-              </div>
             </section>
           </div>
 
           {/* RIGHT COLUMN: Location & Submit */}
           <div className="flex flex-col gap-8">
-            <section>
+            <section className="report-location">
               <h2 className="text-heading mb-3">Location</h2>
 
               {geo.kind === "locating" && <LoadingState label="Finding your location" />}
@@ -307,13 +283,13 @@ export default function ReportComposerPage() {
               )}
 
               {(needsManualPin || manualPin) && (
-                <div>
+                <div className="report-map-wrap">
                   <p className="text-meta text-ink-muted mb-3">
                     Tap the map where the problem is. Accuracy worse than {MAX_ACCURACY_M} m is
                     not precise enough for a crew to find it.
                   </p>
                   {/* Leaflet is downloaded ONLY at this point. */}
-                  <div className="rounded-2xl overflow-hidden border border-rule">
+                  <div className="report-map rounded-2xl overflow-hidden border border-rule">
                     <MapCanvas
                       center={{ lat: lat ?? 30.9, lng: lng ?? 75.85 }}
                       zoom={17}
@@ -353,6 +329,35 @@ export default function ReportComposerPage() {
               )}
             </section>
 
+            {/* Landmark and description describe the location, so they sit with it; this also
+                keeps the left column short enough for a one-screen layout. */}
+            <section className="report-notes">
+              <div className="flex flex-col gap-4">
+                <label className="flex flex-col gap-1">
+                  <span className="text-meta">Landmark (optional)</span>
+                  <span className="text-meta text-ink-muted">Helps a crew find the exact spot.</span>
+                  <input
+                    {...register("landmark", { onChange: (e) => patch({ landmark: e.target.value }) })}
+                    maxLength={200}
+                    placeholder="Near the bus stop"
+                    className="bg-surface-raised border border-rule px-3 text-body"
+                    style={{ minHeight: "var(--hit-min)", borderRadius: "var(--radius)" }}
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1">
+                  <span className="text-meta">Description (optional)</span>
+                  <textarea
+                    {...register("description", { onChange: (e) => patch({ description: e.target.value }) })}
+                    maxLength={2000}
+                    rows={3}
+                    className="bg-surface-raised border border-rule px-3 py-2 text-body"
+                    style={{ borderRadius: "var(--radius)" }}
+                  />
+                </label>
+              </div>
+            </section>
+
             {/*
               Sticky to the bottom of the viewport on one column, static once
               the layout splits in two. On a phone this section sits below the
@@ -362,7 +367,7 @@ export default function ReportComposerPage() {
               seconds, held one-handed, outdoors.
             */}
             <section
-              className="bg-surface-raised p-6 rounded-3xl border border-rule flex flex-col gap-4 sticky bottom-0 z-10 lg:static lg:mt-auto"
+              className="bg-surface-raised p-6 rounded-3xl report-submit border border-rule flex flex-col gap-4 sticky bottom-0 z-10 lg:static lg:mt-auto"
             >
               {uploadFraction !== null && (
                 <UploadProgress fraction={uploadFraction} />

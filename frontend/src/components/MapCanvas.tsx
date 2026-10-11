@@ -20,6 +20,7 @@ const MapCanvasInner = dynamic(() => import("./map/MapCanvasInner"), {
   ssr: false,
   loading: () => (
     <div
+      data-map-canvas
       className="flex items-center justify-center bg-surface-raised border border-rule"
       style={{ height: 420, borderRadius: "var(--radius)" }}
     >

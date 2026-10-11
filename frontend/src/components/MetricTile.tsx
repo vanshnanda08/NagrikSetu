@@ -61,13 +61,13 @@ export function MetricTile({
       }`}
       style={{ borderRadius: "var(--radius)" }}
     >
-      <h3
+      <h2
         className={`text-heading font-semibold leading-tight ${
           filled ? "text-tile-emph-ink" : "text-ink"
         }`}
       >
         {label}
-      </h3>
+      </h2>
 
       {pending ? (
         <div className="flex-1 flex items-start mt-2">

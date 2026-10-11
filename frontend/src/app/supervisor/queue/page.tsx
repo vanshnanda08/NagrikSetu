@@ -204,7 +204,7 @@ function Board() {
             </p>
           )}
 
-          <ol className="mt-3 list-none p-0 border-t border-rule">
+          <ol key={tab} className="mt-3 list-none p-0 border-t border-rule">
             {rows.map((b) => (
               <Row
                 key={b.row.id}
