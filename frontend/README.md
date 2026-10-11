@@ -1,6 +1,12 @@
 # NagrikSetu frontend
 
-Next.js 16 (App Router), React 19, Tailwind v4. Delivered in phase 4.
+Next.js 16 (App Router), React 19, Tailwind v4.
+
+**Status.** Built across phases 4, 6 and 7 (public screens and report composer;
+citizen verification and notifications; supervisor tools and the live dashboard),
+then refreshed on 2026-10-11: NagrikSetu branding, a glass theme, a one-screen
+desktop layout and accessibility fixes. Nothing from phases 8 and 9 exists here
+yet. Every screen in the plan up to phase 7 is built and passes the route sweep.
 
 ## Running
 
@@ -27,6 +33,32 @@ sends a placeholder URL and everything else works. See `.env.example`.
 **Restart `npm run start` after `npm run build`.** A stale server serves old
 chunks and the failure presents as an application bug (DD-027 records the
 equivalent trap on the Maven side).
+
+## Layout and theme
+
+- **`src/app/liquid-glass.css`** holds the whole glass theme and the layout rules
+  that make every page fit the window. The palette comes from the logo: navy
+  (`--accent-solid`), orange for the wordmark and the live badge only, and sky
+  blue. Status colours are untouched; colour still encodes status and nothing
+  else.
+- **Fit to screen.** At 1280 x 600 or larger the app is exactly the window tall.
+  The page card fills what is left; lists, timelines and the dashboard detail
+  panel scroll inside themselves, and anything unexpected makes the card scroll,
+  so content is never clipped. Below that size, and on phones, the normal
+  flowing layout applies. The rules key off class names (`report-form`,
+  `detail-grid`, `data-map-canvas`), never child positions, so adding an element
+  to a page cannot silently move something else.
+- **`/` redirects to `/dashboard`.** There is no landing page.
+- **`BrandMark.tsx`** is the logo; its colours switch to the reversed version in
+  dark mode through `--logo-*` tokens. `src/app/icon.svg` is the favicon.
+- The internal name `civictrack` is kept in cookie names, storage keys and API
+  config because the backend shares them.
+
+Checked on 2026-10-11: all pages at four window sizes in both themes, keyboard
+focus, the sign-in dialog, form validation, photo upload, filters and paging, and
+an axe scan with no findings on the pages covered. Known and existing: map marker
+touch targets are under 24px, and controls are 40px high (not 48px) on windows of
+1280px or wider.
 
 ## Things that are load-bearing
 
