@@ -24,6 +24,11 @@ Restart the frontend after building so it serves matching chunks.
 | `uiwalk.mjs` | Exact actions offered at those five states, successful transition responses and no browser runtime errors. |
 | `sweep.mjs` | Runtime and unexpected HTTP errors on routes through phase 7, anonymous and as CITIZEN, STAFF, SUPERVISOR and ADMIN. Includes notifications, verification, assignment, review and split/merge screens. Deliberate 404s are narrowly allowed; missing Cloudinary photos must render their fallback. |
 
+Last run on 2026-10-11, after the frontend refresh: all four pass against the
+local scratch database (the route sweep reports 0 failing route checks; `/` now
+redirects to `/dashboard`). The lifecycle scripts create demo issues as they
+run, so expect the ticket numbers to climb.
+
 All four scripts exit nonzero on failed checks. The CI verification job runs
 them against a fresh PostGIS service and gates Render deployment. It uses
 `demo,seed`, which disables scheduled writers while the harness mutates its

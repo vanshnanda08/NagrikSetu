@@ -16,16 +16,21 @@ dashboard publishes the resulting numbers without a login.
 **Phases 0–7 implemented; deployment activation checks remain.** Month one (weeks 1–4) plus citizen verification
 (week 5) and supervisor moderation with the full live dashboard (week 6) are
 built and tested. Evaluation (week 7) and anti-abuse and the write-up (week 8)
-are next.
+are next, and have not been started.
+
+Outside the numbered phases, the frontend was reworked on 2026-10-11: it is now
+branded **NagrikSetu**, has a glass-style theme in light and dark, fits a
+desktop window without scrolling the page, and opens on the dashboard. It was
+verified locally (see the end of this file).
 
 | | |
 |---|---|
-| Frontend | https://civic-track-six.vercel.app |
+| Frontend | https://civic-track-six.vercel.app (deployed from `main` by Vercel; whether the live site already has the latest redesign has not been checked) |
 | API | https://civictrack-api.onrender.com |
 | API docs (Swagger) | https://civictrack-api.onrender.com/swagger-ui/index.html |
 | Backend tests | **224** passing, against real PostGIS via Testcontainers |
 | Frontend tests | **68** passing, plus lint, typecheck and production build in CI |
-| CI | Green on `main` (GitHub Actions) |
+| CI | GitHub Actions: backend suite, frontend lint/typecheck/tests/build, then the API/browser verification job before the deploy hook. It was last confirmed green before 2026-10-07; runs since then have not been checked from this environment |
 | Deployed corpus | 113 issues / 254 reports in the verified backup taken 2026-10-07; counts change with usage |
 
 > The API runs on Render's free tier and sleeps after 15 minutes idle. The
@@ -34,22 +39,25 @@ are next.
 
 ### Done
 
+✅ done · 🟡 implemented, remote checks pending · ⏳ not started
+
 | Phase | Deliverable | Status |
 |---|---|---|
 | 1 | Flyway schema, PostGIS wired, health check, `GeoFactory`, ward-containment canary | ✅ done |
 | 2 | Clustering engine: candidate query, accuracy-weighted centroid, adaptive radius, extent cap, advisory lock, post-lock re-read, concurrency test; seed corpus with ground-truth labels | ✅ done |
 | 3 | State machine and `TransitionPolicy`, status history, staff queue, SLA clock, escalation ladder, ShedLock sweep, priority ageing, JWT auth and RBAC | ✅ done |
 | 4 | Public read API; Next.js frontend: report composer, map, issue detail, **cluster inspector**, staff queue and work view, public dashboard, auth with httpOnly refresh cookie | ✅ done |
-| 5 | Deployment: Docker image with CDS, Supabase, Render, Vercel, GitHub Actions CI, keep-alive, backup with a tested restore, Swagger UI, Cloudinary photo upload and nightly orphan sweep | Implemented; remote activation checks pending |
+| 5 | Deployment: Docker image with CDS, Supabase, Render, Vercel, GitHub Actions CI, keep-alive, backup with a tested restore, Swagger UI, Cloudinary photo upload and nightly orphan sweep | 🟡 Implemented; remote activation checks pending |
 | 6 | Citizen verification: quorum, one vote per citizen per fix, timeout sweep, auto-close, reopen on rejection, `/me/verify`, notification centre, resolved-without-verification rate per department | ✅ done |
 | 7 | Supervisor tools (assignment board, review queue, split/merge with full recomputation and a permanent log, recategorise), full dashboard aggregates behind expandable headings, SSE live updates | ✅ done |
+| UI | Frontend refresh (not a numbered phase): NagrikSetu branding and logo, glass theme with a navy / orange / sky palette, one-screen desktop layout for every page, root redirect to the dashboard, accessibility fixes | ✅ done, verified locally 2026-10-11 |
 
 ### Next
 
-| Phase | Deliverable |
-|---|---|
-| 8 | Evaluation: clustering precision/recall/F1 against the ground-truth labels, merge-radius sweep, latency vs. scale, extent-cap ablation |
-| 9 | Rate limiting, anti-abuse, demo scenario, paper; then the remaining blueprint screens (system screens, reassign ward, audit log, profile, ward detail, department analytics) |
+| Phase | Deliverable | Status |
+|---|---|---|
+| 8 | Evaluation: clustering precision/recall/F1 against the ground-truth labels, merge-radius sweep, latency vs. scale, extent-cap ablation | ⏳ not started. Groundwork only: `backend/ground_truth_labels.csv` and the reproducible seed corpus |
+| 9 | Rate limiting, anti-abuse, demo scenario, paper; then the remaining blueprint screens (system screens, reassign ward, audit log, profile, ward detail, department analytics) | ⏳ not started. No rate limiting exists yet (`AuthController` and `SecurityConfig` both note it as a later phase) |
 
 ## Features
 
@@ -87,6 +95,10 @@ are next.
   colours checked for colour-blind separation, every chart with a table view.
 - **Accessible status display.** Every status is encoded by colour, shape and
   word, never colour alone. Light and dark themes.
+- **One-screen desktop layout.** On a window of 1280 x 600 or larger the page
+  never scrolls: the header stays, tiles and maps take the available height,
+  and only long content (the issue list, a timeline) scrolls inside its own
+  panel. Smaller windows and phones use the normal flowing layout.
 
 ## Tech stack
 
@@ -106,6 +118,12 @@ frontend/    Next.js 16 App Router, Tailwind v4
 tools/       Harnesses that check the running server (contract, transitions, UI, runtime errors)
 scripts/     Database backup, restore and remote seeding
 ```
+
+The product is called **NagrikSetu**. The name `civictrack` is kept on purpose
+in the Java package, Spring config keys, cookie and storage keys, the Render API
+hostname and the seeded `@civictrack.example` accounts: they are shared between
+the backend, the deployment and the browser, and renaming them would break
+logins and the API contract.
 
 The backend is packaged **by feature, not by layer**:
 `com.civictrack.{report, clustering, issue, sla, verification, user, department,
@@ -153,7 +171,7 @@ cd backend && mvn spring-boot:run \
   -Dspring-boot.run.arguments="--civictrack.demo.staff-password=demo1234 \
                                --civictrack.cors.allowed-origins=http://localhost:3000"
 
-cd frontend && npm install && npm run dev     # http://localhost:3000
+cd frontend && npm install && npm run dev     # http://localhost:3000 (/ redirects to /dashboard)
 ```
 
 Flyway applies the schema on first boot. Verify:
@@ -350,4 +368,15 @@ build. Expanded API field-contract checks and the lifecycle browser walk pass;
 135 route checks pass across anonymous, citizen, staff, supervisor and admin
 sessions. The harnesses now fail on mismatches and unexpected HTTP/runtime
 errors, and CI includes them before the Render deploy hook. These CI changes
-have been validated locally but have not been pushed or run on GitHub yet.
+were pushed on 2026-10-11; the resulting GitHub Actions runs have not been checked
+from this environment.
+
+Frontend refresh verification (2026-10-11), against a local scratch database: 68
+frontend tests, lint, typecheck and the Webpack production build pass; the API
+contract check, the transition table, the lifecycle UI walk and the route sweep
+(0 failing route checks) pass. All 17 pages were measured at 1280x600, 1366x700,
+1440x790 and 1920x1080 in light and dark: the window never scrolls and there are
+no runtime errors. An axe accessibility scan reports no issues on the pages it
+covered, apart from the map markers, whose touch targets are under 24px (an
+existing Leaflet marker limitation). On windows of 1280px or wider, controls are
+40px high rather than 48px.
