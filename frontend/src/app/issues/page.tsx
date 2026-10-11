@@ -111,7 +111,9 @@ function IssueIndexInner() {
 
           {/* u-stagger walks the rows in 28ms apart, capped so a full page does
               not make the last row wait. --i is the row's index. */}
-          <div className="mt-2 border-t border-rule u-stagger">
+          {/* Keyed by the query so a new page or filter starts at the top of the list,
+              which is now its own scroll container on a desktop window. */}
+          <div key={params.toString()} className="mt-2 border-t border-rule u-stagger">
             {issues.data.items.map((i, idx) => (
               <IssueRow
                 key={i.id}
