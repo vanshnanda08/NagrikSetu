@@ -1,18 +1,36 @@
 # Verification harnesses
 
-Checks that unit tests structurally cannot perform, because they need the real
-server. Each one exists because it caught a bug that a passing test suite had
-endorsed — see DD-035, DD-036 and DD-038.
+Run against a **local, seeded scratch database**, with the backend on `:8080`
+using the `demo` profile and `civictrack.demo.staff-password=demo1234`, and the
+frontend on `:3000` pointing to that backend. These scripts mutate issues and
+create a citizen account; they are not production monitoring tools.
 
-Run with both servers up (backend `:8080` on the `demo` profile, frontend
-`:3000`), from a directory with `playwright` installed:
+```bash
+cd tools
+npm ci
+npx playwright install chrome
+npm run contract
+npm run transitions
+npm run uiwalk
+npm run sweep
+```
 
-| Script | What it catches |
+Restart the frontend after building so it serves matching chunks.
+
+| Script | What it checks |
 |---|---|
-| `contract.mjs <path-to-types.ts>` | A TypeScript interface disagreeing with the JSON the endpoint actually returns. TypeScript cannot see this: a fetch response is `any` until something asserts a type, and the assertion can be wrong. |
-| `table.mjs` | A transition the client offers that the server refuses. Walks NEW → ACKNOWLEDGED → ASSIGNED → IN_PROGRESS → PENDING_VERIFICATION through the API and asserts no step 4xxs. |
-| `uiwalk.mjs` | The wrong action rendered for a status. Walks one issue through all five states in a browser and prints the action offered at each. |
-| `sweep.mjs` | Runtime errors on any route, signed out and signed in, including deliberate 404 routes and `NaN`/`undefined` leaking into rendered text. |
+| `contract.mjs <path-to-types.ts>` | Required and unexpected JSON fields, including phase 6 verification/notifications and phase 7 dashboard, review and assignment contracts. HTTP errors and missing required fixtures fail. This checks field names, not field value types. |
+| `table.mjs` | NEW → ACKNOWLEDGED → ASSIGNED → IN_PROGRESS → PENDING_VERIFICATION through the API, asserting successful responses and resulting states. |
+| `uiwalk.mjs` | Exact actions offered at those five states, successful transition responses and no browser runtime errors. |
+| `sweep.mjs` | Runtime and unexpected HTTP errors on routes through phase 7, anonymous and as CITIZEN, STAFF, SUPERVISOR and ADMIN. Includes notifications, verification, assignment, review and split/merge screens. Deliberate 404s are narrowly allowed; missing Cloudinary photos must render their fallback. |
 
-These belong in CI in phase 5. Every failure they catch is invisible until
-somebody opens the right page in the right state.
+All four scripts exit nonzero on failed checks. The CI verification job runs
+them against a fresh PostGIS service and gates Render deployment. It uses
+`demo,seed`, which disables scheduled writers while the harness mutates its
+fixtures. Browser checks cover routes and lifecycle actions; the backend suite
+checks vote/quorum, split/merge, assignment guards and SSE behavior.
+
+If a local corpus has no usable NEW Roads issues left, the lifecycle scripts
+try CLOSED Roads locations and verify the resulting issue is actually NEW.
+They fail clearly if another active cluster absorbs every attempted report;
+reseed a scratch database in that case. They never reset a database themselves.

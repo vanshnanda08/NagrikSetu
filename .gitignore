@@ -6,6 +6,7 @@ backend/target/
 
 # Node / Next.js
 frontend/node_modules/
+tools/node_modules/
 frontend/.next/
 frontend/out/
 frontend/.env*.local

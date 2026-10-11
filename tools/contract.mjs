@@ -6,7 +6,7 @@
  * until something asserts otherwise.
  */
 import fs from 'node:fs';
-const API = 'http://localhost:8080/api/v1';
+import { json, login } from './http.mjs';
 const src = fs.readFileSync(process.argv[2], 'utf8');
 
 function keysOf(iface) {
@@ -18,17 +18,17 @@ function keysOf(iface) {
   return { required, optional, all: new Set([...required, ...optional]) };
 }
 
-const login = async (e) => (await (await fetch(`${API}/auth/login`, { method:'POST',
-  headers:{'Content-Type':'application/json'},
-  body: JSON.stringify({email:e,password:'demo1234'})})).json());
 const sup = await login('head.roads@civictrack.example');
 const citizenTok = sup; // any authenticated principal for /me/reports shape
 
-const j = async (path, tok) => (await fetch(API+path, tok ? { headers:{Authorization:`Bearer ${tok.accessToken}`}} : undefined)).json();
+const j = (path, token) => json(path, { token });
 
 const page = await j('/public/issues?limit=1');
 const issue = page.items[0];
 const staffQueue = await j('/staff/queue?limit=1', sup);
+const board = await j('/supervisor/queue?tab=all&limit=1', sup);
+const review = await j('/supervisor/review', sup);
+const metrics = await j('/dashboard/metrics');
 
 const checks = [
   ['PublicIssuePage', page],
@@ -42,14 +42,27 @@ const checks = [
   ['MyReportsPage',   await j('/me/reports?limit=1', citizenTok)],
   ['QueueRow',        staffQueue[0]],
   ['StaffIssue',      await j(`/issues/${staffQueue[0]?.id ?? issue.id}`, sup)],
+  ['NotificationPage', await j('/me/notifications', sup)],
+  ['VerificationView', await j(`/me/verifications/${issue.id}`, sup)],
+  ['DepartmentAccountability', (await j('/dashboard/departments'))[0]],
+  ['DashboardMetrics', metrics],
+  ['ReviewPage', review],
+  ...(review.items.length ? [['ReviewItem', review.items[0]]] : []),
+  ['BoardRow', board[0]],
+  ['Median', metrics.resolutionTime?.overall],
+  ['AgeBucket', metrics.backlogAge?.[0]],
+  ['DayCount', metrics.reportedVsResolved?.[0]],
+  ['ComplianceDay', metrics.slaCompliance?.trend[0]],
+  ['TopCluster', metrics.topClusters?.[0]],
+  ...((await j('/dashboard/breaching')).map(value => ['BreachingIssue', value])),
 ];
 
 let problems = 0;
 for (const [label, value, ifaceName] of checks) {
   const iface = ifaceName ?? label;
   const declared = keysOf(iface);
-  if (!declared) { console.log(`  ?  ${label}: no interface named ${iface}`); continue; }
-  if (value == null) { console.log(`  ?  ${label}: endpoint returned nothing to compare`); continue; }
+  if (!declared) { problems++; console.log(`  FAIL  ${label}: no interface named ${iface}`); continue; }
+  if (value == null) { problems++; console.log(`  FAIL  ${label}: seed fixture missing`); continue; }
   const actual = new Set(Object.keys(value));
   const missing = [...declared.required].filter(k => !actual.has(k));
   const extra   = [...actual].filter(k => !declared.all.has(k));
@@ -72,3 +85,4 @@ if (hist) {
   else console.log(`  ok        PublicHistoryEntry  (${d.all.size} fields)`);
 }
 console.log(problems ? `\n${problems} mismatch(es)` : '\nno mismatches');
+process.exitCode = problems ? 1 : 0;
