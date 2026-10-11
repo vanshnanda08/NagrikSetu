@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Activity, ChevronDown } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { MetricTile } from "@/components/MetricTile";
 import { ErrorState } from "@/components/ErrorState";
@@ -54,85 +55,97 @@ export default function DashboardPage() {
   const stream = useDashboardStream();
 
   return (
-    <PageShell wide>
-      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+    <PageShell wide className="liquid-dashboard">
+      <div className="dashboard-greeting">
         <h1 className="text-display">Accountability dashboard</h1>
         <LiveBadge state={stream} />
       </div>
 
-      {summary.isPending && <SkeletonTileGrid label="Loading the dashboard" />}
+      <div className="dashboard-layout">
+        <div className="dashboard-metrics">
+          {summary.isPending && <SkeletonTileGrid label="Loading the dashboard" />}
 
-      {summary.isError && (
-        <ErrorState
-          action="Loading the dashboard"
-          problem={(summary.error as ApiError)?.problem}
-          onRetry={() => void summary.refetch()}
-        />
-      )}
+          {summary.isError && (
+            <ErrorState
+              action="Loading the dashboard"
+              problem={(summary.error as ApiError)?.problem}
+              onRetry={() => void summary.refetch()}
+            />
+          )}
 
-      {summary.data && (
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 u-stagger">
-          <MetricTile
-            label="Currently overdue"
-            emphasis
-            {...(summary.data.overdueCount === null
-              ? { pending: "This figure could not be computed just now. It will return on the next refresh." }
-              : {
-                  value: summary.data.overdueCount.toLocaleString("en-IN"),
-                  trend: "Breached and still on the clock",
-                })}
-          />
-          <MetricTile label="Total resolved to date" value={summary.data.totalResolved.toLocaleString("en-IN")} />
-          <MetricTile
-            label="Ward holding the most overdue work"
-            {...(summary.data.topOverdueWard
-              ? { value: String(summary.data.topOverdueWard.count), unit: `in ${summary.data.topOverdueWard.name}` }
-              : { pending: "Nothing is overdue in any ward." })}
-          />
-          <MetricTile
-            label="Department holding the most overdue work"
-            {...(summary.data.topOverdueDepartment
-              ? {
-                  value: String(summary.data.topOverdueDepartment.count),
-                  unit: `in ${summary.data.topOverdueDepartment.name}`,
-                }
-              : { pending: "No department is holding overdue work." })}
-          />
+          {summary.data && (
+            <div className="dashboard-metric-grid u-stagger">
+              <MetricTile
+                label="Currently overdue"
+                emphasis
+                {...(summary.data.overdueCount === null
+                  ? { pending: "This figure could not be computed just now. It will return on the next refresh." }
+                  : {
+                      value: summary.data.overdueCount.toLocaleString("en-IN"),
+                      trend: "Breached and still on the clock",
+                    })}
+              />
+              <MetricTile label="Total resolved to date" value={summary.data.totalResolved.toLocaleString("en-IN")} />
+              <MetricTile
+                label="Ward holding the most overdue work"
+                {...(summary.data.topOverdueWard
+                  ? { value: String(summary.data.topOverdueWard.count), unit: `in ${summary.data.topOverdueWard.name}` }
+                  : { pending: "Nothing is overdue in any ward." })}
+              />
+              <MetricTile
+                label="Department holding the most overdue work"
+                {...(summary.data.topOverdueDepartment
+                  ? {
+                      value: String(summary.data.topOverdueDepartment.count),
+                      unit: `in ${summary.data.topOverdueDepartment.name}`,
+                    }
+                  : { pending: "No department is holding overdue work." })}
+              />
+            </div>
+          )}
+
+          <div className="dashboard-metric-grid u-stagger">
+            {metrics.data && <HeadlineAggregates m={metrics.data} />}
+            <DepartmentRecord tilesOnly />
+          </div>
         </div>
-      )}
+        <section className="dashboard-detail glass" aria-labelledby="dashboard-detail-heading">
+          <div className="dashboard-detail-intro">
+            <span className="dashboard-detail-icon glass-thin"><Activity size={24} aria-hidden="true" /></span>
+            <div>
+              <p className="text-meta text-ink-muted">City overview</p>
+              <h2 id="dashboard-detail-heading">Every report. A clearer picture.</h2>
+            </div>
+          </div>
+          <p className="dashboard-detail-hint text-dense text-ink-muted">Choose a heading to explore its detailed figures.</p>
+          <DashboardSection title="Currently breaching">
+            <Breaching />
+          </DashboardSection>
 
-      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 u-stagger">
-        {metrics.data && <HeadlineAggregates m={metrics.data} />}
-        <DepartmentRecord tilesOnly />
+          {metrics.isPending && <SkeletonTileGrid tiles={2} label="Loading the figures" />}
+          {metrics.isError && (
+            <ErrorState
+              action="Loading the dashboard figures"
+              problem={(metrics.error as ApiError)?.problem}
+              onRetry={() => void metrics.refetch()}
+            />
+          )}
+          {metrics.data && <Aggregates m={metrics.data} />}
+
+          {/* Outside the summary's block: its own request, its own failure. */}
+          <DashboardSection title="Did the fixes hold?">
+            <DepartmentRecord />
+          </DashboardSection>
+
+          {metrics.data && (
+            <p className="mt-8 text-meta text-ink-muted">
+              Figures generated {absoluteDateTime(metrics.data.generatedAt)}. Days are calendar days in
+              local time. Resolution time runs from the first report to resolution; a fix counts as on time
+              when the department claimed it before the deadline.
+            </p>
+          )}
+        </section>
       </div>
-
-      <p className="mt-8 mb-3 text-dense text-ink-muted">Choose a heading to explore its detailed figures.</p>
-      <DashboardSection title="Currently breaching">
-        <Breaching />
-      </DashboardSection>
-
-      {metrics.isPending && <SkeletonTileGrid tiles={2} label="Loading the figures" />}
-      {metrics.isError && (
-        <ErrorState
-          action="Loading the dashboard figures"
-          problem={(metrics.error as ApiError)?.problem}
-          onRetry={() => void metrics.refetch()}
-        />
-      )}
-      {metrics.data && <Aggregates m={metrics.data} />}
-
-      {/* Outside the summary's block: its own request, its own failure. */}
-      <DashboardSection title="Did the fixes hold?">
-        <DepartmentRecord />
-      </DashboardSection>
-
-      {metrics.data && (
-        <p className="mt-8 text-meta text-ink-muted">
-          Figures generated {absoluteDateTime(metrics.data.generatedAt)}. Days are calendar days in
-          Ludhiana. Resolution time runs from the first report to resolution; a fix counts as on time
-          when the department claimed it before the deadline.
-        </p>
-      )}
     </PageShell>
   );
 }
@@ -140,12 +153,10 @@ export default function DashboardPage() {
 /** Native disclosure controls support keyboard navigation and one open section at a time. */
 function DashboardSection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <details name="dashboard-sections" className="group border-b border-rule">
+    <details name="dashboard-sections" className="dashboard-section group border-b border-rule">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-ink hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-4 [&::-webkit-details-marker]:hidden">
         <h2 className="text-heading">{title}</h2>
-        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" className="shrink-0 group-open:rotate-180">
-          <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.5" />
-        </svg>
+        <ChevronDown aria-hidden="true" size={20} className="shrink-0 transition-transform group-open:rotate-180" />
       </summary>
       <div className="pb-6">{children}</div>
     </details>
@@ -156,7 +167,7 @@ function LiveBadge({ state }: { state: StreamState }) {
   if (state === "unsupported") return null;
   const live = state === "live";
   return (
-    <span className="text-meta text-ink-muted inline-flex items-center gap-2" role="status">
+    <span className={`dashboard-live glass-thin text-meta inline-flex items-center gap-2 ${live ? "is-live" : ""}`} role="status">
       <span
         aria-hidden="true"
         className="inline-block rounded-full"

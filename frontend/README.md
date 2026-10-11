@@ -1,4 +1,4 @@
-# CivicTrack frontend
+# NagrikSetu frontend
 
 Next.js 16 (App Router), React 19, Tailwind v4. Delivered in phase 4.
 
@@ -20,7 +20,7 @@ sends a placeholder URL and everything else works. See `.env.example`.
 
 | | |
 |---|---|
-| `npm run test` | 53 unit tests over the logic that mirrors a server rule |
+| `npm run test` | 68 unit tests over validation, server rules, charts and uploads |
 | `npm run lint` | includes the rule confining Leaflet to one module |
 | `npm run build` | production build |
 

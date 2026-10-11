@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/Button";
 import { DeadlineCountdown } from "@/components/DeadlineCountdown";
 import { EmptyState } from "@/components/EmptyState";
@@ -63,7 +64,7 @@ export default function StyleguidePage() {
   const [category, setCategory] = useState<string>("POTHOLE");
 
   return (
-    <main className="mx-auto px-4 py-8" style={{ maxWidth: 1100 }}>
+    <PageShell wide>
       <h1 className="text-display">Styleguide</h1>
       <p className="mt-2 text-body" style={{ maxWidth: "var(--measure-prose)" }}>
         Tokens from blueprint §1.3–1.5, applied to the components that ship.
@@ -362,6 +363,6 @@ export default function StyleguidePage() {
         commented blocks with the same structure. Swapping one in changes the whole interface;
         the font is a one-line change in <code className="font-mono">src/app/layout.tsx</code>.
       </p>
-    </main>
+    </PageShell>
   );
 }

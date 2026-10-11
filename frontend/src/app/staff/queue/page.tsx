@@ -81,7 +81,7 @@ function StaffQueueInner() {
         Most urgent first: priority score, then deadline.
       </p>
 
-      <div className="mt-4 flex flex-wrap gap-1 border-b border-rule">
+      <div className="segmented-control mt-4 flex flex-wrap gap-1 border-b border-rule">
         {TABS.map((t) => (
           <button
             key={t.value}

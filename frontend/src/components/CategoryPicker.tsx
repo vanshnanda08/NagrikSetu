@@ -51,7 +51,7 @@ export function CategoryPicker({
               // used outdoors, one-handed, often on a screen that is not
               // clean, and the border going from 1px to 2px is not much to
               // notice under those conditions.
-              className="flex items-center gap-3 px-3 py-2 cursor-pointer bg-surface-raised
+              className="category-option flex items-center gap-3 px-3 py-2 cursor-pointer bg-surface-raised
                          u-press transition-[border-color,background-color]
                          duration-[var(--dur-fast)] hover:bg-surface
                          has-[:focus-visible]:outline has-[:focus-visible]:outline-2

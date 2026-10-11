@@ -1,0 +1,335 @@
+/* Shared liquid-glass presentation. Domain status colors, data and behavior
+   remain owned by the existing components. */
+html:root {
+  --font-stack-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, sans-serif;
+  --font-stack-serif: var(--font-stack-sans);
+  --ink: #0b2540;
+  --ink-muted: #46607a;
+  --ink-faint: #4f6578;
+  --accent-solid: #0b3b5e;
+  --logo-pin: #0b3b5e;
+  --logo-bridge: #fff;
+  --brand-orange: #c85a0a;
+  --accent-solid-ink: #fff;
+  --brand-primary: var(--accent-solid);
+  --brand-dark: var(--accent-solid);
+  --brand-ink: #fff;
+  --brand-dark-ink: #fff;
+  --radius: 28px;
+  --rule: rgba(11, 59, 94, .16);
+  --rule-strong: #9db5c9;
+  --surface: #eaf3fa;
+  --surface-raised: #f4f8fc;
+  --glass-fill: rgba(255, 255, 255, .45);
+  --glass-thin-fill: rgba(255, 255, 255, .6);
+  --glass-edge: rgba(255, 255, 255, .6);
+  --glass-solid: #f8fbff;
+  --glass-shadow: inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(255,255,255,.15), 0 8px 32px rgba(15,23,42,.08);
+  --glass-highlight: rgba(255,255,255,.4);
+}
+.liquid-app {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  font-family: var(--font-stack-sans);
+  color: var(--ink);
+  background: radial-gradient(ellipse at 3% 10%, #c3e2f6 0, transparent 46%), radial-gradient(ellipse at 93% 30%, #fde4cd 0, transparent 49%), radial-gradient(ellipse at 32% 92%, #cfe8f3 0, transparent 48%), #eaf3fa;
+  min-height: 100svh;
+}
+.liquid-app::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
+}
+html.dark {
+  /* Navy on a navy page disappears; the dark accent is a lighter slate. */
+  --accent-solid: #2b6a99;
+  --logo-pin: #fff;
+  --logo-bridge: #0b3b5e;
+  --brand-orange: #f59a4b;
+  --ink: #eef5fb;
+  --ink-muted: #b9cbdb;
+  --ink-faint: #acc0d2;
+  --surface: #0d1f33;
+  --surface-raised: #1a3047;
+  --rule: rgba(255,255,255,.15);
+  --rule-strong: #5f7a93;
+  --glass-fill: rgba(16,40,64,.45);
+  --glass-thin-fill: rgba(16,40,64,.65);
+  --glass-edge: rgba(255,255,255,.12);
+  --glass-solid: #17304a;
+  --glass-highlight: rgba(255,255,255,.12);
+  --glass-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(255,255,255,.03), 0 8px 32px rgba(0,0,0,.2);
+}
+.dark .liquid-app {
+  background: radial-gradient(ellipse at 0% 0%, #0f4a72 0, transparent 48%), radial-gradient(ellipse at 95% 35%, #4a2e1a 0, transparent 50%), radial-gradient(ellipse at 30% 100%, #0d3d52 0, transparent 50%), #091a2c;
+}
+:is(.liquid-app, .ct-dialog) :is(.glass, .glass-thin, .metric-tile:not(.bg-tile-emph-bg), .dashboard-metric-grid > section, .site-logo, .site-links, .site-actions > a, .site-actions > button) {
+  position: relative;
+  isolation: isolate;
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 28px;
+}
+:is(.liquid-app, .ct-dialog) :is(.glass, .glass-thin, .metric-tile:not(.bg-tile-emph-bg), .dashboard-metric-grid > section, .site-logo, .site-links, .site-actions > a, .site-actions > button)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--glass-highlight), transparent 42%);
+  pointer-events: none;
+  z-index: -1;
+}
+:is(.liquid-app, .ct-dialog) :is(.glass-thin, .site-logo, .site-links, .site-actions > a, .site-actions > button) { background: var(--glass-thin-fill); border-radius: 999px; }
+.liquid-app > header { position: relative; width: 100%; border: 0; background: transparent; padding: 28px 32px 0; }
+.liquid-app .site-header-inner { display: flex; flex-direction: row; align-items: center; gap: 24px; height: auto; padding: 0; overflow: visible; }
+.liquid-app .site-brand { flex-shrink: 0; }
+.liquid-app .site-logo { min-height: 64px; padding: 10px 20px 10px 12px; }
+.liquid-app .site-logo .text-heading { font-size: 23px; font-weight: 600; letter-spacing: -.8px; }
+.liquid-app .site-logo > span:first-child { border-radius: 50%; width: 40px; height: 40px; }
+.liquid-app .site-brand > button { display: none; }
+.liquid-app #site-nav { margin: 0; display: block; min-width: 0; }
+.liquid-app #site-nav > div { display: flex; flex-direction: row; align-items: center; visibility: visible; gap: 20px; overflow: visible; }
+.liquid-app #site-nav > div > p { display: none; }
+.liquid-app .site-links { display: flex; flex-direction: row; gap: 2px; padding: 5px; width: max-content; max-width: 100%; margin: auto; overflow-x: auto; }
+.liquid-app .site-links a { white-space: nowrap; width: auto; padding: 0 19px; min-height: 48px; border-radius: 999px; font-size: 14px; }
+.liquid-app .site-links a svg { display: none; }
+.liquid-app .site-links a[aria-current="page"] { box-shadow: 0 3px 8px rgba(15,23,42,.16), inset 0 1px 0 rgba(255,255,255,.15); }
+.liquid-app .site-actions { flex-direction: row; margin: 0; padding: 0; gap: 8px; flex-shrink: 0; }
+.liquid-app .site-actions > :is(a, button) { width: 48px; height: 48px; justify-content: center; padding: 0; color: var(--ink); }
+/* Existing text remains the accessible name of these compact controls. */
+.liquid-app .site-actions > :is(a, button) > span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.liquid-dashboard > main { max-width: 1800px !important; padding: 38px 32px 40px; }
+.dashboard-greeting { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 0 0 30px; }
+.dashboard-greeting h1 { font-size: clamp(28px, 3vw, 42px); line-height: 1.15; letter-spacing: -1.6px; font-weight: 500; }
+.liquid-app .dashboard-live { padding: 10px 15px; font-size: 12px; max-width: 360px; color: var(--ink-muted); }
+.liquid-app .dashboard-live.is-live { --ink: #2e1503; --ink-muted: #2e1503; color: #2e1503; background: #f8a45c; border-color: rgba(255,255,255,.55); }
+.dashboard-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 22px; align-items: start; }
+.dashboard-metrics { display: grid; gap: 16px; min-width: 0; }
+.dashboard-metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.liquid-app .dashboard-metric-grid > section { padding: 22px; min-height: 175px; }
+.liquid-app .dashboard-metric-grid h3 { font-size: 15px; font-weight: 500; line-height: 1.35; letter-spacing: -.2px; }
+.liquid-app .dashboard-metric-grid > section:first-child.bg-tile-emph-bg { background: var(--accent-solid); color: var(--accent-solid-ink); }
+.dark .liquid-app .dashboard-metric-grid > section:first-child.bg-tile-emph-bg { border-color: rgba(255,255,255,.35); box-shadow: var(--glass-shadow), 0 10px 30px rgba(43,106,153,.5); }
+.liquid-app .dashboard-metric-grid > section:first-child.bg-tile-emph-bg :is(h3, .text-tile-emph-ink) { color: #fff; }
+.liquid-app .dashboard-metric-grid > section:first-child.bg-tile-emph-bg .text-tile-emph-ink-muted { color: #cfe0ee; }
+.liquid-app .dashboard-metric-grid > section.border-dashed { border-style: dashed; border-color: var(--ink-faint); }
+.liquid-app .dashboard-metric-grid .text-meta { font-size: 12px; line-height: 1.5; }
+.liquid-app .dashboard-metric-grid p.flex { flex-wrap: wrap; }
+.liquid-app .dashboard-metric-grid .text-ink-muted { color: var(--ink-muted); }
+.dashboard-detail { min-width: 0; padding: 30px; min-height: 770px; }
+.dashboard-detail-intro { display: flex; align-items: center; gap: 16px; padding: 6px 0 30px; }
+.dashboard-detail-intro h2 { font-size: clamp(22px, 2.2vw, 30px); line-height: 1.25; font-weight: 500; letter-spacing: -.9px; margin-top: 6px; }
+.dashboard-detail-icon { display: grid; place-items: center; width: 56px; height: 56px; flex-shrink: 0; }
+.dashboard-detail-hint { padding-bottom: 18px; }
+.liquid-app .dashboard-section > summary { border-radius: 16px; padding: 23px 8px; transition: background 200ms ease-out; }
+.liquid-app .dashboard-section > summary h2 { font-size: 17px; font-weight: 500; letter-spacing: -.3px; }
+.liquid-app .dashboard-section[open] > summary { margin-bottom: 12px; }
+.liquid-app .dashboard-section > div { padding-inline: 8px; }
+.liquid-app :is(button, a) { transition: transform 200ms ease-out, box-shadow 200ms ease-out, background-color 200ms ease-out; }
+.liquid-app :is(button, .site-logo, .site-actions > a):hover { transform: translateY(-1px); box-shadow: var(--glass-shadow), 0 5px 16px rgba(15,23,42,.1); }
+.liquid-app :is(button, a):active { transform: scale(.97); }
+.liquid-app :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@media (max-width: 1279px) {
+  .liquid-app .site-header-inner { flex-wrap: wrap; gap: 16px; }
+  .liquid-app #site-nav { flex-basis: 100%; }
+  .liquid-app #site-nav > div { gap: 12px; }
+  .liquid-app .site-links { margin-left: 0; }
+  .dashboard-layout { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-detail { min-height: 0; }
+  .dashboard-metrics { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-metric-grid { align-content: start; }
+  .dashboard-greeting { align-items: start; }
+}
+@media (max-width: 767px) {
+  .liquid-app > header { padding: 18px 16px 0; }
+  .liquid-app .site-logo { min-height: 54px; padding: 7px 18px 7px 8px; }
+  .liquid-app .site-logo .text-heading { font-size: 21px; }
+  .liquid-app #site-nav > div { flex-wrap: wrap; }
+  .liquid-app .site-links { width: 100%; max-width: calc(100vw - 32px); }
+  .liquid-app .site-links a { padding-inline: 17px; }
+  .liquid-app .site-actions { position: absolute; top: 21px; right: 16px; max-width: calc(100% - 215px); overflow-x: auto; border-radius: 999px; }
+  .liquid-app .site-actions > :is(a, button) { width: 42px; min-width: 42px; min-height: 44px !important; height: 44px; }
+  .liquid-app > main { padding: 28px 16px; }
+  .dashboard-greeting { flex-direction: column; gap: 16px; margin-bottom: 24px; }
+  .dashboard-greeting h1 { font-size: 32px; letter-spacing: -1.1px; }
+  .dashboard-layout, .dashboard-metrics, .dashboard-metric-grid { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-detail { padding: 22px 18px; }
+  .dashboard-detail-intro { gap: 12px; padding-bottom: 22px; }
+  .dashboard-detail-intro h2 { font-size: 24px; }
+  .dashboard-detail-icon { width: 44px; height: 44px; }
+  .liquid-app .dashboard-section > summary { padding: 20px 3px; }
+  .liquid-app .dashboard-section > summary h2 { font-size: 16px; }
+  .liquid-app .dashboard-metric-grid > section { min-height: 150px; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :is(.liquid-app, .ct-dialog) :is(.glass, .glass-thin, .metric-tile:not(.bg-tile-emph-bg), .dashboard-metric-grid > section, .site-logo, .site-links, .site-actions > a, .site-actions > button) { background: var(--glass-solid); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :is(.liquid-app, .ct-dialog) :is(.glass, .glass-thin, .metric-tile:not(.bg-tile-emph-bg), .dashboard-metric-grid > section, .site-logo, .site-links, .site-actions > a, .site-actions > button) { background: var(--glass-solid); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .liquid-app::before { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .liquid-app :is(button, a, .u-lift):is(:hover, :active) { transform: none; }
+}
+.liquid-app .site-actions > a > span.min-w-6 {
+  clip-path: none; width: auto; height: auto; min-width: 18px; padding: 0 4px;
+  margin: 0; top: -2px; right: -3px; font-size: 10px; line-height: 18px;
+}
+/* Keep the existing chart's six date labels readable without changing its
+   calculations or keyboard/pointer behavior. Only the chart region scrolls. */
+@media (max-width: 767px) {
+  .liquid-app .dashboard-detail figure { overflow-x: auto; scrollbar-width: thin; }
+  .liquid-app .dashboard-detail figure > div.relative { min-width: 520px; }
+}
+
+/* Shared page surfaces: queues, citizen reports, forms, details and fallbacks. */
+.liquid-app:not(.liquid-dashboard) > .page-main {
+  position: relative;
+  isolation: isolate;
+  flex: 0 1 auto;
+  width: calc(100% - 64px);
+  margin: 36px auto 48px;
+  padding: 36px;
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-edge);
+  border-radius: 28px;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+.liquid-app:not(.liquid-dashboard) > .page-main::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(135deg, var(--glass-highlight), transparent 42%);
+  pointer-events: none; z-index: -1;
+}
+.liquid-app .page-main > :is(h1, section > .text-display) {
+  font-size: clamp(28px, 3vw, 40px); line-height: 1.18;
+  font-weight: 500; letter-spacing: -1.2px;
+}
+:is(.liquid-app, .ct-dialog) .glass-button {
+  border-radius: 999px !important; padding-inline: 22px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 3px 10px rgba(15,23,42,.07);
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out, background 200ms ease-out;
+}
+:is(.liquid-app, .ct-dialog) .glass-button[data-variant="primary"] {
+  background: var(--accent-solid); color: var(--accent-solid-ink); border-color: rgba(255,255,255,.2);
+}
+:is(.liquid-app, .ct-dialog) .glass-button[data-variant="secondary"] {
+  background: var(--glass-thin-fill); color: var(--ink); border-color: var(--rule-strong);
+}
+:is(.liquid-app, .ct-dialog) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) {
+  background: var(--glass-thin-fill); color: var(--ink);
+  border-radius: 16px !important; max-width: 100%;
+  box-shadow: inset 0 1px 2px rgba(15,23,42,.04), 0 1px 0 var(--glass-edge);
+  min-height: 48px; padding-inline: 14px;
+  transition: box-shadow 200ms ease-out, border-color 200ms ease-out;
+}
+:is(.liquid-app, .ct-dialog) select option { background: var(--surface-raised); color: var(--ink); }
+:is(.liquid-app, .ct-dialog) textarea { padding-block: 12px; }
+:is(.liquid-app, .ct-dialog) input::placeholder,
+:is(.liquid-app, .ct-dialog) textarea::placeholder { color: var(--ink-faint); opacity: 1; }
+:is(.liquid-app, .ct-dialog) :is(input[type="checkbox"], input[type="radio"]) { accent-color: var(--brand-primary); }
+.liquid-app .issue-row { margin: 10px 0; padding: 20px; border: 1px solid var(--glass-edge); border-radius: 20px; background: var(--glass-fill); }
+.liquid-app .issue-row:hover { background: var(--glass-thin-fill); box-shadow: var(--glass-shadow); }
+.liquid-app .issue-row > div + div { margin-top: 10px; }
+.liquid-app .feedback-panel { padding: 24px; margin-block: 20px; }
+.liquid-app .category-option { border-radius: 20px !important; background: var(--glass-thin-fill); }
+.liquid-app .category-option:has(input:checked) { background: var(--surface-raised); box-shadow: var(--glass-shadow); }
+.liquid-app .issue-detail-panel { padding: 24px; }
+.liquid-app .page-main > ol > li { padding: 22px 12px; }
+.liquid-app .page-main > ol > li:first-child { border-top: 0; }
+.liquid-app table th, .liquid-app table td { padding-block: 12px; }
+.liquid-app .page-main a.inline-flex { border-radius: 999px; }
+.liquid-app .page-main :is(button, a)[aria-pressed="true"] { background: var(--accent-solid); color: var(--accent-solid-ink); border-radius: 999px; }
+.liquid-app .leaflet-container { border: 1px solid var(--glass-edge); box-shadow: var(--glass-shadow); overflow: hidden; }
+.liquid-app .leaflet-bar { border: 1px solid var(--glass-edge); border-radius: 16px; overflow: hidden; box-shadow: var(--glass-shadow); }
+.liquid-app .leaflet-bar a { background: var(--glass-solid); color: var(--ink); border-color: var(--rule); }
+.liquid-app .leaflet-popup-content-wrapper { background: var(--glass-solid); color: var(--ink); border-radius: 20px; }
+.liquid-app .leaflet-popup-tip { background: var(--glass-solid); }
+/* Map imagery retains its original colors; only controls adopt the theme. */
+.ct-dialog .auth-panel.glass { background: var(--glass-solid); padding: 32px; }
+.ct-dialog::backdrop { background: rgba(15,23,42,.38); backdrop-filter: blur(12px) saturate(140%); }
+.ct-dialog .text-heading { font-size: 28px; line-height: 1.2; letter-spacing: -.8px; }
+.ct-dialog :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.ct-dialog button:active:not(:disabled) { transform: scale(.97); }
+@media (max-width: 1279px) {
+  .liquid-app .site-header-inner { position: relative; }
+  .liquid-app .site-actions { position: absolute; right: 0; top: 8px; max-width: calc(100% - 215px); overflow: visible; }
+  .liquid-app #site-nav { width: 100%; }
+  .liquid-app .site-links { max-width: 100%; }
+}
+@media (max-width: 767px) {
+  .liquid-app:not(.liquid-dashboard) > .page-main { width: calc(100% - 32px); margin: 24px auto; padding: 24px 18px; }
+  .liquid-app .site-actions { top: 3px; right: 0; }
+  .liquid-app .issue-row { padding: 16px 12px; }
+  .liquid-app .issue-row .ml-auto { margin-left: 0; }
+  .liquid-app .page-main :is(.min-w-\[18rem\], .min-w-\[16rem\]) { min-width: 0; flex-basis: 100%; }
+  .liquid-app .page-main .ml-10 { margin-left: 0; }
+  .liquid-app .page-main label { min-width: 0; max-width: 100%; }
+  .liquid-app .category-option { gap: 8px; padding-inline: 9px; }
+  .liquid-app .category-option .text-dense { font-size: 13px; overflow-wrap: anywhere; }
+  .ct-dialog .auth-panel.glass { padding: 24px; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .liquid-app:not(.liquid-dashboard) > .page-main, .liquid-app .issue-row { background: var(--glass-solid); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .liquid-app:not(.liquid-dashboard) > .page-main, .liquid-app .issue-row,
+  :is(.liquid-app, .ct-dialog) :is(input, select, textarea, .category-option, .glass-button[data-variant="secondary"]) {
+    background: var(--glass-solid); backdrop-filter: none; -webkit-backdrop-filter: none;
+  }
+  .ct-dialog::backdrop { backdrop-filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ct-dialog button:active:not(:disabled) { transform: none; }
+}
+.liquid-app .segmented-control {
+  width: fit-content; max-width: 100%; padding: 5px;
+  border: 1px solid var(--glass-edge); border-radius: 999px;
+  background: var(--glass-thin-fill); gap: 4px;
+}
+.liquid-app .segmented-control button {
+  min-height: 44px; padding: 10px 20px; border: 0 !important;
+  margin-bottom: 0 !important; border-radius: 999px;
+}
+.liquid-app .segmented-control button[aria-current="page"] { background: var(--accent-solid); color: var(--accent-solid-ink); box-shadow: 0 3px 8px rgba(15,23,42,.16); }
+@media (max-width: 767px) {
+  .liquid-app .segmented-control { border-radius: 24px; }
+  .liquid-app .segmented-control button { padding-inline: 14px; }
+}
+@media (max-width: 767px) {
+  .liquid-app .site-logo { gap: 8px; padding: 8px 12px 8px 8px; }
+  .liquid-app .site-logo .text-heading { font-size: 18px; }
+  .liquid-app .site-logo > span:first-child { width: 32px; height: 32px; }
+  .liquid-app .site-actions { gap: 4px; max-width: calc(100% - 164px); overflow: visible; }
+  .liquid-app .site-actions > :is(a, button) { width: 44px; min-width: 44px; }
+}
+@media (max-width: 374px) {
+  .liquid-app .site-actions { position: static; max-width: 100%; margin-left: auto; flex-wrap: wrap; }
+}
+/* Keep absolutely positioned accessible captions inside the scrolling table,
+   rather than positioning them against the outer frosted page panel. */
+.liquid-app .overflow-x-auto { position: relative; min-width: 0; max-width: 100%; }
+.liquid-app table .text-ref { white-space: nowrap; }
+
+/* The page panel is already a backdrop root, so blurring inside it only adds cost. */
+.liquid-app:not(.liquid-dashboard) > .page-main :is(.glass, .glass-thin) { backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* The nav scrolls sideways on a phone; fade the right edge so a clipped label reads as "more". */
+@media (max-width: 767px) {
+  .liquid-app .site-links { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); scrollbar-width: none; }
+  .liquid-app .site-links::-webkit-scrollbar { display: none; }
+}
+
+/* NagrikSetu wordmark: navy "Nagrik" in the page ink, orange "Setu". */
+.liquid-app .site-logo > span:first-child { border-radius: 0; }
+.liquid-app .site-logo > span:first-child svg { width: 100%; height: 100%; }
+.site-logo .brand-setu { color: var(--brand-orange); }

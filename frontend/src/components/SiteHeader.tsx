@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSignIn } from "@/lib/signInDialog";
 import { request } from "@/lib/api";
 import { keys } from "@/lib/queries";
+import { BrandMark } from "./BrandMark";
 
 /**
  * The primary navigation.
@@ -245,32 +246,19 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-[500] md:self-start bg-surface-raised border-b md:border-b-0 md:border-r border-rule shrink-0 w-full md:w-[var(--sidebar-width)]">
-      <div className="md:h-screen md:overflow-y-auto flex flex-col p-4 md:p-6">
-        <div className="flex items-center justify-between">
+      <div className="site-header-inner md:h-screen md:overflow-y-auto flex flex-col p-4 md:p-6">
+        <div className="site-brand flex items-center justify-between">
           <Link
             href="/"
             onClick={close}
-            className="text-ink no-underline flex items-center gap-3 px-2"
+            className="site-logo text-ink no-underline flex items-center gap-3 px-2"
           >
-            <span className="w-9 h-9 rounded-xl bg-brand-primary flex items-center justify-center text-brand-ink flex-shrink-0">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
+            <span className="flex items-center justify-center flex-shrink-0">
+              <BrandMark size={36} />
             </span>
-            <span className="text-heading font-semibold tracking-tight">CivicTrack</span>
+            <span className="text-heading font-semibold tracking-tight">
+              Nagrik<span className="brand-setu">Setu</span>
+            </span>
           </Link>
 
           {/* Below md only: the disclosure for everything under this row. */}
@@ -342,13 +330,15 @@ export function SiteHeader() {
           <p className="text-meta text-ink-muted uppercase tracking-wider mb-2 px-4">
             Menu
           </p>
-          <div className="flex flex-col gap-1">{MENU_LINKS.map(renderLink)}</div>
+          <div className="site-links flex flex-col gap-1">{MENU_LINKS.map(renderLink)}</div>
 
-          <div className="flex flex-col gap-1 mt-8 md:mt-auto md:pt-8">
+          <div className="site-actions flex flex-col gap-1 mt-8 md:mt-auto md:pt-8">
             {!initialising && session && (
               <>
                 <Link
                   href="/me/notifications"
+                  aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
+                  title="Notifications"
                   onClick={close}
                   aria-current={notificationsActive ? "page" : undefined}
                   className={`${ROW} ${
@@ -368,6 +358,8 @@ export function SiteHeader() {
                 </Link>
                 <Link
                   href="/me/reports"
+                  aria-label={`${session.fullName}, my reports`}
+                  title={`${session.fullName}, my reports`}
                   onClick={close}
                   className={`${ROW} ${ROW_IDLE}`}
                   style={{ minHeight: "var(--hit-min)" }}
@@ -381,6 +373,8 @@ export function SiteHeader() {
                     close();
                     void signOut();
                   }}
+                  aria-label="Sign out"
+                  title="Sign out"
                   className={`${ROW} ${ROW_IDLE}`}
                   style={{ minHeight: "var(--hit-min)" }}
                 >
@@ -396,6 +390,8 @@ export function SiteHeader() {
                   close();
                   openSignIn();
                 }}
+                aria-label="Sign in"
+                title="Sign in"
                 className={`${ROW} ${ROW_IDLE}`}
                 style={{ minHeight: "var(--hit-min)" }}
               >
@@ -407,6 +403,8 @@ export function SiteHeader() {
             <button
               type="button"
               onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Light mode" : "Dark mode"}
+              title={theme === "dark" ? "Light mode" : "Dark mode"}
               className={`${ROW} ${ROW_IDLE}`}
               style={{ minHeight: "var(--hit-min)" }}
             >
