@@ -27,7 +27,7 @@ export interface EmptyStateProps {
 
 export function EmptyState({ message, actionLabel, actionHref, onAction }: EmptyStateProps) {
   return (
-    <div className="py-8" style={{ maxWidth: "var(--measure-prose)" }}>
+    <div className="glass feedback-panel py-8" style={{ maxWidth: "var(--measure-prose)" }}>
       <p className="text-body">{message}</p>
       {actionLabel && onAction && (
         <p className="mt-3">

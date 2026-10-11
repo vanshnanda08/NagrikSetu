@@ -46,7 +46,7 @@ export function IssueDetailPanel({
 
   return (
     <aside
-      className="bg-surface-raised border border-rule-strong p-4 flex flex-col gap-3 u-rise"
+      className="glass issue-detail-panel bg-surface-raised border border-rule-strong p-4 flex flex-col gap-3 u-rise"
       style={{ borderRadius: "var(--radius)" }}
       aria-label={`Details for ${issue.publicRef}`}
     >

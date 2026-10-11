@@ -99,7 +99,7 @@ export default async function LandingPage() {
       {/* Three sentences, no feature grid. */}
       <div className="mt-8" style={{ maxWidth: "var(--measure-prose)" }}>
         <p className="text-body">
-          Report a civic problem in Ludhiana with a photo and a location, and the
+          Report a civic problem in your city with a photo and a location, and the
           system groups it with everyone else who reported the same thing.
         </p>
         <p className="mt-3 text-body">

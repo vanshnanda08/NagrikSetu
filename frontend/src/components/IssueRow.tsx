@@ -65,7 +65,7 @@ export function IssueRow({
       // tint and the inset are the affordance. Padding is on the inside so the
       // hover fill has something to fill -- a hairline-separated row with a
       // background change and no padding looks like a rendering fault.
-      className="block border-b border-rule py-3 px-2 -mx-2 no-underline text-ink
+      className="issue-row block border-b border-rule py-3 px-2 -mx-2 no-underline text-ink
                  rounded-[var(--radius-token-sm)] u-press
                  transition-colors duration-[var(--dur-fast)]
                  hover:bg-surface-raised"

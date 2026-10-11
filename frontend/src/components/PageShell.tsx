@@ -14,14 +14,16 @@ import { SiteHeader } from "./SiteHeader";
 export function PageShell({
   children,
   wide = false,
+  className = "",
 }: {
   children: React.ReactNode;
   wide?: boolean;
+  className?: string;
 }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
+    <div className={`liquid-app flex min-h-screen flex-col md:flex-row ${className}`}>
       <SiteHeader />
       {/* `min-w-0` so a wide table or a long unbroken string inside `main`
           cannot force the flex row wider than the viewport -- the default
@@ -39,8 +41,8 @@ export function PageShell({
       */}
       <main
         key={pathname}
-        className="flex-1 min-w-0 w-full mx-auto px-4 py-6 md:px-8 u-rise"
-        style={{ maxWidth: wide ? 1100 : 760 }}
+        className="page-main flex-1 min-w-0 w-full mx-auto px-4 py-6 md:px-8 u-rise"
+        style={{ maxWidth: wide ? 1440 : 920 }}
       >
         {children}
       </main>

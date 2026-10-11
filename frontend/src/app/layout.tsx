@@ -47,9 +47,9 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "CivicTrack",
+  title: "NagrikSetu",
   description:
-    "Report a civic problem in Ludhiana and follow what the municipality does about it.",
+    "Citizens report. The city answers. Report a civic problem and follow what your municipality does about it.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

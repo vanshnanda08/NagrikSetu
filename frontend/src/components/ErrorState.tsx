@@ -26,7 +26,7 @@ export function ErrorState({ action, problem, onRetry, retryLabel = "Try again" 
   const detail = problem?.detail?.trim();
 
   return (
-    <div className="py-6" style={{ maxWidth: "var(--measure-prose)" }} role="alert">
+    <div className="glass feedback-panel py-6" style={{ maxWidth: "var(--measure-prose)" }} role="alert">
       <p className="text-body" style={{ color: "var(--st-breached)" }}>
         {detail ?? `${action} failed because the server could not be reached.`}
       </p>

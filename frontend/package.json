@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.9.1",
     "@tanstack/react-query": "^5.102.8",
     "leaflet": "^1.9.4",
+    "lucide-react": "^1.55.0",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",

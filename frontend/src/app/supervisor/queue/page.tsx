@@ -131,7 +131,7 @@ function Board() {
       <h1 className="text-display">Assignment board</h1>
       <p className="mt-1 text-dense text-ink-muted">Most urgent first. Acknowledge new work, then assign it to a crew member.</p>
 
-      <div className="mt-4 flex flex-wrap gap-1 border-b border-rule">
+      <div className="segmented-control mt-4 flex flex-wrap gap-1 border-b border-rule">
         {TABS.map((t) => (
           <button
             key={t.value}

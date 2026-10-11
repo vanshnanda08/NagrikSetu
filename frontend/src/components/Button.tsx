@@ -28,7 +28,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function Button({ variant = "primary", className = "", ...rest }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center gap-2 px-4 text-dense font-medium " +
+    "glass-button inline-flex items-center justify-center gap-2 px-4 text-dense font-medium " +
     // u-press scales to 0.97 on :active. On a phone there is no hover, so the
     // press is the ONLY feedback between tapping and the page changing --
     // which on a weak connection can be a second or more of apparent nothing.
@@ -44,6 +44,7 @@ export function Button({ variant = "primary", className = "", ...rest }: ButtonP
 
   return (
     <button
+      data-variant={variant}
       className={`${base} ${skin} ${className}`}
       style={{ minHeight: "var(--hit-min)", borderRadius: "var(--radius)" }}
       {...rest}
