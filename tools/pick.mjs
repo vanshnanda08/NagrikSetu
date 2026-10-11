@@ -27,41 +27,41 @@ const DEPARTMENT = "Roads and Infrastructure";
  * The location is borrowed deliberately: it is known to be inside a ward, which
  * the ingest endpoint requires, and a CLOSED issue is not a merge candidate --
  * the candidate query excludes CLOSED, REJECTED, and RESOLVED older than the
- * reopen window -- so the report lands as a NEW issue of its own instead of
- * merging into the one whose coordinates it used.
+ * reopen window -- but another active issue may still match. The result is checked before
+ * it is used as a NEW fixture.
  */
 async function createOne(API) {
-  const closed = await (await fetch(`${API}/public/issues?status=CLOSED&limit=25`)).json();
-  const donor = (closed.items ?? []).find((i) => i.departmentName === DEPARTMENT)
-             ?? (closed.items ?? [])[0];
-  if (!donor) {
-    throw new Error(
-      "No CLOSED issue to borrow a location from, and no NEW issue to walk. " +
-      "Reseed: drop the database and run the seed profile.",
-    );
+  const closed = await (await fetch(`${API}/public/issues?status=CLOSED&limit=100`)).json();
+  const donors = (closed.items ?? []).filter((i) => i.departmentName === DEPARTMENT);
+  // A closed ticket is excluded from matching, but another active ticket at
+  // its location is not. Check the ingest result before claiming it is NEW.
+  for (const donor of donors) {
+    const res = await fetch(`${API}/reports`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categoryCode: donor.categoryCode,
+        lat: donor.lat,
+        lng: donor.lng,
+        accuracyM: 8,
+        manualPin: false,
+        description: "Created by a verification harness because the NEW pool was empty.",
+        landmark: "harness",
+        photoUrl: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+        deviceId: "harness-" + Date.now(),
+      }),
+    });
+    if (!res.ok) {
+      throw new Error(`Could not create an issue to walk: ${res.status} ${await res.text()}`);
+    }
+    const out = await res.json();
+    const issue = await (await fetch(`${API}/public/issues/${out.issueId}`)).json();
+    if (issue.status === 'NEW' && issue.departmentName === DEPARTMENT) {
+      console.log(`  (no NEW issue was left in ${DEPARTMENT}; created ${out.publicRef})`);
+      return out.issueId;
+    }
   }
-
-  const res = await fetch(`${API}/reports`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      categoryCode: donor.categoryCode,
-      lat: donor.lat,
-      lng: donor.lng,
-      accuracyM: 8,
-      manualPin: false,
-      description: "Created by a verification harness because the NEW pool was empty.",
-      landmark: "harness",
-      photoUrl: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
-      deviceId: "harness-" + Date.now(),
-    }),
-  });
-  if (!res.ok) {
-    throw new Error(`Could not create an issue to walk: ${res.status} ${await res.text()}`);
-  }
-  const out = await res.json();
-  console.log(`  (no NEW issue was left in ${DEPARTMENT}; created ${out.publicRef})`);
-  return out.issueId;
+  throw new Error('No fresh Roads issue could be created at the CLOSED fixture locations. Run this harness against a freshly seeded local scratch database.');
 }
 
 /** An issue id in NEW that the ROADS staff may act on. Creates one if needed. */

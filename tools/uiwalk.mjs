@@ -1,24 +1,31 @@
 import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
 import { pickWalkableIssue } from './pick.mjs';
 const API='http://localhost:8080/api/v1', APP='http://localhost:3000';
 const login = async (e) => (await (await fetch(`${API}/auth/login`,{method:'POST',
   headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:'demo1234'})})).json());
 const sup = await login('head.roads@civictrack.example');
 const crew = await login('crew.roads@civictrack.example');
-const post = (tok,id,verb,body)=>fetch(`${API}/issues/${id}/${verb}`,{method:'POST',
-  headers:{'Content-Type':'application/json',Authorization:`Bearer ${tok.accessToken}`},body:JSON.stringify(body??{})});
+const post = async (tok,id,verb,body) => {
+  const response = await fetch(`${API}/issues/${id}/${verb}`,{method:'POST',
+    headers:{'Content-Type':'application/json',Authorization:`Bearer ${tok.accessToken}`},body:JSON.stringify(body??{})});
+  assert.ok(response.ok, `${verb}: HTTP ${response.status}`);
+};
 
 const id = await pickWalkableIssue(API);
 
 const b = await chromium.launch({ channel:'chrome' });
 const ctx = await b.newContext({viewport:{width:1280,height:900}});
 const p = await ctx.newPage();
-p.on('pageerror', e => console.log('  PAGEERROR:', String(e).slice(0,200)));
+const pageErrors = [];
+p.on('pageerror', e => pageErrors.push(String(e)));
+try {
 await p.goto(APP+'/login',{waitUntil:'networkidle'});
-await p.getByLabel('Email').fill('crew.roads@civictrack.example');
-await p.getByLabel('Password').fill('demo1234');
-await p.getByRole('button',{name:'Sign in'}).click();
-await p.waitForURL('**/me/reports');
+const dialog = p.locator('dialog');
+await dialog.getByLabel('Email').fill('crew.roads@civictrack.example');
+await dialog.getByLabel('Password').fill('demo1234');
+await dialog.getByRole('button',{name:'Sign in', exact:true}).click();
+await dialog.waitFor({state:'hidden'});
 
 async function look(expectStatus) {
   await p.goto(APP+'/staff/issues/'+id,{waitUntil:'domcontentloaded'});
@@ -29,6 +36,10 @@ async function look(expectStatus) {
     .filter(t=>/Acknowledge|Start work|Submit for citizen|Resolve/.test(t));
   const waiting = txt.split('\n').find(l=>/waiting|Waiting|assign|somebody else|under way|confirmed/i.test(l)) ?? '';
   console.log(`  ${expectStatus.padEnd(21)} action=${JSON.stringify(btns).padEnd(38)} ${waiting.slice(0,72)}`);
+  const expected = {NEW:['Acknowledge'], ACKNOWLEDGED:[], ASSIGNED:['Start work'],
+    IN_PROGRESS:['Submit for citizen verification'], PENDING_VERIFICATION:[]};
+  assert.deepEqual(btns, expected[expectStatus], `Wrong action at ${expectStatus}`);
+  assert.deepEqual(pageErrors, [], 'Browser runtime errors');
 }
 
 const picked = await (await fetch(`${API}/public/issues/${id}`)).json();
@@ -39,4 +50,6 @@ await post(sup,id,'assign',{assigneeId:crew.userId,note:'To crew'}); await look(
 await post(crew,id,'start',{note:'On site'});                        await look('IN_PROGRESS');
 await post(crew,id,'submit-for-verification',{proofPhotoUrl:'https://example.test/f.jpg',
   note:'Filled and compacted the pothole, resurfaced the patch.'});  await look('PENDING_VERIFICATION');
-await b.close();
+} finally {
+  await b.close();
+}

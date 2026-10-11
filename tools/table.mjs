@@ -6,6 +6,7 @@
  */
 
 import { pickWalkableIssue } from './pick.mjs';
+import assert from 'node:assert/strict';
 const API = 'http://localhost:8080/api/v1';
 const login = async (email) => (await (await fetch(`${API}/auth/login`, {
   method: 'POST', headers: {'Content-Type':'application/json'},
@@ -37,10 +38,13 @@ const steps = [
       note:'Filled and compacted the pothole, resurfaced the patch.' }],
 ];
 
-for (const [verb, tok, body] of steps) {
+const expected = ['ACKNOWLEDGED', 'ASSIGNED', 'IN_PROGRESS', 'PENDING_VERIFICATION'];
+for (const [index, [verb, tok, body]] of steps.entries()) {
   const before = (await get(tok, id)).status;
   const r = await post(tok, id, verb, body);
   const after = (await get(tok, id)).status;
   console.log(`  ${before.padEnd(12)} --${verb.padEnd(24)}--> ${String(r.status).padEnd(4)} ${after}` +
     (r.status >= 400 ? `   ${r.body?.detail ?? ''}` : ''));
+  assert.ok(r.status >= 200 && r.status < 300, `${verb} returned HTTP ${r.status}`);
+  assert.equal(after, expected[index], `${verb} reached the wrong state`);
 }

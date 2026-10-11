@@ -1,4 +1,4 @@
-# CivicTrack
+# NagrikSetu
 
 Municipal issue reporting with bounded incremental geo-clustering, SLA-driven
 escalation, and public accountability.
@@ -241,8 +241,9 @@ present as bugs somewhere else entirely.
 Backend on Render (Docker, free tier), database on Supabase, frontend on
 Vercel. GitHub Actions runs the full backend suite and the frontend lint,
 typecheck, tests and build on every push; a push to `main` that passes both
-triggers the Render deploy hook, and Vercel deploys the frontend from its own
-Git integration. A scheduled keep-alive workflow pings the API every ten
+runs the API/browser verification job against a fresh PostGIS database, then
+triggers the Render deploy hook if that also passes. Vercel deploys the frontend
+from its own Git integration. A scheduled keep-alive workflow pings the API every ten
 minutes.
 
 The deployed corpus is the seeded 250 reports across ~110 issues. It was 2,000
@@ -313,10 +314,11 @@ and extent-cap comparisons are still phase 8 deliverables, not completed measure
 `.github/workflows/backup.yml` schedules a backup every Sunday at 02:00 IST.
 It restores the dump into a disposable PostGIS database, fails on restore errors,
 encrypts it with GPG, and retains only the encrypted artifact for 56 days.
-Configure these GitHub Actions secrets before enabling the workflow on `main`:
+Configure these GitHub Actions secrets before running the workflow:
 `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP_DATABASE_PASSWORD`, and
 `BACKUP_PASSPHRASE` (a strong passphrase also kept in your password manager).
-This workflow is prepared locally; remote activation and secrets were not verified.
+The workflow is active on GitHub as of 2026-10-07, but has no recorded runs.
+Secrets and encrypted artifact recovery remain unverified.
 
 For a local backup, use `backend/.env.seed` or the `DATABASE_*` environment
 variables, then run `./scripts/backup.sh` and
@@ -340,3 +342,12 @@ in the available local environment, so production deletion remains unverified.
 Verification on 2026-10-07: backend tests, frontend tests, typecheck and lint pass.
 The production frontend builds with `npm run build -- --webpack`; this environment
 rejects the local worker port used by Turbopack. The normal build command is unchanged.
+
+
+Phase 7 verification follow-up (2026-10-07): all 224 backend tests and 68
+frontend tests pass, along with lint, typecheck and the Webpack production
+build. Expanded API field-contract checks and the lifecycle browser walk pass;
+135 route checks pass across anonymous, citizen, staff, supervisor and admin
+sessions. The harnesses now fail on mismatches and unexpected HTTP/runtime
+errors, and CI includes them before the Render deploy hook. These CI changes
+have been validated locally but have not been pushed or run on GitHub yet.

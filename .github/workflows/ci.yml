@@ -279,9 +279,88 @@ jobs:
           API_BASE: http://localhost:8080/api/v1
           NEXT_PUBLIC_API_BASE: http://localhost:8080/api/v1
 
+  verification:
+    name: Phase 7 — API contracts and browser journeys
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      db:
+        image: postgis/postgis:17-3.4
+        env:
+          POSTGRES_DB: civictrack
+          POSTGRES_USER: civictrack
+          POSTGRES_PASSWORD: civictrack
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U civictrack -d civictrack"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: temurin
+          cache: maven
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            tools/package-lock.json
+      - name: Start a seeded, disposable backend
+        working-directory: backend
+        run: |
+          mvn -B --no-transfer-progress -DskipTests package
+          java -jar target/civictrack-backend-0.1.0-SNAPSHOT.jar \
+            --spring.profiles.active=demo,seed \
+            --civictrack.demo.staff-password=demo1234 \
+            --civictrack.cors.allowed-origins=http://localhost:3000 \
+            --civictrack.seed.labels-file-path=/tmp/verification-labels.csv \
+            > /tmp/verification-backend.log 2>&1 &
+          for attempt in $(seq 1 120); do
+            if curl -fsS http://localhost:8080/actuator/health/readiness > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/verification-backend.log
+          exit 1
+      - name: Build and start the frontend
+        working-directory: frontend
+        env:
+          API_BASE: http://localhost:8080/api/v1
+          NEXT_PUBLIC_API_BASE: http://localhost:8080/api/v1
+        run: |
+          npm ci
+          npm run build
+          npm run start > /tmp/verification-frontend.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://localhost:3000 > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/verification-frontend.log
+          exit 1
+      - name: Check contracts, transitions, actions and all roles
+        working-directory: tools
+        run: |
+          npm ci
+          npx playwright install --with-deps chrome
+          npm run contract
+          npm run transitions
+          npm run uiwalk
+          npm run sweep
+      - name: Preserve server logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-server-logs
+          path: /tmp/verification-*.log
+          retention-days: 7
+
   deploy:
     name: Trigger Render deploy
-    needs: [backend, frontend]
+    needs: [backend, frontend, verification]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
