@@ -35,3 +35,6 @@ backups/
 
 # Project documents are kept locally, not in the repository.
 docs/
+
+# Local verification screenshots and walk output (large, regenerable)
+artifacts/
