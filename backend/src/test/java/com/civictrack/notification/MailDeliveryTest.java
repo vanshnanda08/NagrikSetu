@@ -21,6 +21,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withUnauthorizedRequest;
 
 class MailDeliveryTest {
 
@@ -54,5 +55,31 @@ class MailDeliveryTest {
         verify(jdbc).update("UPDATE mail_outbox SET sent_at = now(), body = '[Delivered]', attempts = attempts + 1 WHERE id = ?", 7L);
         org.assertj.core.api.Assertions.assertThat(delivery.publicUrl())
                 .isEqualTo("https://civic-track-six.vercel.app");
+    }
+
+    @Test
+    void brevoHttpFailureSchedulesRetryWithoutMarkingMailDelivered() {
+        JdbcTemplate jdbc = mock(JdbcTemplate.class);
+        @SuppressWarnings("unchecked") ObjectProvider<JavaMailSender> smtp = mock(ObjectProvider.class);
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        MailProperties properties = new MailProperties(true, "brevo", "verified@example.test",
+                "NagrikSetu", "bad-api-key", "https://api.brevo.test/v3/smtp/email");
+        MailDelivery delivery = new MailDelivery(jdbc, smtp, properties, builder,
+                "https://civic-track-six.vercel.app");
+        when(jdbc.queryForList(anyString())).thenReturn(List.of(Map.of(
+                "id", 9L,
+                "recipient", "citizen@example.test",
+                "subject", "Reset your NagrikSetu password",
+                "body", "Use this private reset link")));
+
+        server.expect(once(), requestTo("https://api.brevo.test/v3/smtp/email"))
+                .andRespond(withUnauthorizedRequest());
+
+        delivery.deliver();
+
+        server.verify();
+        verify(jdbc).update("UPDATE mail_outbox SET attempts = attempts + 1, "
+                + "next_attempt_at = now() + interval '1 minute' * power(2, attempts) WHERE id = ?", 9L);
     }
 }
