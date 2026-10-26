@@ -98,7 +98,9 @@ server:
 management:
   health:
     mail:
-      enabled: ${MAIL_ENABLED:false}
+      # This indicator checks JavaMail/SMTP specifically. HTTPS providers such
+      # as Brevo have no SMTP connection for it to probe.
+      enabled: ${SMTP_HEALTH_ENABLED:false}
   endpoints:
     web:
       exposure:

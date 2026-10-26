@@ -244,7 +244,8 @@ continues normally.
 On hosting plans that block SMTP, set `MAIL_PROVIDER=brevo`, `MAIL_ENABLED=true`,
 `BREVO_API_KEY`, `MAIL_FROM` (a verified Brevo sender), `MAIL_FROM_NAME`, and
 `PUBLIC_APP_URL`. The Brevo integration uses HTTPS; the API key belongs only in
-the backend environment and must never use a `NEXT_PUBLIC_` name.
+the backend environment and must never use a `NEXT_PUBLIC_` name. Leave
+`SMTP_HEALTH_ENABLED=false` for HTTPS delivery; enable it only for SMTP.
 
 Seeded logins, all with the password passed above:
 
