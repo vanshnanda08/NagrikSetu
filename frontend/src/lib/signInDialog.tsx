@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SignInDialog } from "@/components/SignInDialog";
+import { safeRedirect } from "./safeRedirect";
 
 /**
  * One sign-in dialog for the whole application, openable from anywhere.
@@ -53,7 +54,7 @@ export function SignInProvider({ children }: { children: React.ReactNode }) {
   // parameter happened to point.
   const succeeded = useCallback(() => {
     setOpen(false);
-    if (opts.next) router.replace(opts.next);
+    if (opts.next) router.replace(safeRedirect(opts.next));
   }, [opts.next, router]);
 
   const value = useMemo(() => ({ openSignIn }), [openSignIn]);

@@ -16,6 +16,7 @@ import { STATUS, isOverdue } from "@/lib/status";
 import { absoluteDateTime, ageLabel, coordinates, metres, reporters } from "@/lib/format";
 import { isUnknownTicket, type ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { IssueEngagement } from "@/components/IssueEngagement";
 
 /**
  * Issue detail (blueprint §3.6): everything publicly known about one work item.
@@ -132,7 +133,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
       {reports.data && reports.data.length > 0 && (
         <section className="mt-8 detail-photos">
           <h2 className="text-heading">Photos</h2>
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-2" tabIndex={0} role="region" aria-label="Report photos">
             {reports.data.map((r) => (
               <Photo
                 key={r.id}
@@ -189,6 +190,10 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
               <Link href={`/supervisor/issues/${i.id}/cluster`} className="text-body underline text-ink">
                 Split or merge
               </Link>
+              {" · "}
+              <Link href={`/supervisor/issues/${i.id}`} className="text-body underline text-ink">
+                Moderate
+              </Link>
             </>
           )}
         </p>
@@ -244,6 +249,8 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
           </Timeline>
         )}
       </section>
+
+      <IssueEngagement issueId={i.id} />
 
       </div>
       </div>

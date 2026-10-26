@@ -41,6 +41,7 @@ import java.util.UUID;
 public class IssueController {
 
     private final IssueLifecycleService lifecycle;
+    private final com.civictrack.media.PhotoEvidenceService photos;
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('STAFF','SUPERVISOR','ADMIN') and @issueGuard.canAct(#id, authentication)")
@@ -82,7 +83,7 @@ public class IssueController {
                                           @Valid @RequestBody ResolveRequest body,
                                           @AuthenticationPrincipal Jwt jwt) {
         return IssueDto.from(lifecycle.submitForVerification(
-                id, actor(jwt), body.proofPhotoUrl(), body.note()));
+                id, actor(jwt), body.proofPhotoUrl(), photos.verify(body.proofPhotoUrl(), body.proofPhotoHash()), body.note()));
     }
 
     @PostMapping("/{id}/reject")

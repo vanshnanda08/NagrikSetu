@@ -13,5 +13,11 @@ public enum NotificationType {
     REOPENED,
 
     /** A supervisor rejected an issue you reported, with a reason. */
-    REJECTED
+    REJECTED,
+
+    /** Staff need clarification from a citizen who reported the issue. */
+    INFO_REQUESTED,
+
+    /** A citizen answered a clarification request. */
+    CITIZEN_REPLIED
 }

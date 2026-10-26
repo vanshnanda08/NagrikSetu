@@ -45,6 +45,27 @@ public interface WardRepository extends JpaRepository<Ward, UUID> {
             """, nativeQuery = true)
     List<WardBoundaryRow> findAllWithBoundary();
 
+    /**
+     * Wards by distance from a point, nearest first. A ward containing the point
+     * is at distance zero. Geography, not planar: standing rule 2.
+     */
+    @Query(value = """
+            SELECT w.id AS id, w.ward_number AS wardNumber, w.name AS name,
+                   ST_Distance(w.boundary::geography,
+                               ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography) AS distanceM
+            FROM wards w
+            ORDER BY distanceM ASC, w.ward_number ASC
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<WardDistanceRow> nearest(@Param("lat") double lat, @Param("lng") double lng, @Param("limit") int limit);
+
+    interface WardDistanceRow {
+        UUID getId();
+        int getWardNumber();
+        String getName();
+        double getDistanceM();
+    }
+
     interface WardBoundaryRow {
         UUID getId();
         int getWardNumber();

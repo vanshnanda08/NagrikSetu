@@ -71,6 +71,8 @@ export type ComposerValues = z.infer<typeof composerSchema>;
  */
 export const ingestSchema = composerSchema.omit({ hasPhoto: true }).extend({
   photoUrl: z.string().min(1, { message: "The photo failed to upload." }),
+  photoHash: z.string().regex(/^[0-9a-f]{16}$/),
+  photoCapturedAt: z.string().datetime().nullable(),
   deviceId: z.string().max(64),
 });
 
@@ -114,7 +116,10 @@ export const registerSchema = loginSchema.extend({
     // is the same class of mismatch as DD-035, just in the friendlier
     // direction. If the server's minimum moves, this moves with it.
     .min(10, { message: "Use at least 10 characters." })
-    .max(100),
+    .max(72)
+    .refine((value) => new TextEncoder().encode(value).length <= 72, {
+      message: "Use at most 72 UTF-8 bytes; some characters use more than one byte.",
+    }),
 });
 
 export type RegisterValues = z.infer<typeof registerSchema>;

@@ -51,6 +51,14 @@ export interface MapCircle {
   style: "accuracy" | "merge" | "extentCap";
 }
 
+/** One grid cell of issue density: how many issues, and how many of them are still open. */
+export interface MapDensityCell {
+  lat: number;
+  lng: number;
+  issues: number;
+  open: number;
+}
+
 export interface MapCanvasProps {
   center: LatLng;
   zoom?: number;
@@ -68,4 +76,8 @@ export interface MapCanvasProps {
    * individual markers still works, and is the path on touch screens.
    */
   onBoxSelect?: (bounds: Omit<Viewport, "zoom">) => void;
+  /** A ward boundary as GeoJSON text (a MultiPolygon). Drawn as an outline, and the view fits it. */
+  boundaryGeoJson?: string;
+  /** Issue density, drawn as translucent discs sized by how many issues each cell holds. */
+  density?: MapDensityCell[];
 }

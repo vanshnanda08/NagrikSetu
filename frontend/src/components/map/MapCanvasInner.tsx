@@ -120,6 +120,8 @@ export default function MapCanvasInner({
   onPinPlace,
   fitToMarkers = false,
   onBoxSelect,
+  boundaryGeoJson,
+  density = [],
 }: MapCanvasProps) {
   const nodeRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -240,6 +242,31 @@ export default function MapCanvasInner({
     if (!layer || !map) return;
     layer.clearLayers();
 
+    // A ward outline sits under everything else. Neutral navy: density and
+    // boundaries are not statuses, so they do not borrow a status colour.
+    if (boundaryGeoJson) {
+      try {
+        const outline = L.geoJSON(JSON.parse(boundaryGeoJson), {
+          style: { color: "#0b3b5e", weight: 2, fillColor: "#0b3b5e", fillOpacity: 0.04 },
+        }).addTo(layer);
+        map.fitBounds(outline.getBounds(), { padding: [16, 16], animate: false });
+      } catch {
+        // A boundary that does not parse is a data fault; the map still works without it.
+      }
+    }
+
+    for (const cell of density) {
+      L.circle([cell.lat, cell.lng], {
+        radius: 45 + 28 * Math.sqrt(cell.issues),
+        color: "#0b3b5e",
+        weight: 1,
+        fillColor: "#0b3b5e",
+        fillOpacity: Math.min(0.55, 0.18 + 0.08 * cell.issues),
+      })
+        .bindTooltip(`${cell.issues} issue${cell.issues === 1 ? "" : "s"}, ${cell.open} open`)
+        .addTo(layer);
+    }
+
     for (const c of circles) {
       L.circle([c.lat, c.lng], { radius: c.radiusM, ...CIRCLE_STYLE[c.style] }).addTo(layer);
     }
@@ -261,7 +288,7 @@ export default function MapCanvasInner({
       // Padded so the outermost accuracy circle is not clipped by the frame.
       map.fitBounds(bounds.pad(0.35), { animate: false, maxZoom: 18 });
     }
-  }, [markers, circles, fitToMarkers]);
+  }, [markers, circles, fitToMarkers, boundaryGeoJson, density]);
 
   return (
     <div

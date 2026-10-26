@@ -18,6 +18,8 @@
  *    detailed street scene, and it is the street scene that matters here.
  */
 
+import { exifCapturedAt } from "./exif";
+
 export interface CompressedImage {
   blob: Blob;
   /** Object URL of the compressed result. The caller must revoke it. */
@@ -26,6 +28,10 @@ export interface CompressedImage {
   height: number;
   bytes: number;
   originalBytes: number;
+  /** 64-bit perceptual difference hash, encoded as 16 hex characters. */
+  perceptualHash: string;
+  /** Browser file metadata; null when the source does not carry a useful time. */
+  capturedAt: string | null;
 }
 
 const MAX_EDGE = 1600;
@@ -44,8 +50,9 @@ export class UnsupportedImageError extends Error {
 }
 
 export async function compressImage(file: File): Promise<CompressedImage> {
-  if (!ACCEPTED.includes(file.type)) {
-    throw new UnsupportedImageError(file.type);
+  const actualType = await sniffImageMime(file);
+  if (!actualType || !ACCEPTED.includes(actualType)) {
+    throw new UnsupportedImageError(actualType || file.type);
   }
 
   const bitmap = await createImageBitmap(file);
@@ -75,10 +82,65 @@ export async function compressImage(file: File): Promise<CompressedImage> {
       height,
       bytes: blob.size,
       originalBytes: file.size,
+      perceptualHash: differenceHash(canvas),
+      capturedAt: await exifCapturedAt(file),
     };
   } finally {
     bitmap.close();
   }
+}
+
+/**
+ * Identifies supported images from their signature, never from the caller's
+ * Content-Type. A renamed executable with `type=image/jpeg` stops here before
+ * it reaches the upload service.
+ */
+export async function sniffImageMime(blob: Blob): Promise<string | null> {
+  const bytes = new Uint8Array(await blob.slice(0, 16).arrayBuffer());
+  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
+    return "image/jpeg";
+  }
+  if (
+    bytes.length >= 8 &&
+    bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 &&
+    bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a
+  ) {
+    return "image/png";
+  }
+  const ascii = String.fromCharCode(...bytes);
+  if (ascii.startsWith("RIFF") && ascii.slice(8, 12) === "WEBP") return "image/webp";
+  if (ascii.slice(4, 8) === "ftyp" && /^(heic|heix|hevc|hevx|mif1|msf1)$/.test(ascii.slice(8, 12))) {
+    return "image/heic";
+  }
+  return null;
+}
+
+/** Horizontal 9x8 luminance comparisons produce the conventional 64-bit dHash. */
+function differenceHash(source: HTMLCanvasElement): string {
+  const tiny = document.createElement("canvas");
+  tiny.width = 9;
+  tiny.height = 8;
+  const context = tiny.getContext("2d", { willReadFrequently: true });
+  if (!context) throw new Error("Could not fingerprint the photo.");
+  context.drawImage(source, 0, 0, 9, 8);
+  const pixels = context.getImageData(0, 0, 9, 8).data;
+  let bits = "";
+  for (let y = 0; y < 8; y += 1) {
+    for (let x = 0; x < 8; x += 1) {
+      const left = luminance(pixels, (y * 9 + x) * 4);
+      const right = luminance(pixels, (y * 9 + x + 1) * 4);
+      bits += left > right ? "1" : "0";
+    }
+  }
+  let hex = "";
+  for (let at = 0; at < bits.length; at += 4) {
+    hex += Number.parseInt(bits.slice(at, at + 4), 2).toString(16);
+  }
+  return hex;
+}
+
+function luminance(pixels: Uint8ClampedArray, at: number): number {
+  return pixels[at] * 0.299 + pixels[at + 1] * 0.587 + pixels[at + 2] * 0.114;
 }
 
 function toBlob(canvas: HTMLCanvasElement, quality: number): Promise<Blob | null> {

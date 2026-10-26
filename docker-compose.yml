@@ -1,11 +1,11 @@
 # Local development database.
 #
-# postgis/postgis:16-3.4 is pinned to match production exactly. The same image
+# postgis/postgis:17-3.4 is pinned to match the test and evaluation environments. The same image
 # tag is used by the Testcontainers integration tests -- spatial behaviour is
 # not portable, and there is no H2 fallback anywhere in this project.
 services:
   db:
-    image: postgis/postgis:16-3.4
+    image: postgis/postgis:17-3.4
     container_name: civictrack-db
     environment:
       POSTGRES_DB: civictrack

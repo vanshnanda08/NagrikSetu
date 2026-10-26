@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { setRefreshCookie } from "@/lib/authCookie";
+import { isSameOrigin } from "@/lib/sameOrigin";
 
 /**
  * Proxies the backend's login and splits the token pair.
@@ -10,6 +11,7 @@ import { setRefreshCookie } from "@/lib/authCookie";
  * route exists rather than the browser calling Spring directly.
  */
 export async function POST(request: Request) {
+  if (!isSameOrigin(request)) return NextResponse.json({ detail: "Same-origin requests only." }, { status: 403 });
   const base = process.env.API_BASE ?? "http://localhost:8080/api/v1";
   const body = await request.text();
 
@@ -17,7 +19,10 @@ export async function POST(request: Request) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body,
-  });
+    signal: AbortSignal.timeout(15000),
+  }).catch(() => null);
+
+  if (!upstream) return NextResponse.json({ detail: "The sign-in service is unavailable. Retry shortly." }, { status: 503 });
 
   const text = await upstream.text();
   if (!upstream.ok) {
@@ -27,7 +32,10 @@ export async function POST(request: Request) {
     // rewording it here would undo it.
     return new NextResponse(text, {
       status: upstream.status,
-      headers: { "Content-Type": upstream.headers.get("Content-Type") ?? "application/json" },
+      headers: {
+        "Content-Type": upstream.headers.get("Content-Type") ?? "application/json",
+        ...(upstream.headers.has("Retry-After") ? { "Retry-After": upstream.headers.get("Retry-After")! } : {}),
+      },
     });
   }
 

@@ -116,3 +116,13 @@ export function ordinal(n: number): string {
             : "th";
   return `${n}${suffix}`;
 }
+
+/** Hours as the dashboard says them: under two days in hours, otherwise in days. */
+export function durationHours(hours: number): string {
+  return hours >= 48 ? `${(hours / 24).toFixed(1)} days` : `${hours.toFixed(1)} hours`;
+}
+
+/** 0.236 as "24%". Null stays null so a caller can show "not enough data" instead of "0%". */
+export function percent(rate: number | null | undefined): string | null {
+  return rate === null || rate === undefined ? null : `${Math.round(rate * 100)}%`;
+}

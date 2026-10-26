@@ -147,6 +147,9 @@ public class Issue {
     @Column(name = "resolution_photo_url")
     private String resolutionPhotoUrl;
 
+    @Column(name = "resolution_photo_hash", length = 64)
+    private String resolutionPhotoHash;
+
     @Column(name = "resolved_by")
     private UUID resolvedBy;
 

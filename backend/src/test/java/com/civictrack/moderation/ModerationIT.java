@@ -296,6 +296,36 @@ class ModerationIT extends IntegrationTestBase {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    @DisplayName("redaction hides public text, preserves evidence, and records the supervisor action")
+    void redactPreservesEvidenceAndHidesPublicText() throws Exception {
+        UUID issueId = ingest("POTHOLE", GeoFixtures.LAT, GeoFixtures.LNG, 8, null).issueId();
+        UUID reportId = reportIds(issueId).get(0);
+
+        postJson(roadsHead, "/api/v1/supervisor/issues/{id}/reports/" + reportId + "/redact",
+                        issueId, "{\"reason\":\"Contains a private phone number\"}")
+                .andExpect(status().isNoContent());
+
+        mvc.perform(get("/api/v1/public/issues/{id}/reports", issueId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].description")
+                        .value("[Description removed by a supervisor]"));
+        Map<String, Object> stored = jdbc.queryForMap(
+                "SELECT description, description_redacted, redacted_by, redaction_reason "
+                        + "FROM reports WHERE id = ?", reportId);
+        assertThat(stored.get("description")).isEqualTo("test report");
+        assertThat(stored.get("description_redacted")).isEqualTo(true);
+        assertThat(stored.get("redacted_by")).isEqualTo(roadsHead.getId());
+        assertThat(stored.get("redaction_reason")).isEqualTo("Contains a private phone number");
+        assertThat(jdbc.queryForObject(
+                "SELECT COUNT(*) FROM moderation_actions WHERE action = 'REDACT' AND issue_id = ?",
+                Integer.class, issueId)).isEqualTo(1);
+
+        postJson(roadsHead, "/api/v1/supervisor/issues/{id}/reports/" + reportId + "/redact",
+                        issueId, "{\"reason\":\"Second redaction attempt\"}")
+                .andExpect(status().isConflict());
+    }
+
     // ------------------------------------------------------------------
     // helpers
     // ------------------------------------------------------------------

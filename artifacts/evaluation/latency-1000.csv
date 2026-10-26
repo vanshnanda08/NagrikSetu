@@ -1,0 +1,2 @@
+scale,requests,p50_ms,p95_ms,p99_ms,average_ms,failure_rate
+1000,500,55.986384,126.5379177,492.25513358,71.56475817599998,0

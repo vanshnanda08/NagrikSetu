@@ -1,5 +1,6 @@
 package com.civictrack.report.api;
 
+import com.civictrack.abuse.RateLimitService;
 import com.civictrack.clustering.ClusterOutcome;
 import com.civictrack.clustering.ClusteringService;
 import com.civictrack.department.Department;
@@ -55,15 +56,24 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReportController {
 
-    private final ClusteringService clusteringService;
+    private final com.civictrack.report.ReportSubmissionService submissions;
     private final IssueRepository issues;
     private final WardRepository wards;
     private final DepartmentRepository departments;
+    private final RateLimitService rateLimits;
+    private final com.civictrack.media.PhotoEvidenceService photos;
 
     @PostMapping
     public ResponseEntity<ClusterResultDto> ingest(@Valid @RequestBody IngestReportRequest request,
+                                                   @org.springframework.web.bind.annotation.RequestHeader(value="Idempotency-Key", required=false) UUID submissionId,
                                                    @AuthenticationPrincipal Jwt jwt) {
-        ClusterOutcome outcome = clusteringService.ingest(request.toCommand(reporterId(jwt)));
+        UUID reporterId = reporterId(jwt);
+        var cmd = request.toCommand(reporterId);
+        String hash = photos.verify(cmd.photoUrl(), cmd.photoHash());
+        ClusterOutcome outcome = submissions.submit(new com.civictrack.clustering.IngestReportCommand(
+                cmd.categoryCode(), cmd.lat(), cmd.lng(), cmd.accuracyM(), cmd.manualPin(),
+                cmd.description(), cmd.addressText(), cmd.landmark(), cmd.photoUrl(), hash,
+                cmd.photoCapturedAt(), cmd.reporterId(), cmd.deviceId()), submissionId);
 
         // 201 with a Location header pointing at the issue, not the report: the
         // issue is the thing the citizen will come back to look at.

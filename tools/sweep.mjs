@@ -16,10 +16,12 @@ const q = await (await fetch(`${API}/public/issues?status=PENDING_VERIFICATION&l
 const pend = q.items[0];
 const r = await (await fetch(`${API}/public/issues?status=RESOLVED&limit=1`)).json();
 const res = r.items[0];
+const wardList = await (await fetch(`${API}/wards`)).json();
 
 const routes = [
   '/', '/report', '/map', '/issues', '/issues?sort=priority&status=NEW', '/dashboard',
-  '/login', '/register', '/me/reports', '/staff/queue', '/staff/queue?tab=unassigned',
+  '/login', '/register', '/forgot-password', '/reset-password', '/report/outbox',
+  '/me/reports', '/staff/queue', '/staff/queue?tab=unassigned',
   `/issues/${iss.id}`, `/issues/${iss.id}/cluster`, `/report/success/${iss.publicRef}`,
   `/staff/issues/${staffIss.id}`, '/does-not-exist', '/issues/00000000-0000-0000-0000-000000000000',
   '/report/success/CT-1999-000001',
@@ -27,6 +29,9 @@ const routes = [
 routes.push('/me/notifications', `/me/verify/${pend?.id ?? iss.id}`,
   '/supervisor/queue', '/supervisor/queue?tab=all', '/supervisor/review',
   `/supervisor/issues/${staffIss.id}/cluster`);
+routes.push('/me/profile', '/me/security', '/supervisor/analytics', '/admin/audit', '/admin/configuration',
+  `/dashboard/wards/${wardList[0].id}`, `/supervisor/issues/${staffIss.id}`,
+  '/dashboard/wards/00000000-0000-0000-0000-000000000000');
 if (pend) { routes.push(`/issues/${pend.id}`, `/issues/${pend.id}/cluster`); }
 if (res)  { routes.push(`/issues/${res.id}`); }
 
@@ -72,14 +77,19 @@ for (const [role, email] of [
       const status = response.status();
       if (status < 400) return;
       const url = new URL(response.url());
-      const missing = ['/does-not-exist', '/issues/00000000-0000-0000-0000-000000000000', '/report/success/CT-1999-000001'].includes(route);
-      if (status === 404 && missing && (url.pathname === route || /^\/api\/v1\/public\/issues\/00000000-0000-0000-0000-000000000000(?:\/(?:history|reports))?$/.test(url.pathname) || url.pathname.endsWith('/CT-1999-000001'))) return;
+      const missing = ['/does-not-exist', '/issues/00000000-0000-0000-0000-000000000000', '/report/success/CT-1999-000001', '/dashboard/wards/00000000-0000-0000-0000-000000000000'].includes(route);
+      if (status === 404 && missing && (url.pathname === route || /^\/api\/v1\/public\/issues\/00000000-0000-0000-0000-000000000000(?:\/(?:history|reports))?$/.test(url.pathname) || url.pathname.endsWith('/CT-1999-000001') || url.pathname === '/api/v1/dashboard/wards/00000000-0000-0000-0000-000000000000')) return;
       if (response.request().resourceType() === 'image' && url.hostname === 'res.cloudinary.com') {
         failedPhotos.push(response.url());
         return;
       }
       if (status === 401 && url.pathname === '/api/auth/refresh') return;
       if (status === 403 && role === 'CITIZEN' && (url.pathname.startsWith('/api/v1/staff/') || url.pathname === `/api/v1/issues/${staffIss.id}`)) return;
+      // A fresh citizen is not a reporter; municipal users may be outside scope.
+      // Positive private-thread access is exercised separately by audit.mjs.
+      if (status === 403 && ['CITIZEN', 'STAFF', 'SUPERVISOR'].includes(role)
+          && response.request().method() === 'GET'
+          && /^\/api\/v1\/issues\/[0-9a-f-]+\/messages$/.test(url.pathname)) return;
       errs.push(`HTTP ${status}: ${url.pathname}`);
     };
     p.on('response', onResponse);

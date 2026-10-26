@@ -69,7 +69,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationConverter converter)
+    SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationConverter converter,
+                                    SecurityProblemHandlers problems)
             throws Exception {
         return http
                 // Stateless bearer tokens, no cookie-borne session, so there is
@@ -77,6 +78,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(errors -> errors
+                        .authenticationEntryPoint(problems.authenticationEntryPoint())
+                        .accessDeniedHandler(problems.accessDeniedHandler()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/health/**",
                                          "/actuator/info").permitAll()
@@ -109,6 +113,8 @@ public class SecurityConfig {
                 // entry point at all, so an unauthenticated caller was told
                 // "forbidden" when the truthful answer was "unauthenticated".
                 .oauth2ResourceServer(oauth2 -> oauth2
+                        .authenticationEntryPoint(problems.authenticationEntryPoint())
+                        .accessDeniedHandler(problems.accessDeniedHandler())
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(converter)))
                 .build();
     }
@@ -125,8 +131,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        return TokenSupport.roleClaimConverter();
+    JwtAuthenticationConverter jwtAuthenticationConverter(JwtProperties properties) {
+        return TokenSupport.roleClaimConverter(properties);
     }
 
     @Bean
@@ -134,7 +140,8 @@ public class SecurityConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOrigins(allowedOrigins);
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Device-Id"));
+        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Device-Id", "Idempotency-Key"));
+        cfg.setExposedHeaders(List.of("Retry-After"));
         cfg.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", cfg);

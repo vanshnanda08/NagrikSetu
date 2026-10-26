@@ -8,7 +8,15 @@ import { REVIEW_CAUSE, reviewCause } from "./moderation";
  */
 describe("review causes", () => {
   it("has a label for every reason the clustering engine writes", () => {
-    expect(Object.keys(REVIEW_CAUSE).sort()).toEqual(["EXTENT_CAP", "LOW_CONF_MERGE", "LOW_CONF_SPLIT"]);
+    expect(Object.keys(REVIEW_CAUSE).sort()).toEqual([
+      "CAPTURE_TIME_GAP",
+      "EXTENT_CAP",
+      "LOW_CONF_MERGE",
+      "LOW_CONF_SPLIT",
+      "PROFANITY",
+      "REUSED_PROOF_PHOTO",
+      "REUSED_REPORT_PHOTO",
+    ]);
   });
 
   it("falls back to a generic label rather than nothing", () => {

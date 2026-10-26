@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { REFRESH_COOKIE, clearRefreshCookie, setRefreshCookie } from "@/lib/authCookie";
+import { isSameOrigin } from "@/lib/sameOrigin";
 
 /**
  * Silent refresh.
@@ -13,7 +14,8 @@ import { REFRESH_COOKIE, clearRefreshCookie, setRefreshCookie } from "@/lib/auth
  * every subsequent 401 trigger another doomed refresh, so the client would
  * loop instead of sending the user to sign in.
  */
-export async function POST() {
+export async function POST(request: Request) {
+  if (!isSameOrigin(request)) return NextResponse.json({ detail: "Same-origin requests only." }, { status: 403 });
   const base = process.env.API_BASE ?? "http://localhost:8080/api/v1";
   const jar = await cookies();
   const refreshToken = jar.get(REFRESH_COOKIE)?.value;
@@ -32,7 +34,12 @@ export async function POST() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ refreshToken }),
-  });
+    signal: AbortSignal.timeout(15000),
+  }).catch(() => null);
+
+  if (!upstream || upstream.status >= 500 || upstream.status === 429) {
+    return NextResponse.json({ detail: "The sign-in service is temporarily unavailable. Retry shortly." }, { status: 503 });
+  }
 
   if (!upstream.ok) {
     const res = NextResponse.json({ detail: "Your session has expired." }, { status: 401 });

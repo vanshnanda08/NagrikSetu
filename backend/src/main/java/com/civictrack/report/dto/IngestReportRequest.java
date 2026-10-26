@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
+import java.time.Instant;
 
 /**
  * The ingest request body.
@@ -46,6 +47,7 @@ public record IngestReportRequest(
         String photoUrl,
 
         @Size(max = 64) String photoHash,
+        Instant photoCapturedAt,
         @Size(max = 64) String deviceId
 ) {
     /**
@@ -57,6 +59,6 @@ public record IngestReportRequest(
         return new IngestReportCommand(
                 categoryCode, lat, lng, accuracyM, manualPin,
                 description, addressText, landmark,
-                photoUrl, photoHash, reporterId, deviceId);
+                photoUrl, photoHash, photoCapturedAt, reporterId, deviceId);
     }
 }

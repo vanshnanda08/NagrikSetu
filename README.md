@@ -13,10 +13,12 @@ dashboard publishes the resulting numbers without a login.
 
 ## Project status
 
-**Phases 0–7 implemented; deployment activation checks remain.** Month one (weeks 1–4) plus citizen verification
-(week 5) and supervisor moderation with the full live dashboard (week 6) are
-built and tested. Evaluation (week 7) and anti-abuse and the write-up (week 8)
-are next, and have not been started.
+**Phases 0–9 implemented; production sign-off is conditional.**
+The application, evaluation, hardening, demo profile, and final write-up are
+built and tested. Production credential checks (deployment, backup artifact,
+and Cloudinary deletion) remain operator tasks because they require the live
+accounts and secrets. See [the 2026-10-26 audit](FINAL_AUDIT.md) for security fixes,
+fresh verification and the remaining operational/accessibility checks.
 
 Outside the numbered phases, the frontend was reworked on 2026-10-11: it is now
 branded **NagrikSetu**, has a glass-style theme in light and dark, fits a
@@ -28,8 +30,8 @@ verified locally (see the end of this file).
 | Frontend | https://civic-track-six.vercel.app (deployed from `main` by Vercel; whether the live site already has the latest redesign has not been checked) |
 | API | https://civictrack-api.onrender.com |
 | API docs (Swagger) | https://civictrack-api.onrender.com/swagger-ui/index.html |
-| Backend tests | **224** passing, against real PostGIS via Testcontainers |
-| Frontend tests | **68** passing, plus lint, typecheck and production build in CI |
+| Backend tests | **275 total: 273 passed, 2 opt-in evaluation tests skipped, 0 failures/errors**, against real PostGIS via Testcontainers |
+| Frontend tests | **82** passing, plus lint, typecheck and production build |
 | CI | GitHub Actions: backend suite, frontend lint/typecheck/tests/build, then the API/browser verification job before the deploy hook. It was last confirmed green before 2026-10-07; runs since then have not been checked from this environment |
 | Deployed corpus | 113 issues / 254 reports in the verified backup taken 2026-10-07; counts change with usage |
 
@@ -50,14 +52,18 @@ verified locally (see the end of this file).
 | 5 | Deployment: Docker image with CDS, Supabase, Render, Vercel, GitHub Actions CI, keep-alive, backup with a tested restore, Swagger UI, Cloudinary photo upload and nightly orphan sweep | 🟡 Implemented; remote activation checks pending |
 | 6 | Citizen verification: quorum, one vote per citizen per fix, timeout sweep, auto-close, reopen on rejection, `/me/verify`, notification centre, resolved-without-verification rate per department | ✅ done |
 | 7 | Supervisor tools (assignment board, review queue, split/merge with full recomputation and a permanent log, recategorise), full dashboard aggregates behind expandable headings, SSE live updates | ✅ done |
+| 8 | Evaluation: labelled clustering quality, radius sweep, latency at 1k/10k/50k issues, extent-cap ablation, and live concurrency cohorts | ✅ done; reproducible scripts and CSV/PDF results are in `evaluation/` and `artifacts/evaluation/` |
+| 9 | Rate limiting, anti-abuse screening, privacy redaction, demo scenario, remaining blueprint screens, and final report | ✅ done |
+| Extended scope | Password reset, refresh-token rotation and reuse detection, opt-in email delivery, audited admin configuration, persistent drafts, and background offline submission | ✅ done |
+| Production essentials | Authenticator MFA and recovery codes for municipal roles, active-session revocation, issue following, private clarification threads, installable PWA manifest, and security headers | ✅ done |
 | UI | Frontend refresh (not a numbered phase): NagrikSetu branding and logo, glass theme with a navy / orange / sky palette, one-screen desktop layout for every page, root redirect to the dashboard, accessibility fixes | ✅ done, verified locally 2026-10-11 |
 
-### Next
+### Remaining operator checks
 
-| Phase | Deliverable | Status |
-|---|---|---|
-| 8 | Evaluation: clustering precision/recall/F1 against the ground-truth labels, merge-radius sweep, latency vs. scale, extent-cap ablation | ⏳ not started. Groundwork only: `backend/ground_truth_labels.csv` and the reproducible seed corpus |
-| 9 | Rate limiting, anti-abuse, demo scenario, paper; then the remaining blueprint screens (system screens, reassign ward, audit log, profile, ward detail, department analytics) | ⏳ not started. No rate limiting exists yet (`AuthController` and `SecurityConfig` both note it as a later phase) |
+- Confirm the newest deployment on Render and Vercel with production credentials.
+- Confirm one scheduled encrypted backup artifact can be downloaded and restored.
+- Review Cloudinary orphan-sweep dry-run output before enabling deletion.
+- Record the final demo using `docs/DEMO-RUNBOOK.md` if a submission video is required.
 
 ## Features
 
@@ -80,10 +86,33 @@ verified locally (see the end of this file).
   sweeps.
 - **Anonymous reporting.** No account needed to report; a signed-in reporter's
   identity is taken from the verified token, never from the request body.
+- **Recoverable accounts.** Refresh cookies rotate through reuse-detecting
+  token families. One-use password-reset links expire after 30 minutes, and
+  password/access changes revoke refresh sessions.
+- **Protected municipal access.** Staff, supervisor and administrator roles
+  require time-based authenticator MFA in production, with one-use recovery
+  codes and replay protection. Every user can inspect and revoke refresh-token
+  session families from the security screen.
+- **Email without coupling civic work to SMTP.** Email updates are opt-in and
+  use a transactional outbox with bounded retries. In-app notifications and
+  issue transitions still succeed when the mail service is down.
+- **Persistent offline reporting.** Draft text, coordinates and compressed
+  photos survive reloads in IndexedDB. Explicitly submitted offline reports
+  enter a visible service-worker outbox, remain bound to the original account,
+  and use server-side idempotency keys during background retry.
+- **Layered abuse controls.** Durable and in-memory report throttles, login
+  throttling, perceptual photo hashes, capture-time/profanity review flags, and
+  proof-photo reuse checks reduce spam without blocking anonymous civic access.
+  Supervisors can redact public descriptions while retaining the original and
+  an immutable audit record.
 - **Citizen verification.** A claimed fix is put to the people who reported it:
   enough "fixed" votes resolve it, a rejection reopens and escalates it, and
   silence resolves it after 72 hours. Issues no citizen could verify are
   counted and published per department rather than hidden.
+- **Issue following and clarification.** Citizens may follow a public issue
+  without affecting its priority and receive lifecycle notifications. The
+  original signed-in reporters can privately answer scoped municipal requests
+  for more information; neither side exposes the thread publicly.
 - **Supervisor moderation.** A review queue of every grouping the engine was
   unsure of; split and merge with a server-computed preview, full
   recomputation, and a permanent log. No report is ever deleted, and a merged
@@ -95,10 +124,18 @@ verified locally (see the end of this file).
   colours checked for colour-blind separation, every chart with a table view.
 - **Accessible status display.** Every status is encoded by colour, shape and
   word, never colour alone. Light and dark themes.
+- **Audited administration.** An administrator screen manages category/SLA
+  policy, account roles and scopes, department hierarchy and ward officers.
+  It prevents the last administrator from being removed, rejects hierarchy
+  cycles, revokes affected sessions, and records before/after values.
 - **One-screen desktop layout.** On a window of 1280 x 600 or larger the page
   never scrolls: the header stays, tiles and maps take the available height,
   and only long content (the issue list, a timeline) scrolls inside its own
   panel. Smaller windows and phones use the normal flowing layout.
+- **Installable and hardened web client.** A web-app manifest, responsive app
+  icons and install prompt make the existing offline-capable frontend
+  installable. Browser responses include HSTS, frame denial, MIME-sniffing,
+  referrer, permissions and opener-isolation headers.
 
 ## Tech stack
 
@@ -169,6 +206,7 @@ docker compose up -d                     # PostGIS on 5432
 cd backend && mvn spring-boot:run \
   -Dspring-boot.run.profiles=demo \
   -Dspring-boot.run.arguments="--civictrack.demo.staff-password=demo1234 \
+                               --civictrack.media.verify-evidence=false \
                                --civictrack.cors.allowed-origins=http://localhost:3000"
 
 cd frontend && npm install && npm run dev     # http://localhost:3000 (/ redirects to /dashboard)
@@ -188,6 +226,21 @@ escalation happen while a slide is still on screen — which means nearly every
 seeded issue reads as overdue. Run without the profile for realistic deadlines,
 at the cost of not being able to log in.
 
+Production requires MFA before a municipal account receives its role
+authority. The `demo` profile deliberately disables that requirement only for
+seeded browser automation and workshops; it does not change the production
+default. MFA can still be enrolled and exercised at `/me/security` under the
+normal profile.
+
+`verify-evidence=false` is only for the local placeholder-photo demo. Production
+must leave verification enabled and set the same Cloudinary cloud in
+`CLOUDINARY_CLOUD_NAME` and `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`; the API then
+downloads and hashes the actual uploaded pixels. To exercise email locally,
+run Mailpit on ports 1025/8025 and set `MAIL_ENABLED=true`. Production mail also
+needs `SMTP_HOST`, `SMTP_PORT`, optional SMTP credentials/TLS, `MAIL_FROM`, and
+`PUBLIC_APP_URL`. With mail disabled, messages remain in the outbox and issue work
+continues normally.
+
 Seeded logins, all with the password passed above:
 
 | Role | Email |
@@ -203,8 +256,8 @@ account at all.
 ## Testing
 
 ```bash
-cd backend  && mvn clean test    # 224 integration and unit tests, Testcontainers
-cd frontend && npm run test      # 68 unit tests
+cd backend  && mvn clean test    # 275 total: 273 passed, 2 opt-in evaluations skipped
+cd frontend && npm run test      # 82 unit tests
 cd frontend && npm run lint      # includes the Leaflet import boundary rule
 ```
 
@@ -324,8 +377,16 @@ mvn spring-boot:run -Dspring-boot.run.profiles=seed \
   -Dspring-boot.run.arguments="--civictrack.seed.corpus-size=250"
 ```
 
-The reference corpus is ready for phase 8. F1/radius sweeps, latency benchmarks
-and extent-cap comparisons are still phase 8 deliverables, not completed measurements.
+The completed phase-8 harness is documented in `evaluation/README.md`. On the
+250-report labelled corpus the production grouping achieved pairwise precision
+1.000, recall 0.790, and F1 0.883. The cap deliberately trades some recall on
+the random seed corpus, but on the synthetic linear-defect stress corpus it
+raised F1 from 0.558 to 1.000 by preventing chain merges. Live cohorts of 2,
+5, 10, 20, and 50 simultaneous reports each produced one issue. With 500
+requests per scale, ingest p50 was 56.0 ms at 1k, 52.7 ms at 10k, and 57.7 ms
+at 50k existing issues, with no failed requests. CSV source tables and vector
+PDF plots are retained in `artifacts/evaluation/`; results are local-machine
+measurements, not production capacity claims.
 
 ## Backup and cleanup operations
 
@@ -357,7 +418,7 @@ Cloudinary cleanup needs `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and
 setting `CLOUDINARY_DRY_RUN=false`. Those management credentials are not configured
 in the available local environment, so production deletion remains unverified.
 
-Verification on 2026-10-07: backend tests, frontend tests, typecheck and lint pass.
+Verification on 2026-10-24: backend tests, frontend tests, typecheck and lint pass.
 The production frontend builds with `npm run build -- --webpack`; this environment
 rejects the local worker port used by Turbopack. The normal build command is unchanged.
 
@@ -380,3 +441,14 @@ no runtime errors. An axe accessibility scan reports no issues on the pages it
 covered, apart from the map markers, whose touch targets are under 24px (an
 existing Leaflet marker limitation). On windows of 1280px or wider, controls are
 40px high rather than 48px.
+
+Final closeout verification (2026-10-24): 270 backend tests recorded against
+PostGIS 17: 268 passed, 2 opt-in evaluations skipped, 0 failures/errors.
+All 79 frontend tests, lint, TypeScript, and the Webpack production
+build pass. Phase-8 clustering, concurrency, cap-ablation, and latency artifacts
+were regenerated from disposable databases. This verification includes MFA,
+session revocation, issue following and private clarification-thread coverage.
+The final project report and demo runbook are in `docs/`.
+
+See [the current progress record](docs/PROGRESS.md) for the completed scope,
+verification boundaries, migration state and outstanding operator checks.

@@ -8,10 +8,13 @@ import com.civictrack.moderation.dto.MergeRequest;
 import com.civictrack.moderation.dto.ModerationEntryDto;
 import com.civictrack.moderation.dto.ModerationResultDto;
 import com.civictrack.moderation.dto.NoteRequest;
+import com.civictrack.moderation.dto.ReassignWardRequest;
+import com.civictrack.moderation.dto.RedactRequest;
 import com.civictrack.moderation.dto.RecategoriseRequest;
 import com.civictrack.moderation.dto.ReviewPageDto;
 import com.civictrack.moderation.dto.SplitPreviewDto;
 import com.civictrack.moderation.dto.SplitRequest;
+import com.civictrack.moderation.dto.WardOptionDto;
 import com.civictrack.user.auth.Actors;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -105,10 +109,34 @@ public class SupervisorController {
         return result(moderation.recategorise(id, body.categoryCode(), Actors.from(jwt), body.note()), null);
     }
 
+    @GetMapping("/issues/{id}/ward-options")
+    @PreAuthorize("hasAnyRole('SUPERVISOR','ADMIN') and @issueGuard.canAct(#id, authentication)")
+    public List<WardOptionDto> wardOptions(@PathVariable UUID id) {
+        return moderation.wardOptions(id).stream()
+                .map(o -> new WardOptionDto(o.id(), o.wardNumber(), o.name(), o.distanceM(), o.current(), o.allowed()))
+                .toList();
+    }
+
+    @PostMapping("/issues/{id}/reassign-ward")
+    @PreAuthorize("hasAnyRole('SUPERVISOR','ADMIN') and @issueGuard.canAct(#id, authentication)")
+    public ModerationResultDto reassignWard(@PathVariable UUID id, @Valid @RequestBody ReassignWardRequest body,
+                                            @AuthenticationPrincipal Jwt jwt) {
+        return result(moderation.reassignWard(id, body.wardId(), Actors.from(jwt), body.note()), null);
+    }
+
     @GetMapping("/issues/{id}/moderation")
     @PreAuthorize("hasAnyRole('SUPERVISOR','ADMIN') and @issueGuard.canAct(#id, authentication)")
     public List<ModerationEntryDto> history(@PathVariable UUID id) {
         return moderation.history(id).stream().map(ModerationEntryDto::from).toList();
+    }
+
+    @PostMapping("/issues/{id}/reports/{reportId}/redact")
+    @PreAuthorize("hasAnyRole('SUPERVISOR','ADMIN') and @issueGuard.canAct(#id, authentication)")
+    public ResponseEntity<Void> redact(@PathVariable UUID id, @PathVariable UUID reportId,
+                                       @Valid @RequestBody RedactRequest body,
+                                       @AuthenticationPrincipal Jwt jwt) {
+        moderation.redact(id, reportId, Actors.from(jwt), body.reason());
+        return ResponseEntity.noContent().build();
     }
 
     private static ModerationResultDto result(Issue issue, Issue related) {

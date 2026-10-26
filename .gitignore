@@ -10,6 +10,7 @@ tools/node_modules/
 frontend/.next/
 frontend/out/
 frontend/.env*.local
+.venv-evaluation/
 
 # IDE
 .idea/
@@ -33,8 +34,17 @@ backend/.env.seed
 # have no business in version control.
 backups/
 
-# Project documents are kept locally, not in the repository.
-docs/
+# Historical working documents stay local. Retain the final closeout evidence.
+docs/*
+!docs/DEMO-RUNBOOK.md
+!docs/PROGRESS.md
+!docs/DESIGN-DECISIONS.md
+!docs/FINAL-PROJECT-REPORT.md
+!docs/MONTH-2-WORK-DONE.md
 
-# Local verification screenshots and walk output (large, regenerable)
-artifacts/
+# Local verification screenshots and walk output (large, regenerable). Keep
+# the small, reproducible phase-8 result tables and vector plots.
+artifacts/*
+!artifacts/evaluation/
+!artifacts/evaluation/*.csv
+!artifacts/evaluation/*.pdf

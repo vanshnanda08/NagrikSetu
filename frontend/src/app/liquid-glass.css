@@ -476,3 +476,28 @@ html.dark {
   .liquid-app .report-notes textarea { height: 40px; }
   .liquid-app .report-notes label > .text-ink-muted { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
+
+/* "Manage": the work tools under one menu on a desktop window; flat in the mobile menu. */
+.liquid-app .site-links .manage-group { position: relative; }
+.liquid-app .site-links .manage-toggle { width: auto; white-space: nowrap; padding: 0 16px 0 19px; min-height: 48px; border-radius: 999px; font-size: 14px; }
+.liquid-app .site-links .manage-toggle[aria-current], .liquid-app .site-links .manage-toggle.bg-brand-dark { box-shadow: 0 3px 8px rgba(15,23,42,.16), inset 0 1px 0 rgba(255,255,255,.15); }
+.liquid-app .manage-panel {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 700; display: none;
+  flex-direction: column; gap: 2px; min-width: 230px; padding: 6px;
+  background: var(--glass-solid); border: 1px solid var(--glass-edge); border-radius: 22px;
+  box-shadow: var(--glass-shadow), 0 14px 36px rgba(15,23,42,.2);
+}
+.liquid-app .manage-panel[data-open="true"] { display: flex; }
+.liquid-app .manage-panel a { width: 100%; justify-content: flex-start; }
+@media (min-width: 768px) {
+  /* The menu hangs below the pill, so the pill must not clip it. */
+  .liquid-app .site-links { overflow: visible; }
+}
+@media (max-width: 767px) {
+  .liquid-app .site-links .manage-toggle { display: none; }
+  .liquid-app .manage-panel { position: static; display: flex; min-width: 0; padding: 0; background: none; border: 0; box-shadow: none; flex-direction: row; gap: 2px; }
+  .liquid-app .manage-panel a { width: auto; }
+}
+@media (min-width: 1280px) and (min-height: 600px) {
+  .liquid-app .site-links .manage-toggle { min-height: 40px; }
+}

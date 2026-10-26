@@ -13,6 +13,8 @@
  * field is ever needed here that is not on the public DTO, the answer is a
  * decision about the public contract, not a cast.
  */
+import type { Role } from "./auth";
+
 
 import type { IssueStatus } from "./status";
 
@@ -296,7 +298,7 @@ export interface AwaitingVerdict {
   silenceDeadline: string | null;
 }
 
-export type NotificationType = "VERIFY_REQUESTED" | "RESOLVED" | "REOPENED" | "REJECTED";
+export type NotificationType = "VERIFY_REQUESTED" | "RESOLVED" | "REOPENED" | "REJECTED" | "INFO_REQUESTED" | "CITIZEN_REPLIED";
 
 export interface AppNotification {
   id: number;
@@ -455,7 +457,7 @@ export interface ModerationResult {
 
 export interface ModerationEntry {
   id: number;
-  action: "CONFIRM" | "SPLIT" | "MERGE" | "RECATEGORISE";
+  action: "CONFIRM" | "SPLIT" | "MERGE" | "RECATEGORISE" | "REASSIGN_WARD" | "REDACT";
   issueId: string;
   relatedIssueId: string | null;
   actorRole: string;
@@ -478,4 +480,117 @@ export interface Member {
   role: "STAFF" | "SUPERVISOR";
   wardName: string | null;
   openAssigned: number;
+}
+
+// ---------------------------------------------------------------------------
+// Profile, ward reassignment, audit log, ward page, department analytics
+// ---------------------------------------------------------------------------
+
+/** `GET /me/profile`. `mutableNotificationTypes` is the set the screen may offer a switch for. */
+export interface Profile {
+  id: string;
+  fullName: string;
+  email: string | null;
+  phone: string | null;
+  role: Role;
+  mutedNotificationTypes: NotificationType[];
+  mutableNotificationTypes: NotificationType[];
+  createdAt: string;
+}
+
+/** `GET /supervisor/issues/{id}/ward-options`: nearest first; `allowed` is the ward guard's verdict. */
+export interface WardOption {
+  id: string;
+  wardNumber: number;
+  name: string;
+  distanceM: number;
+  current: boolean;
+  allowed: boolean;
+}
+
+export type AuditKind = "STATUS" | "ESCALATION" | "MODERATION";
+
+export interface AuditEntry {
+  at: string;
+  kind: AuditKind;
+  issueId: string;
+  issueRef: string;
+  category: string;
+  action: string;
+  fromStatus: string | null;
+  toStatus: string | null;
+  level: number | null;
+  actorRole: string;
+  actorName: string | null;
+  note: string | null;
+}
+
+export interface AuditPage {
+  items: AuditEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/** The dashboard's figures for one ward or one department. A null rate or median means "below the minimum sample". */
+export interface ScopeMetrics {
+  openCount: number;
+  overdueCount: number;
+  resolvedCount: number;
+  reportedLast30Days: number;
+  resolvedLast30Days: number;
+  medianResolutionHours: number | null;
+  resolvedWithTime: number;
+  slaResolved: number;
+  slaOnTime: number;
+  slaRate: number | null;
+  fixesClaimed: number;
+  reopened: number;
+  reopenRate: number | null;
+  resolvedWithoutVerification: number;
+  unverifiedRate: number | null;
+  backlogAge: AgeBucket[];
+  reportedVsResolved: DayCount[];
+  openByCategory: { code: string; name: string; open: number }[];
+  minimumSample: number;
+  generatedAt: string;
+}
+
+export interface WardDashboard {
+  ward: { id: string; wardNumber: number; name: string; boundary: string };
+  metrics: ScopeMetrics;
+  density: { lat: number; lng: number; issues: number; open: number }[];
+  recurrence: {
+    categoryCode: string;
+    categoryName: string;
+    lat: number;
+    lng: number;
+    issues: number;
+    open: number;
+    firstReportedAt: string;
+    lastReportedAt: string;
+    refs: string[];
+    issueIds: string[];
+  }[];
+  generatedAt: string;
+}
+
+export interface StaffAnalyticsRow {
+  id: string;
+  name: string;
+  fixesClaimed: number;
+  resolved: number;
+  reopened: number;
+  reopenRate: number | null;
+  medianResolutionHours: number | null;
+  openAssigned: number;
+  overdueAssigned: number;
+}
+
+export interface DepartmentAnalytics {
+  department: { id: string; name: string };
+  metrics: ScopeMetrics;
+  staff: StaffAnalyticsRow[];
+  minimumSample: number;
+  generatedAt: string;
 }

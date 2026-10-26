@@ -83,7 +83,13 @@ describe("composerSchema", () => {
 });
 
 describe("ingestSchema", () => {
-  const body = { ...valid, photoUrl: "https://example.test/a.jpg", deviceId: "d1" };
+  const body = {
+    ...valid,
+    photoUrl: "https://example.test/a.jpg",
+    photoHash: "0123456789abcdef",
+    photoCapturedAt: "2026-10-24T10:00:00.000Z",
+    deviceId: "d1",
+  };
 
   it("accepts the real payload once the photo has a URL", () => {
     const { hasPhoto: _unused, ...rest } = body;
@@ -95,6 +101,12 @@ describe("ingestSchema", () => {
     const { hasPhoto: _unused, ...rest } = body;
     void _unused;
     expect(ingestSchema.safeParse({ ...rest, photoUrl: "" }).success).toBe(false);
+  });
+
+  it("requires a canonical 64-bit perceptual hash", () => {
+    const { hasPhoto: _unused, ...rest } = body;
+    void _unused;
+    expect(ingestSchema.safeParse({ ...rest, photoHash: "not-a-hash" }).success).toBe(false);
   });
 });
 

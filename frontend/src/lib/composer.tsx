@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { offlineStore } from "./offlineStore";
 import type { CompressedImage } from "./compressImage";
 
 /**
@@ -18,6 +19,8 @@ import type { CompressedImage } from "./compressImage";
  */
 
 export interface ComposedReport {
+  submissionId?: string;
+  ownerId?: string | null;
   categoryCode: string | null;
   lat: number | null;
   lng: number | null;
@@ -43,6 +46,8 @@ export const EMPTY_REPORT: ComposedReport = {
 };
 
 interface ComposerValue {
+  hydrated: boolean;
+  storageError: boolean;
   report: ComposedReport;
   patch: (changes: Partial<ComposedReport>) => void;
   reset: () => void;
@@ -52,6 +57,21 @@ const ComposerContext = createContext<ComposerValue | null>(null);
 
 export function ComposerProvider({ children }: { children: React.ReactNode }) {
   const [report, setReport] = useState<ComposedReport>(EMPTY_REPORT);
+  const [hydrated, setHydrated] = useState(false);
+  const [storageError, setStorageError] = useState(false);
+  useEffect(() => {
+    let live = true;
+    offlineStore<ComposedReport | undefined>("drafts", "get", "report").then(saved => {
+      if (!live || !saved) return;
+      if (saved.photo) saved.photo.previewUrl = URL.createObjectURL(saved.photo.blob);
+      setReport(saved);
+    }).catch(() => { if (live) setStorageError(true); }).finally(() => { if (live) setHydrated(true); });
+    return () => { live = false; };
+  }, []);
+  useEffect(() => {
+    if (!hydrated) return;
+    void offlineStore("drafts", "put", "report", report).catch(() => setStorageError(true));
+  }, [report, hydrated]);
 
   /**
    * `patch` and `reset` are stable for the life of the provider.
@@ -74,8 +94,8 @@ export function ComposerProvider({ children }: { children: React.ReactNode }) {
   const reset = useCallback(() => setReport(EMPTY_REPORT), []);
 
   const value = useMemo<ComposerValue>(
-    () => ({ report, patch, reset }),
-    [report, patch, reset],
+    () => ({ report, patch, reset, hydrated, storageError }),
+    [report, patch, reset, hydrated, storageError],
   );
 
   return <ComposerContext.Provider value={value}>{children}</ComposerContext.Provider>;

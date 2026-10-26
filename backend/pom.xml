@@ -19,11 +19,22 @@
 
     <properties>
         <java.version>21</java.version>
+        <!-- Compatible security updates beyond the Boot 3.5.16 BOM. -->
+        <jackson-bom.version>2.21.7</jackson-bom.version>
+        <tomcat.version>10.1.61</tomcat.version>
+        <postgresql.version>42.7.12</postgresql.version>
+        <log4j2.version>2.25.5</log4j2.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <shedlock.version>6.10.0</shedlock.version>
         <springdoc.version>2.9.1</springdoc.version>
+        <bucket4j.version>8.21.0</bucket4j.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
         <!-- core -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -40,6 +51,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
         <!--
           Declared explicitly, though not strictly required today: aspectjweaver
@@ -115,6 +130,14 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- Local token buckets for anonymous/login abuse control. Database
+             checks remain the durable authority for report quotas. -->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j_jdk17-core</artifactId>
+            <version>${bucket4j.version}</version>
         </dependency>
 
         <!--

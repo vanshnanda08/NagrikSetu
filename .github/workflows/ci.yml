@@ -317,6 +317,7 @@ jobs:
           java -jar target/civictrack-backend-0.1.0-SNAPSHOT.jar \
             --spring.profiles.active=demo,seed \
             --civictrack.demo.staff-password=demo1234 \
+            --civictrack.media.verify-evidence=false \
             --civictrack.cors.allowed-origins=http://localhost:3000 \
             --civictrack.seed.labels-file-path=/tmp/verification-labels.csv \
             > /tmp/verification-backend.log 2>&1 &

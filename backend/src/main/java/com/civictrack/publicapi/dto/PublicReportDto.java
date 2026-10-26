@@ -43,7 +43,9 @@ public record PublicReportDto(
                 round1(r.getClusterDistanceM()),
                 round1(r.getEffectiveRadiusM()),
                 round1(r.getProjectedExtentM()),
-                r.getPhotoUrl(), r.getDescription(), r.getLandmark());
+                r.getPhotoUrl(),
+                r.isDescriptionRedacted() ? "[Description removed by a supervisor]" : r.getDescription(),
+                r.getLandmark());
     }
 
     private static Double round1(Double v) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { absoluteDateTime, ageLabel, fileSize, humaniseMs, metres, ordinal, reporters } from "./format";
+import { absoluteDateTime, ageLabel, durationHours, fileSize, humaniseMs, metres, ordinal, percent, reporters } from "./format";
 
 /**
  * Formatting. Small, but every one of these appears in a queue row or on the
@@ -98,5 +98,27 @@ describe("date formatting never throws on bad input", () => {
   it("degrades the age label rather than printing NaN", () => {
     expect(ageLabel(undefined)).toBe("Reported at an unknown time");
     expect(humaniseMs(Number.NaN)).toBe("an unknown time");
+  });
+});
+
+describe("durationHours", () => {
+  it("speaks in hours under two days and in days from two days up, as the dashboard does", () => {
+    expect(durationHours(10)).toBe("10.0 hours");
+    expect(durationHours(47.9)).toBe("47.9 hours");
+    expect(durationHours(48)).toBe("2.0 days");
+    expect(durationHours(60)).toBe("2.5 days");
+  });
+});
+
+describe("percent", () => {
+  it("rounds a rate to a whole percent", () => {
+    expect(percent(0)).toBe("0%");
+    expect(percent(0.236)).toBe("24%");
+    expect(percent(1)).toBe("100%");
+  });
+
+  it("keeps 'no data' distinct from zero, so a ward with nothing resolved never reads as a perfect 0%", () => {
+    expect(percent(null)).toBeNull();
+    expect(percent(undefined)).toBeNull();
   });
 });

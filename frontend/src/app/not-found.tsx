@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
+import { TicketSearch } from "@/components/TicketSearch";
 
 /**
  * 404 (blueprint §3.22): states that the page or ticket does not exist, and
@@ -14,7 +15,8 @@ export default function NotFound() {
         The address may have been mistyped, or the ticket number may not be one
         this system issued.
       </p>
-      <p className="mt-4 flex flex-wrap gap-4">
+      <TicketSearch />
+      <p className="mt-6 flex flex-wrap gap-4">
         <Link href="/issues" className="text-body underline text-ink">
           Search the issue index
         </Link>

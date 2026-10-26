@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useTheme, useThemeSync, toggleTheme } from "@/lib/theme";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useSignIn } from "@/lib/signInDialog";
 import { request } from "@/lib/api";
@@ -34,6 +35,14 @@ interface NavLink {
   staffOnly?: boolean;
   /** Supervisors and administrators: the moderation tools (blueprint 3.17). */
   supervisorOnly?: boolean;
+  /** Administrators only: the audit log (blueprint 3.21). */
+  adminOnly?: boolean;
+  /**
+   * Work tools. Supervisors and administrators get these under one "Manage"
+   * menu, because nine links will not fit the top bar of a laptop; crew, who
+   * have exactly one, get it as an ordinary link.
+   */
+  group?: "manage";
 }
 
 const MENU_LINKS: NavLink[] = [
@@ -43,12 +52,16 @@ const MENU_LINKS: NavLink[] = [
   { href: "/report", label: "Report a problem", icon: "flag" },
   // "Work queue", not "Team". The link goes to a queue of work items; the
   // blueprint's vocabulary rule (§9) is that the label names the thing.
-  { href: "/staff/queue", label: "Work queue", icon: "inbox", staffOnly: true },
-  { href: "/supervisor/queue", label: "Assignment board", icon: "users", supervisorOnly: true },
-  { href: "/supervisor/review", label: "Review queue", icon: "layers", supervisorOnly: true },
+  { href: "/staff/queue", label: "Work queue", icon: "inbox", staffOnly: true, group: "manage" },
+  { href: "/supervisor/queue", label: "Assignment board", icon: "users", supervisorOnly: true, group: "manage" },
+  { href: "/supervisor/review", label: "Review queue", icon: "layers", supervisorOnly: true, group: "manage" },
+  { href: "/supervisor/analytics", label: "Analytics", icon: "chart", supervisorOnly: true, group: "manage" },
+  { href: "/admin/audit", label: "Audit log", icon: "scroll", adminOnly: true, group: "manage" },
+  { href: "/admin/configuration", label: "Configuration", icon: "scroll", adminOnly: true, group: "manage" },
 ];
 
-type IconName = "grid" | "list" | "pin" | "flag" | "inbox" | "users" | "layers" | "bell" | "signOut" | "signIn";
+type IconName =
+  | "grid" | "list" | "pin" | "flag" | "inbox" | "users" | "layers" | "chart" | "scroll" | "bell" | "signOut" | "signIn";
 
 /** Decorative throughout: every icon here sits beside its own text label. */
 function Icon({ name }: { name: IconName }) {
@@ -119,6 +132,24 @@ function Icon({ name }: { name: IconName }) {
         <svg {...common}>
           <circle cx="9" cy="10" r="5" />
           <circle cx="15" cy="14" r="5" />
+        </svg>
+      );
+    case "chart":
+      return (
+        <svg {...common}>
+          <line x1="4" y1="20" x2="20" y2="20" />
+          <rect x="6" y="11" width="3" height="9" />
+          <rect x="11" y="6" width="3" height="14" />
+          <rect x="16" y="13" width="3" height="7" />
+        </svg>
+      );
+    case "scroll":
+      return (
+        <svg {...common}>
+          <path d="M6 3h11a2 2 0 012 2v14a2 2 0 01-2 2H6z" />
+          <line x1="9" y1="8" x2="16" y2="8" />
+          <line x1="9" y1="12" x2="16" y2="12" />
+          <line x1="9" y1="16" x2="13" y2="16" />
         </svg>
       );
     case "bell":
@@ -202,6 +233,30 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
+  // The desktop "Manage" menu. Closed by an outside press or Escape, and by
+  // choosing a link; the listeners are attached only while it is open.
+  const [manageOpen, setManageOpen] = useState(false);
+  const manageRef = useRef<HTMLDivElement | null>(null);
+  const manageToggleRef = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    if (!manageOpen) return;
+    const onPress = (e: MouseEvent) => {
+      if (!manageRef.current?.contains(e.target as Node)) setManageOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setManageOpen(false);
+        manageToggleRef.current?.focus();
+      }
+    };
+    document.addEventListener("mousedown", onPress);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPress);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [manageOpen]);
+
   // Sign-in is a dialog now, not /login. See lib/signInDialog for why.
   const { openSignIn } = useSignIn();
 
@@ -223,6 +278,7 @@ export function SiteHeader() {
   const renderLink = (l: NavLink) => {
     if (l.staffOnly && !isStaff) return null;
     if (l.supervisorOnly && !isSupervisor) return null;
+    if (l.adminOnly && session?.role !== "ADMIN") return null;
     // Exact match, or a child route under it. Plain `startsWith` would light
     // up "/issues" while sitting on "/issues-archive".
     const isActive = pathname === l.href || pathname.startsWith(`${l.href}/`);
@@ -231,7 +287,10 @@ export function SiteHeader() {
       <Link
         key={l.href}
         href={l.href}
-        onClick={close}
+        onClick={() => {
+          close();
+          setManageOpen(false);
+        }}
         aria-current={isActive ? "page" : undefined}
         className={`${ROW} ${
           isActive ? "bg-brand-dark text-brand-dark-ink font-semibold" : ROW_IDLE
@@ -330,7 +389,24 @@ export function SiteHeader() {
           <p className="text-meta text-ink-muted uppercase tracking-wider mb-2 px-4">
             Menu
           </p>
-          <div className="site-links flex flex-col gap-1">{MENU_LINKS.map(renderLink)}</div>
+          <div className="site-links flex flex-col gap-1">
+            {MENU_LINKS.filter((l) => !l.group).map(renderLink)}
+            {isSupervisor ? (
+              <ManageMenu
+                links={MENU_LINKS.filter((l) => l.group === "manage")}
+                renderLink={renderLink}
+                active={MENU_LINKS.some(
+                  (l) => l.group === "manage" && (pathname === l.href || pathname.startsWith(`${l.href}/`)),
+                )}
+                open={manageOpen}
+                onToggle={() => setManageOpen((o) => !o)}
+                groupRef={manageRef}
+                toggleRef={manageToggleRef}
+              />
+            ) : (
+              MENU_LINKS.filter((l) => l.group === "manage").map(renderLink)
+            )}
+          </div>
 
           <div className="site-actions flex flex-col gap-1 mt-8 md:mt-auto md:pt-8">
             {!initialising && session && (
@@ -371,7 +447,7 @@ export function SiteHeader() {
                   type="button"
                   onClick={() => {
                     close();
-                    void signOut();
+                    void signOut().catch((error: unknown) => window.alert(error instanceof Error ? error.message : "Could not sign out. Please retry."));
                   }}
                   aria-label="Sign out"
                   title="Sign out"
@@ -433,5 +509,48 @@ export function SiteHeader() {
         </nav>
       </div>
     </header>
+  );
+}
+
+/**
+ * The "Manage" group: a button that opens the work tools on a desktop window,
+ * and -- in the stacked mobile menu -- is hidden by CSS while its links are
+ * shown flat, so a phone never has to open a menu inside a menu.
+ */
+function ManageMenu({
+  links,
+  renderLink,
+  active,
+  open,
+  onToggle,
+  groupRef,
+  toggleRef,
+}: {
+  links: NavLink[];
+  renderLink: (l: NavLink) => React.ReactNode;
+  active: boolean;
+  open: boolean;
+  onToggle: () => void;
+  groupRef: React.RefObject<HTMLDivElement | null>;
+  toggleRef: React.RefObject<HTMLButtonElement | null>;
+}) {
+  return (
+    <div ref={groupRef} className="manage-group">
+      <button
+        ref={toggleRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls="manage-panel"
+        onClick={onToggle}
+        className={`manage-toggle ${ROW} ${active ? "bg-brand-dark text-brand-dark-ink font-semibold" : ROW_IDLE}`}
+        style={{ minHeight: "var(--hit-min)" }}
+      >
+        <span className="flex-1">Manage</span>
+        <ChevronDown aria-hidden="true" size={16} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      <div id="manage-panel" className="manage-panel" data-open={open ? "true" : "false"}>
+        {links.map(renderLink)}
+      </div>
+    </div>
   );
 }
