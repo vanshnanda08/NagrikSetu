@@ -1,6 +1,7 @@
 package com.civictrack.clustering;
 
 import com.civictrack.category.Category;
+import com.civictrack.abuse.ContentScreeningService;
 import com.civictrack.category.CategoryRepository;
 import com.civictrack.category.LowConfAction;
 import com.civictrack.common.error.LowAccuracyException;
@@ -69,6 +70,7 @@ public class ClusteringService {
     // whole SLA clock is measured from, so a test that cannot set it cannot
     // exercise a deadline at all.
     private final Clock clock;
+    private final ContentScreeningService screening;
 
     /**
      * Ingests one report and returns what happened to it.
@@ -245,6 +247,7 @@ public class ClusteringService {
 
         Report report = buildReport(cmd, category, saved.getId(), decision,
                 distance, effectiveRadius, projectedExtent);
+        applyScreening(cmd, report, saved, now);
         Report savedReport = reportRepo.save(report);
 
         rescore(saved, category, now);
@@ -287,6 +290,7 @@ public class ClusteringService {
 
         Report report = buildReport(cmd, category, issue.getId(), decision,
                 distance, effectiveRadius, projectedExtent);
+        applyScreening(cmd, report, issue, now);
         // Flushed, not just saved: countDistinctReporters below is native and
         // reads committed table state, so an unflushed insert is invisible to it.
         Report savedReport = reportRepo.saveAndFlush(report);
@@ -352,11 +356,20 @@ public class ClusteringService {
         report.setLandmark(cmd.landmark());
         report.setPhotoUrl(cmd.photoUrl());
         report.setPhotoHash(cmd.photoHash());
+        report.setPhotoCapturedAt(cmd.photoCapturedAt());
         report.setClusterDecision(decision);
         report.setClusterDistanceM(distance);
         report.setEffectiveRadiusM(effectiveRadius);
         report.setProjectedExtentM(projectedExtent);
         return report;
+    }
+
+    private void applyScreening(IngestReportCommand command, Report report, Issue issue, Instant now) {
+        ContentScreeningService.Assessment assessment = screening.assess(command, now);
+        report.setAbuseFlags(assessment.flags());
+        if (assessment.flagged() && !issue.isNeedsReview()) {
+            issue.flagForReview(assessment.primaryReason());
+        }
     }
 
     private ClusterOutcome outcome(Report report, Issue issue, ClusterDecision decision,

@@ -2,11 +2,19 @@
 
 Next.js 16 (App Router), React 19, Tailwind v4.
 
-**Status.** Built across phases 4, 6 and 7 (public screens and report composer;
-citizen verification and notifications; supervisor tools and the live dashboard),
-then refreshed on 2026-10-11: NagrikSetu branding, a glass theme, a one-screen
-desktop layout and accessibility fixes. Nothing from phases 8 and 9 exists here
-yet. Every screen in the plan up to phase 7 is built and passes the route sweep.
+**Status (2026-10-26).** The agreed frontend scope is implemented, including
+public reporting, citizen verification, supervisor tools, administration,
+profile and account recovery, email preferences, persistent drafts and offline
+submission. The latest additions are authenticator MFA and session controls at
+`/me/security`, issue following, private clarification threads, an installable
+web-app manifest and browser security headers. The NagrikSetu theme supports
+light/dark modes and responsive layouts.
+
+Latest checks: 82 tests passed, ESLint and TypeScript passed, and
+`npm run build -- --webpack` succeeded with 31 generated static pages.
+The expanded five-role browser route sweep passed 190 checks. Security and
+extended-feature journeys were exercised against a scratch API and local mail.
+See [current progress](../docs/PROGRESS.md) and [audit limitations](../FINAL_AUDIT.md).
 
 ## Running
 
@@ -26,7 +34,7 @@ sends a placeholder URL and everything else works. See `.env.example`.
 
 | | |
 |---|---|
-| `npm run test` | 68 unit tests over validation, server rules, charts and uploads |
+| `npm run test` | 82 unit tests over validation, server rules, charts, uploads and auth boundary helpers |
 | `npm run lint` | includes the rule confining Leaflet to one module |
 | `npm run build` | production build |
 

@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError, apiBase } from "./api";
+import { useQueryClient } from "@tanstack/react-query";
 
 /**
  * Authentication.
@@ -25,13 +26,14 @@ export interface Session {
   userId: string;
   fullName: string;
   role: Role;
+  mfaSetupRequired?: boolean;
 }
 
 interface AuthValue {
   session: Session | null;
   /** True until the first silent refresh settles, so guards do not flash. */
   initialising: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, mfaCode?: string) => Promise<void>;
   register: (input: RegisterInput) => Promise<void>;
   signOut: () => Promise<void>;
   /** Runs a request with the access token, refreshing once on a 401. */
@@ -48,6 +50,7 @@ export interface RegisterInput {
 const AuthContext = createContext<AuthValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [initialising, setInitialising] = useState(true);
 
@@ -62,7 +65,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const attempt = (async () => {
       try {
-        const res = await fetch("/api/auth/refresh", { method: "POST" });
+        const rotate = () => fetch("/api/auth/refresh", { method: "POST" });
+        // Cookies are shared between tabs. Serialize rotation across the origin.
+        const res = navigator.locks
+          ? await navigator.locks.request("ct-auth-cookie", rotate)
+          : await rotate();
         // 204 means "no cookie, nobody is signed in" -- the ordinary anonymous
         // case, not a failure. Anything else non-OK is a real refusal.
         if (res.status === 204 || !res.ok) {
@@ -90,18 +97,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     void refresh().finally(() => setInitialising(false));
   }, [refresh]);
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string, mfaCode?: string) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, mfaCode: mfaCode || null }),
     });
     if (!res.ok) {
       const problem = await res.json().catch(() => null);
       throw new ApiError(res.status, problem);
     }
+    queryClient.clear();
     setSession((await res.json()) as Session);
-  }, []);
+  }, [queryClient]);
 
   const register = useCallback(async (input: RegisterInput) => {
     const res = await fetch("/api/auth/register", {
@@ -113,13 +121,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const problem = await res.json().catch(() => null);
       throw new ApiError(res.status, problem);
     }
+    queryClient.clear();
     setSession((await res.json()) as Session);
-  }, []);
+  }, [queryClient]);
 
   const signOut = useCallback(async () => {
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    const logout = () => fetch("/api/auth/logout", { method: "POST" });
+    const res = navigator.locks ? await navigator.locks.request("ct-auth-cookie", logout) : await logout();
+    if (!res.ok) throw new ApiError(res.status, await res.json().catch(() => null));
+    queryClient.clear();
     setSession(null);
-  }, []);
+  }, [queryClient]);
 
   const authed = useCallback(
     async <T,>(run: (token: string) => Promise<T>): Promise<T> => {

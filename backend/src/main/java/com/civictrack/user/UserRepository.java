@@ -31,6 +31,17 @@ public interface UserRepository extends JpaRepository<AppUser, UUID> {
             """)
     List<AppUser> findAdmins();
 
+    /**
+     * Which of these people have switched this notification type off (V7).
+     * The column is a comma-separated list, so both sides are wrapped in commas
+     * to match a whole name and never a prefix of one.
+     */
+    @Query(value = """
+            SELECT id FROM users
+            WHERE id IN (:ids) AND (',' || muted_notification_types || ',') LIKE ('%,' || :type || ',%')
+            """, nativeQuery = true)
+    List<UUID> findIdsMuting(@Param("ids") java.util.Collection<UUID> ids, @Param("type") String type);
+
     @Query(value = "SELECT head_user_id FROM departments WHERE id = :id", nativeQuery = true)
     Optional<UUID> findDepartmentHead(@Param("id") UUID departmentId);
 

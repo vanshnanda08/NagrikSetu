@@ -27,10 +27,14 @@ public class AuthService {
     private final UserRepository users;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokens;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbc;
+    private final java.time.Clock clock;
+    private final TotpService totp;
 
     @Transactional
     public AppUser register(String email, String phone, String rawPassword, String fullName) {
-        String normalised = email == null ? null : email.trim().toLowerCase();
+        PasswordPolicy.validate(rawPassword);
+        String normalised = email == null ? null : email.trim().toLowerCase(java.util.Locale.ROOT);
         if (normalised != null && users.existsByEmailIgnoreCase(normalised)) {
             throw new EmailAlreadyRegisteredException(normalised);
         }
@@ -47,17 +51,39 @@ public class AuthService {
         return users.save(user);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Authenticated login(String email, String rawPassword) {
-        AppUser user = users.findByEmailIgnoreCase(email == null ? "" : email.trim())
-                .orElseThrow(() -> new InvalidCredentialsException("Email or password is incorrect"));
-        verify(user, rawPassword);
-        return new Authenticated(user, tokens.issue(user));
+        return login(email, rawPassword, null);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
+    public Authenticated login(String email, String rawPassword, String mfaCode) {
+        var ids = jdbc.queryForList("SELECT id FROM users WHERE lower(email)=lower(?) FOR UPDATE",UUID.class,email == null ? "" : email.trim());
+        if (ids.isEmpty()) throw new InvalidCredentialsException("Email or password is incorrect");
+        AppUser user = users.findById(ids.get(0)).orElseThrow(() -> new InvalidCredentialsException("Email or password is incorrect"));
+        verify(user, rawPassword);
+        totp.verifyLogin(user, mfaCode);
+        boolean mfaVerified = user.isMfaEnabled();
+        return new Authenticated(user, tokens.issue(user, mfaVerified));
+    }
+
+    @Transactional(noRollbackFor = InvalidCredentialsException.class)
     public Authenticated refresh(String refreshToken) {
         UUID subject = tokens.parseRefresh(refreshToken);
+        // All rotations and password changes for this account serialize on its row.
+        jdbc.queryForObject("SELECT id FROM users WHERE id = ? FOR UPDATE", UUID.class, subject);
+        var sessions = jdbc.queryForList("SELECT * FROM refresh_sessions WHERE token_hash = ?",
+                TokenDigests.sha256(refreshToken));
+        if (sessions.isEmpty()) throw new InvalidCredentialsException("The session has expired. Sign in again.");
+        var session = sessions.get(0);
+        UUID family = (UUID) session.get("family_id");
+        if (session.get("consumed_at") != null || Boolean.TRUE.equals(session.get("revoked"))) {
+            jdbc.update("UPDATE refresh_sessions SET revoked = true WHERE family_id = ?", family);
+            throw new InvalidCredentialsException("This session was reused. Sign in again.");
+        }
+        if (((java.sql.Timestamp) session.get("expires_at")).toInstant().isBefore(clock.instant())) {
+            throw new InvalidCredentialsException("The session has expired. Sign in again.");
+        }
         AppUser user = users.findById(subject)
                 .orElseThrow(() -> new InvalidCredentialsException("The account no longer exists"));
         if (!user.isActive()) {
@@ -67,7 +93,20 @@ public class AuthService {
         // token: over thirty days a user can change department, be demoted, or
         // be deactivated, and a refreshed access token must reflect the account
         // as it is now rather than as it was when the refresh token was minted.
-        return new Authenticated(user, tokens.issue(user));
+        boolean mfaVerified = Boolean.TRUE.equals(session.get("mfa_verified"));
+        jdbc.update("UPDATE refresh_sessions SET consumed_at = ?, last_used_at = ? WHERE token_hash = ?",
+                java.sql.Timestamp.from(clock.instant()), java.sql.Timestamp.from(clock.instant()),
+                TokenDigests.sha256(refreshToken));
+        return new Authenticated(user, tokens.issue(user, family, mfaVerified));
+    }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        var ids = jdbc.queryForList("SELECT user_id FROM refresh_sessions WHERE token_hash=?",UUID.class,TokenDigests.sha256(refreshToken));
+        if (ids.isEmpty()) return;
+        jdbc.queryForObject("SELECT id FROM users WHERE id=? FOR UPDATE",UUID.class,ids.get(0));
+        jdbc.update("UPDATE refresh_sessions SET revoked = true WHERE family_id IN "
+                + "(SELECT family_id FROM refresh_sessions WHERE token_hash = ?)", TokenDigests.sha256(refreshToken));
     }
 
     private void verify(AppUser user, String rawPassword) {

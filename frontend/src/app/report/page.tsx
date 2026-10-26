@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { offlineStore, queueReport } from "@/lib/offlineStore";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PageShell } from "@/components/PageShell";
@@ -16,6 +18,7 @@ import { useComposer } from "@/lib/composer";
 import { useAuth } from "@/lib/auth";
 import { useGeolocation } from "@/lib/useGeolocation";
 import { deviceId } from "@/lib/deviceId";
+import { useOnline } from "@/lib/useOnline";
 import { uploadPhoto, CLOUDINARY_CONFIGURED } from "@/lib/uploadPhoto";
 import { ApiError, apiBase } from "@/lib/api";
 import { fileSize, metres } from "@/lib/format";
@@ -52,15 +55,29 @@ import type { ClusterResult } from "@/lib/types";
  * and the button relabels to "Retry submission".
  */
 export default function ReportComposerPage() {
+  const { hydrated } = useComposer();
+  return hydrated ? <ReportComposerForm /> : <PageShell><LoadingState label="Restoring your draft" /></PageShell>;
+}
+
+function ReportComposerForm() {
   const router = useRouter();
   const categories = useCategories();
-  const { report, patch } = useComposer();
+  const { report, patch, reset, storageError } = useComposer();
   const { session } = useAuth();
   const { state: geo, locate } = useGeolocation();
 
   const [uploadFraction, setUploadFraction] = useState<number | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
   const [submittedRef, setSubmittedRef] = useState<string | null>(null);
+  // A validated report waiting for the connection to come back (blueprint §3.22).
+  const [held, setHeld] = useState(false);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const submissionId = useRef(report.submissionId);
+  const online = useOnline();
+  useEffect(() => {
+    if (session && report.ownerId === undefined) patch({ ownerId: session.userId });
+  }, [session, report.ownerId, patch]);
+  useEffect(() => { if (held) router.push("/report/outbox"); }, [held, router]);
 
   const form = useForm<ComposerValues>({
     resolver: zodResolver(composerSchema),
@@ -133,8 +150,34 @@ export default function ReportComposerPage() {
     patch({ manualPin: true, lat: la, lng: ln, accuracyM: MANUAL_PIN_ACCURACY_M });
   }
 
-  const onSubmit = handleSubmit(async (values) => {
+  async function submitValues(values: ComposerValues) {
     setFailed(null);
+    const id = submissionId.current ?? crypto.randomUUID();
+    submissionId.current = id;
+    patch({ submissionId: id, ownerId: session?.userId ?? report.ownerId ?? null });
+    const queuedBody: Record<string, unknown> = {
+      categoryCode: values.categoryCode, lat: values.lat, lng: values.lng,
+      accuracyM: values.accuracyM, manualPin: values.manualPin,
+      description: values.description || undefined, landmark: values.landmark || undefined,
+      photoUrl: report.photoUrl, photoHash: report.photo?.perceptualHash,
+      photoCapturedAt: report.photo?.capturedAt ?? null, deviceId: deviceId(),
+    };
+    const saveForBackgroundDelivery = () => queueReport({
+      id, userId: session?.userId ?? report.ownerId ?? null, body: queuedBody,
+      blob: report.photo?.blob ?? null,
+      cloud: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "",
+      preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? "",
+      createdAt: Date.now(), nextAttempt: 0, attempts: 0, state: "pending",
+    });
+    // No connection: hold the report -- photo, pin and details are already in
+    // the ComposerProvider -- and send it when the browser reports it is back.
+    if (!navigator.onLine) {
+      try {
+        await saveForBackgroundDelivery();
+        setHeld(true); reset();
+      } catch(error) { setFailed(error instanceof Error ? error.message : "Could not save the report offline."); }
+      return;
+    }
     try {
       // A retry after a failed SUBMIT must not re-upload a photo that already
       // reached Cloudinary: it would cost the user their bandwidth twice and
@@ -143,6 +186,7 @@ export default function ReportComposerPage() {
       if (!photoUrl && report.photo) {
         setUploadFraction(0);
         photoUrl = (await uploadPhoto(report.photo.blob, setUploadFraction)).url;
+        queuedBody.photoUrl = photoUrl;
         patch({ photoUrl });
       }
       setUploadFraction(null);
@@ -158,6 +202,8 @@ export default function ReportComposerPage() {
         description: values.description || undefined,
         landmark: values.landmark || undefined,
         photoUrl,
+        photoHash: report.photo?.perceptualHash,
+        photoCapturedAt: report.photo?.capturedAt ?? null,
         deviceId: deviceId(),
       });
 
@@ -165,6 +211,7 @@ export default function ReportComposerPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Idempotency-Key": id,
           // Attached when present, never demanded (DD-017).
           ...(session ? { Authorization: `Bearer ${session.accessToken}` } : {}),
         },
@@ -182,22 +229,40 @@ export default function ReportComposerPage() {
       setSubmittedRef(result.publicRef);
     } catch (e) {
       setUploadFraction(null);
+      if (!(e instanceof ApiError)) {
+        try {
+          await saveForBackgroundDelivery();
+          setHeld(true);
+          reset();
+          return;
+        } catch {
+          // The persistent draft remains the fallback if browser storage or
+          // service-worker registration is unavailable.
+        }
+      }
       setFailed(
         e instanceof ApiError
           ? (e.problem?.detail ?? "The report could not be sent.")
           : "The report could not be sent. Your connection may have dropped.",
       );
     }
-  });
+  }
 
   return (
     <PageShell wide>
       <div className="mb-6">
         <h1 className="text-display">Report a problem</h1>
+        <p className="mt-3 text-body">Drafts, photos and queued reports are saved on this device. Only pressing submit authorizes sending. <Link href="/report/outbox" className="underline">View outbox</Link></p>
+        {storageError && <p role="alert">Browser storage is unavailable. Keep this tab open to preserve your draft.</p>}
+        <Button type="button" variant="secondary" className="mt-3" onClick={async () => {
+          if (!confirm("Discard this draft and its saved photo from this device?")) return;
+          try { await offlineStore("drafts", "delete", "report"); window.location.reload(); }
+          catch { setFailed("Could not clear browser storage. Please retry."); }
+        }}>Discard draft</Button>
       </div>
 
       {/* No action attribute and no server post: an event handler, per §6. */}
-      <form onSubmit={onSubmit} noValidate className="report-form">
+      <form ref={formRef} onSubmit={(event) => void handleSubmit(submitValues)(event)} noValidate className="report-form">
         {/*
           `lat`, `lng`, `accuracyM`, `manualPin`, `hasPhoto` and `categoryCode`
           are form values with no visible control, so they are held in form
@@ -371,6 +436,12 @@ export default function ReportComposerPage() {
             >
               {uploadFraction !== null && (
                 <UploadProgress fraction={uploadFraction} />
+              )}
+
+              {held && !online && (
+                <p className="text-meta" role="status">
+                  Your report is saved in the outbox and will be retried when a connection is available.
+                </p>
               )}
 
               {failed && (

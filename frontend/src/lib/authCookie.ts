@@ -14,9 +14,8 @@ import type { NextResponse } from "next/server";
  *
  * `sameSite: "lax"` rather than "strict": strict would drop the cookie on a
  * cross-site navigation into the app, so following a shared issue link while
- * signed in would silently sign you out. There is no CSRF exposure from lax
- * here, because this cookie is only ever read by our own route handler and is
- * never itself an authorisation.
+ * signed in would silently sign you out. Cookie-mutating route handlers also
+ * validate request origins to protect login and same-site sibling boundaries.
  */
 export const REFRESH_COOKIE = "civictrack_refresh";
 

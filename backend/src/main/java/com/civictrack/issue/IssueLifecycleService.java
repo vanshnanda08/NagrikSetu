@@ -73,10 +73,21 @@ public class IssueLifecycleService {
      * accountability claim of the project expressed as a missing table row.
      */
     @Transactional
-    public Issue submitForVerification(UUID issueId, Actor actor, String proofPhotoUrl, String note) {
+    public Issue submitForVerification(UUID issueId, Actor actor, String proofPhotoUrl,
+                                       String proofPhotoHash, String note) {
         Issue issue = load(issueId);
+        if (proofPhotoHash != null && !proofPhotoHash.isBlank()
+                && issues.existsByResolutionPhotoHash(proofPhotoHash)) {
+            issue.flagForReview("REUSED_PROOF_PHOTO");
+        }
         return statusService.transition(issue, IssueStatus.PENDING_VERIFICATION, actor,
-                context(issue).proofPhotoUrl(proofPhotoUrl).note(note).build());
+                context(issue).proofPhoto(proofPhotoUrl, proofPhotoHash).note(note).build());
+    }
+
+    /** Compatibility overload for internal workflow callers without a hash. */
+    @Transactional
+    public Issue submitForVerification(UUID issueId, Actor actor, String proofPhotoUrl, String note) {
+        return submitForVerification(issueId, actor, proofPhotoUrl, null, note);
     }
 
     @Transactional

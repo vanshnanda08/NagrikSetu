@@ -19,6 +19,7 @@ public record TransitionContext(
         Instant now,
         String note,
         String proofPhotoUrl,
+        String proofPhotoHash,
         UUID assigneeId,
         UUID assigneeDepartmentId,
         boolean recurrenceWithinWindow,
@@ -33,6 +34,7 @@ public record TransitionContext(
         private final Instant now;
         private String note;
         private String proofPhotoUrl;
+        private String proofPhotoHash;
         private UUID assigneeId;
         private UUID assigneeDepartmentId;
         private boolean recurrenceWithinWindow;
@@ -50,6 +52,12 @@ public record TransitionContext(
 
         public Builder proofPhotoUrl(String url) {
             this.proofPhotoUrl = url;
+            return this;
+        }
+
+        public Builder proofPhoto(String url, String hash) {
+            this.proofPhotoUrl = url;
+            this.proofPhotoHash = hash;
             return this;
         }
 
@@ -75,7 +83,7 @@ public record TransitionContext(
         }
 
         public TransitionContext build() {
-            return new TransitionContext(now, note, proofPhotoUrl, assigneeId,
+            return new TransitionContext(now, note, proofPhotoUrl, proofPhotoHash, assigneeId,
                     assigneeDepartmentId, recurrenceWithinWindow, tally, autoCloseAfter);
         }
     }

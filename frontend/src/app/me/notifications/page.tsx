@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
+import { MeNav } from "@/components/MeNav";
 import { Button } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
@@ -83,6 +84,7 @@ export default function NotificationsPage() {
 
   return (
     <PageShell wide>
+      <MeNav current="/me/notifications" />
       <div className="flex flex-wrap items-end gap-4">
         <h1 className="text-display">Notifications</h1>
         {data && data.unread > 0 && (

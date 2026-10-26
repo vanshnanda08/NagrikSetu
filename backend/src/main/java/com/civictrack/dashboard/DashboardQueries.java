@@ -44,12 +44,12 @@ import java.util.UUID;
 public class DashboardQueries {
 
     /** The SLA clock is running in exactly these. Matches IssueRepository.countBreached. */
-    private static final String CLOCK_RUNNING = "('NEW','ACKNOWLEDGED','ASSIGNED','IN_PROGRESS','REOPENED')";
-    private static final String RESOLVED = "('RESOLVED','CLOSED')";
-    private static final String OPEN = "i.status NOT IN ('RESOLVED','CLOSED','REJECTED')";
-    private static final String ON_TIME =
+    static final String CLOCK_RUNNING = "('NEW','ACKNOWLEDGED','ASSIGNED','IN_PROGRESS','REOPENED')";
+    static final String RESOLVED = "('RESOLVED','CLOSED')";
+    static final String OPEN = "i.status NOT IN ('RESOLVED','CLOSED','REJECTED')";
+    static final String ON_TIME =
             "COALESCE(i.clock_paused_at, i.resolved_at) <= i.due_at + make_interval(secs => i.paused_seconds)";
-    private static final String HOURS_TO_RESOLVE =
+    static final String HOURS_TO_RESOLVE =
             "EXTRACT(EPOCH FROM (i.resolved_at - i.first_reported_at)) / 3600.0";
 
     private final NamedParameterJdbcTemplate jdbc;

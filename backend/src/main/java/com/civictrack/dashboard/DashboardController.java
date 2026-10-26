@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
 
     private final DashboardService dashboard;
+    private final WardDashboardService wardDashboard;
 
     @GetMapping("/summary")
     public DashboardSummaryDto summary() {
@@ -38,5 +39,11 @@ public class DashboardController {
     @GetMapping("/breaching")
     public java.util.List<BreachingIssueDto> breaching() {
         return dashboard.breaching();
+    }
+
+    /** One ward: scoped figures, boundary, density and recurrence. Public (blueprint 3.9). */
+    @GetMapping("/wards/{id}")
+    public WardDashboardDto ward(@org.springframework.web.bind.annotation.PathVariable java.util.UUID id) {
+        return wardDashboard.ward(id);
     }
 }

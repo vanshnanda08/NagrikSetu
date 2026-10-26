@@ -119,6 +119,7 @@ public class IssueStatusService {
                 // made, not at the moment it is accepted, so a later resolution
                 // cannot be justified by a photo uploaded afterwards.
                 issue.setResolutionPhotoUrl(ctx.proofPhotoUrl());
+                issue.setResolutionPhotoHash(ctx.proofPhotoHash());
                 issue.setResolutionNote(ctx.note());
                 issue.setResolvedBy(actor.id());
                 // DD-059: a new claim is a new vote. Without this, a resubmitted

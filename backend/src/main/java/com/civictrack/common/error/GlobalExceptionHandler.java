@@ -11,6 +11,7 @@ import com.civictrack.verification.AlreadyVerifiedException;
 import com.civictrack.verification.VerificationNotOpenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,6 +19,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.net.URI;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * RFC 7807 problem responses, built with Spring 6's own {@link ProblemDetail}.
@@ -30,9 +33,37 @@ import java.util.stream.Collectors;
  * was and offer manual pin placement rather than a generic error toast.
  */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     private static final String BASE = "https://civictrack.example/problems/";
+
+    @ExceptionHandler(com.civictrack.user.auth.MfaRequiredException.class)
+    ProblemDetail onMfaRequired(com.civictrack.user.auth.MfaRequiredException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        pd.setType(URI.create(BASE + "mfa-required"));
+        pd.setTitle("Multi-factor authentication required");
+        return pd;
+    }
+
+    @ExceptionHandler(com.civictrack.abuse.RateLimitExceededException.class)
+    ResponseEntity<ProblemDetail> onRateLimit(com.civictrack.abuse.RateLimitExceededException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+        pd.setType(URI.create(BASE + "rate-limit-exceeded"));
+        pd.setTitle("Too many requests");
+        pd.setProperty("retryAfterSeconds", ex.retryAfterSeconds());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header("Retry-After", Long.toString(ex.retryAfterSeconds()))
+                .body(pd);
+    }
+
+    @ExceptionHandler(com.civictrack.abuse.ReportIdentityException.class)
+    ProblemDetail onMissingReportIdentity(com.civictrack.abuse.ReportIdentityException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        pd.setType(URI.create(BASE + "report-identity-required"));
+        pd.setTitle("Device identifier required");
+        return pd;
+    }
 
     @ExceptionHandler(LowAccuracyException.class)
     ProblemDetail onLowAccuracy(LowAccuracyException ex) {
@@ -156,6 +187,22 @@ public class GlobalExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(com.civictrack.dashboard.AnalyticsRefusedException.class)
+    ProblemDetail onAnalyticsRefused(com.civictrack.dashboard.AnalyticsRefusedException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(ex.status(), ex.getMessage());
+        pd.setType(URI.create(BASE + "analytics-scope"));
+        pd.setTitle("Cannot show those analytics");
+        return pd;
+    }
+
+    @ExceptionHandler(com.civictrack.dashboard.WardNotFoundException.class)
+    ProblemDetail onWardNotFound(com.civictrack.dashboard.WardNotFoundException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        pd.setType(URI.create(BASE + "ward-not-found"));
+        pd.setTitle("Ward not found");
+        return pd;
+    }
+
     @ExceptionHandler(IssueNotFoundException.class)
     ProblemDetail onIssueNotFound(IssueNotFoundException ex) {
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
@@ -176,6 +223,15 @@ public class GlobalExceptionHandler {
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
         pd.setType(URI.create(BASE + "invalid-credentials"));
         pd.setTitle("Authentication failed");
+        return pd;
+    }
+
+    /** 409: a profile change that is well-formed but cannot be made; the detail says why. */
+    @ExceptionHandler(com.civictrack.user.ProfileRefusedException.class)
+    ProblemDetail onProfileRefused(com.civictrack.user.ProfileRefusedException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        pd.setType(URI.create(BASE + "profile-refused"));
+        pd.setTitle("Cannot make that change");
         return pd;
     }
 
@@ -226,6 +282,48 @@ public class GlobalExceptionHandler {
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
         pd.setType(URI.create(BASE + "validation-failed"));
         pd.setTitle("Request validation failed");
+        return pd;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    ProblemDetail onAccessDenied(AccessDeniedException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN, "Your account is not permitted to perform this action.");
+        pd.setType(URI.create(BASE + "access-denied"));
+        pd.setTitle("Access denied");
+        return pd;
+    }
+
+    /** Last resort: log the diagnostic server-side and expose no implementation detail. */
+    @ExceptionHandler({org.springframework.http.converter.HttpMessageNotReadableException.class,
+            org.springframework.web.bind.MissingServletRequestParameterException.class})
+    ProblemDetail onMalformedRequest(Exception ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "The request is malformed or is missing a required field.");
+    }
+
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    ProblemDetail onMissingRoute(Exception ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "That resource does not exist.");
+    }
+
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    ProblemDetail onWrongMethod(Exception ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED, "That method is not supported for this resource.");
+    }
+
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    ProblemDetail onStatus(org.springframework.web.server.ResponseStatusException ex) {
+        return ProblemDetail.forStatusAndDetail(ex.getStatusCode(), ex.getReason() == null ? "Request refused." : ex.getReason());
+    }
+
+    @ExceptionHandler(Exception.class)
+    ProblemDetail onUnexpected(Exception ex) {
+        log.error("Unhandled request failure", ex);
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "The request could not be completed. Retry; if it keeps failing, quote the time of this error.");
+        pd.setType(URI.create(BASE + "internal-error"));
+        pd.setTitle("Request failed");
         return pd;
     }
 }

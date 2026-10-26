@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AuthProvider } from "@/lib/auth";
 import { ComposerProvider } from "@/lib/composer";
 import { SignInProvider } from "@/lib/signInDialog";
+import { OutboxSync } from "@/components/OutboxSync";
 
 /**
  * Client-side providers.
@@ -32,6 +33,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={client}>
       <AuthProvider>
+        <OutboxSync />
         {/* Inside AuthProvider, because the dialog calls signIn. */}
         <SignInProvider>
           <ComposerProvider>{children}</ComposerProvider>

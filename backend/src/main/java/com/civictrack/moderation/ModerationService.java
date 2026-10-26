@@ -93,6 +93,8 @@ public class ModerationService {
     private final SlaService slaService;
     private final ApplicationEventPublisher events;
     private final Clock clock;
+    private final com.civictrack.ward.WardRepository wards;
+    private final ModerationProperties props;
 
     // ------------------------------------------------------------------
     // confirm
@@ -301,9 +303,118 @@ public class ModerationService {
         return issue;
     }
 
+    // ------------------------------------------------------------------
+    // reassign ward
+    // ------------------------------------------------------------------
+
+    /** Wards an issue could move to, nearest first, each with the ward guard's verdict. */
+    @Transactional(readOnly = true)
+    public List<WardOption> wardOptions(UUID issueId) {
+        Issue issue = load(issueId);
+        return wards.nearest(issue.getCentroid().getY(), issue.getCentroid().getX(), 6).stream()
+                .map(w -> new WardOption(w.getId(), w.getWardNumber(), w.getName(), w.getDistanceM(),
+                        w.getId().equals(issue.getWardId()),
+                        w.getDistanceM() <= props.reassignMaxDistanceM()))
+                .toList();
+    }
+
+    /**
+     * Moves an issue to another ward.
+     *
+     * <p>The ward decides which ward officer an escalation reaches (DD-005) and
+     * which issues a ward's figures count, so this is a moderation action like
+     * the rest: one transaction, row-locked, recomputed from the member reports
+     * and logged permanently. It re-runs the ward guard -- the cluster's
+     * centroid must lie within {@code reassignMaxDistanceM} of the target
+     * ward -- because reassignment is for a pin that fell on the wrong side of
+     * a boundary line, not for sending a problem to a ward it is nowhere near.
+     *
+     * <p>It is also the way to make a cross-ward merge possible: merging is
+     * refused across wards (see {@link #requireMergeable}), so reassign one issue
+     * first, then merge. Reports keep their own coordinates; only the issue's
+     * ward changes.
+     */
+    @Transactional
+    public Issue reassignWard(UUID issueId, UUID targetWardId, Actor actor, String note) {
+        Instant now = clock.instant();
+        Issue issue = lock(issueId);
+        requireModeratable(issue);
+
+        com.civictrack.ward.Ward target = wards.findById(targetWardId)
+                .orElseThrow(() -> new ModerationRefusedException("There is no such ward."));
+        if (target.getId().equals(issue.getWardId())) {
+            throw new ModerationRefusedException("This issue is already in " + target.getName() + ".");
+        }
+        com.civictrack.ward.Ward from = wards.findById(issue.getWardId()).orElseThrow();
+
+        double distance = wards.nearest(issue.getCentroid().getY(), issue.getCentroid().getX(), 200).stream()
+                .filter(w -> w.getId().equals(target.getId()))
+                .mapToDouble(com.civictrack.ward.WardRepository.WardDistanceRow::getDistanceM)
+                .findFirst().orElse(Double.MAX_VALUE);
+        if (distance > props.reassignMaxDistanceM()) {
+            throw new ModerationRefusedException(
+                    "This issue is " + Math.round(distance) + " m from " + target.getName()
+                    + ". A ward can only be reassigned within " + Math.round(props.reassignMaxDistanceM())
+                    + " m of its boundary, for a pin that fell on the wrong side of a line.");
+        }
+
+        Map<String, Object> before = snapshot(issue);
+        // Recompute from the members, as every moderation action does, so the
+        // stored geometry is exactly what the reports say.
+        ClusterRecomputer.ClusterGeometry geometry =
+                recomputer.compute(reports.findByIssueIdOrderByCreatedAtAsc(issue.getId()));
+        recomputer.apply(issue, geometry);
+        issue.setWardId(target.getId());
+        issue.clearReview();
+        issue.setUpdatedAt(now);
+        rescore(issue, category(issue.getCategoryCode()), now);
+
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("fromWardId", from.getId().toString());
+        detail.put("fromWard", from.getName());
+        detail.put("toWardId", target.getId().toString());
+        detail.put("toWard", target.getName());
+        detail.put("distanceToTargetM", Math.round(distance));
+        detail.put("before", before);
+        detail.put("after", snapshot(issue));
+        record(ModerationActionType.REASSIGN_WARD, issue.getId(), null, actor, detail, note, now);
+        return issue;
+    }
+
     @Transactional(readOnly = true)
     public List<ModerationAction> history(UUID issueId) {
         return actions.findTouching(issueId);
+    }
+
+    /**
+     * Removes a description from public responses without destroying evidence.
+     * The original text remains on the append-only report row; public mapping
+     * substitutes a disclosure notice and the permanent moderation log records
+     * who hid it and why.
+     */
+    @Transactional
+    public Report redact(UUID issueId, UUID reportId, Actor actor, String reason) {
+        Instant now = clock.instant();
+        Issue issue = lock(issueId);
+        Report report = reports.findById(reportId)
+                .orElseThrow(() -> new ModerationRefusedException("There is no such report."));
+        if (!issue.getId().equals(report.getIssueId())) {
+            throw new ModerationRefusedException("That report does not belong to this issue.");
+        }
+        if (report.isDescriptionRedacted()) {
+            throw new ModerationRefusedException("That description is already redacted.");
+        }
+        if (report.getDescription() == null || report.getDescription().isBlank()) {
+            throw new ModerationRefusedException("That report has no description to redact.");
+        }
+
+        report.setDescriptionRedacted(true);
+        report.setRedactedAt(now);
+        report.setRedactedBy(actor.id());
+        report.setRedactionReason(reason.strip());
+        record(ModerationActionType.REDACT, issueId, null, actor,
+                Map.of("reportId", reportId.toString(), "reason", reason.strip()), reason, now);
+        return report;
     }
 
     // ------------------------------------------------------------------
@@ -431,6 +542,11 @@ public class ModerationService {
 
     private Category category(String code) {
         return categories.findById(code).orElseThrow();
+    }
+
+    /** A ward an issue could move to. */
+    public record WardOption(UUID id, int wardNumber, String name, double distanceM, boolean current,
+                             boolean allowed) {
     }
 
     /** Both sides of a split, as they would be. */

@@ -206,7 +206,7 @@ export function StatusRule({
   const word = statusWord(status, audience);
 
   return (
-    <span className="inline-flex items-stretch gap-2" style={{ minHeight: 20 }}>
+    <span className="inline-flex max-w-full flex-wrap items-stretch gap-2" style={{ minHeight: 20 }}>
       <span style={ruleStyle(token.shape, token.color)} aria-hidden="true" />
       <span className="inline-flex items-center gap-1.5">
         <Glyph kind={token.glyph} color={token.color} />

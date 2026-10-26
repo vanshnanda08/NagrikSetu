@@ -2,6 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import { SiteHeader } from "./SiteHeader";
+import { OfflineNotice } from "./OfflineNotice";
+import { useAuth } from "@/lib/auth";
+import Link from "next/link";
 
 /**
  * Page chrome. Single column, left-aligned (blueprint §1.5).
@@ -21,6 +24,7 @@ export function PageShell({
   className?: string;
 }) {
   const pathname = usePathname();
+  const { session } = useAuth();
 
   return (
     <div className={`liquid-app flex min-h-screen flex-col md:flex-row ${className}`}>
@@ -44,8 +48,16 @@ export function PageShell({
         className="page-main flex-1 min-w-0 w-full mx-auto px-4 py-6 md:px-8 u-rise"
         style={{ maxWidth: wide ? 1440 : 920 }}
       >
+        {session?.mfaSetupRequired && pathname !== "/me/security" && (
+          <p role="alert" className="mb-4 border-l-4 border-st-breached pl-3 text-dense">
+            Multi-factor authentication is required for municipal accounts.{" "}
+            <Link href="/me/security" className="underline text-ink">Secure this account</Link>
+            {" "}to use staff and administration tools.
+          </p>
+        )}
         {children}
       </main>
+      <OfflineNotice />
     </div>
   );
 }

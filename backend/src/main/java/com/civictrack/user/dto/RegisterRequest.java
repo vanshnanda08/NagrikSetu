@@ -15,6 +15,7 @@ import jakarta.validation.constraints.Size;
  */
 public record RegisterRequest(
 
+        @NotBlank(message = "email is required to sign in")
         @Email(message = "email must be a valid address")
         @Size(max = 180)
         String email,

@@ -15,6 +15,8 @@ logging:
     org.flywaydb: INFO
 
 civictrack:
+  media:
+    verify-evidence: false # Controller fixtures use synthetic URLs; PhotoEvidenceServiceTest covers actual bytes.
   sla:
     # Spring's own "disabled" cron value. A background sweep firing mid-test
     # would mutate the very escalation levels the tests assert on, and the

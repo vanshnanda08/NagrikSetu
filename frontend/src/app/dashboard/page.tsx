@@ -17,6 +17,7 @@ import {
   useDashboardStream,
   useDashboardSummary,
   useDepartmentAccountability,
+  useWards,
   type StreamState,
 } from "@/lib/queries";
 import { useState, type ReactNode } from "react";
@@ -132,6 +133,10 @@ export default function DashboardPage() {
           )}
           {metrics.data && <Aggregates m={metrics.data} />}
 
+          <DashboardSection title="Ward pages">
+            <WardPages />
+          </DashboardSection>
+
           {/* Outside the summary's block: its own request, its own failure. */}
           <DashboardSection title="Did the fixes hold?">
             <DepartmentRecord />
@@ -147,6 +152,31 @@ export default function DashboardPage() {
         </section>
       </div>
     </PageShell>
+  );
+}
+
+/** One link per ward: each ward has its own public page (blueprint 3.9). */
+function WardPages() {
+  const wards = useWards();
+  if (wards.isPending) return <p className="text-dense text-ink-muted">Loading the wards…</p>;
+  if (wards.isError || !wards.data) {
+    return <p className="text-dense text-ink-muted">The ward list could not be loaded just now.</p>;
+  }
+  return (
+    <>
+      <p className="mt-1 text-dense text-ink-muted" style={{ maxWidth: "var(--measure-prose)" }}>
+        The same figures for one ward, its boundary with issue density, and the places that keep coming back.
+      </p>
+      <ul className="mt-3 list-none p-0 grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+        {wards.data.map((w) => (
+          <li key={w.id} className="border-b border-rule">
+            <Link href={`/dashboard/wards/${w.id}`} className="block py-2 text-body underline text-ink">
+              {w.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

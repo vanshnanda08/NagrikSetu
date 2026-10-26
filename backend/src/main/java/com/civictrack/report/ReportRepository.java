@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.time.Instant;
 import java.util.UUID;
 
 public interface ReportRepository extends JpaRepository<Report, UUID> {
@@ -37,6 +38,28 @@ public interface ReportRepository extends JpaRepository<Report, UUID> {
                                 @Param("offset") int offset);
 
     long countByReporterId(UUID reporterId);
+
+    long countByReporterIdAndCreatedAtGreaterThanEqual(UUID reporterId, Instant since);
+
+    boolean existsByPhotoHash(String photoHash);
+
+    @Query(value = """
+            SELECT EXISTS (
+              SELECT 1 FROM reports r
+              WHERE r.device_id = :deviceId
+                AND r.category_code = :category
+                AND r.created_at >= :since
+                AND ST_DWithin(r.location::geography,
+                    ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
+                    :radius)
+            )
+            """, nativeQuery = true)
+    boolean existsRecentNearby(@Param("deviceId") String deviceId,
+                               @Param("category") String category,
+                               @Param("since") Instant since,
+                               @Param("lat") double lat,
+                               @Param("lng") double lng,
+                               @Param("radius") double radius);
 
     /**
      * Geodesic distance from a point to the furthest of these reports -- the

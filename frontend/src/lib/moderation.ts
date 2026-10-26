@@ -21,6 +21,22 @@ export const REVIEW_CAUSE: Record<string, { title: string; explain: string }> = 
     explain:
       "Merging this report would have stretched the cluster past its cap, so it started a new issue. A long defect along a road can do this. Merge if it is one problem.",
   },
+  PROFANITY: {
+    title: "Description needs review",
+    explain: "The description contains language the abuse screen flagged. Redact only if public display would be harmful; the original evidence is retained.",
+  },
+  REUSED_REPORT_PHOTO: {
+    title: "Photo may have been reused",
+    explain: "The perceptual photo hash matches earlier evidence. Check the photographs before confirming the report.",
+  },
+  CAPTURE_TIME_GAP: {
+    title: "Photo may be old",
+    explain: "The photo capture time is far from the submission time. This is a soft warning, not proof of misuse.",
+  },
+  REUSED_PROOF_PHOTO: {
+    title: "Resolution proof may have been reused",
+    explain: "This proof photo hash appeared on another claimed fix. Check both fixes before accepting this evidence.",
+  },
 };
 
 export function reviewCause(reason: string | null) {

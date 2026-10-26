@@ -35,10 +35,16 @@ public record JwtProperties(
 
         /**
          * Long, because the alternative is asking a citizen to log in again
-         * every fortnight to report a pothole. Rotation and reuse detection
-         * are explicitly cut from this phase, which is recorded in DD-019
-         * rather than left as an unstated gap.
+         * every fortnight to report a pothole. Every use rotates the token and
+         * replay revokes its server-side family.
          */
-        @DefaultValue("P30D") Duration refreshTtl
+        @DefaultValue("P30D") Duration refreshTtl,
+
+        /**
+         * Requires a verified second factor before municipal roles are granted.
+         * The scripted demo profile may disable this so seeded accounts remain
+         * automation-friendly; production keeps the secure default.
+         */
+        @DefaultValue("true") boolean requirePrivilegedMfa
 ) {
 }

@@ -1,0 +1,4 @@
+scale,requests,p50_ms,p95_ms,p99_ms,mean_ms,max_ms,measurement
+1000,300,3.4079,7.2090,13.5004,4.0847,39.7158,Micrometer_civictrack.ingest_direct_service
+10000,300,4.3254,11.9276,26.0833,6.2149,129.0409,Micrometer_civictrack.ingest_direct_service
+50000,300,7.9954,10.3547,14.5490,7.3042,24.3565,Micrometer_civictrack.ingest_direct_service

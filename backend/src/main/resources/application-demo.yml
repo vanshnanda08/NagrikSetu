@@ -1,10 +1,8 @@
 # Demo profile: the same system, with the clock turned up.
 #
-# Nothing here changes behaviour, only durations. That is the point -- a demo
-# that ran different code from the deployment would be a rehearsal for a
-# system nobody ships. What it does change is the time constants, so that a
-# breach, an escalation and a re-arm all happen inside a five-minute slot on a
-# projector rather than over three days.
+# Apart from the explicit MFA exception below, this profile changes durations,
+# not product behaviour. Time constants are compressed so that a breach, an
+# escalation and a re-arm happen inside a five-minute slot on a projector.
 #
 # This is emphatically NOT a substitute for the injected Clock. Three-minute
 # SLAs make escalation visible to an audience; they do not let a test assert
@@ -12,6 +10,12 @@
 # profile compresses real time; the Clock replaces it.
 
 civictrack:
+  security:
+    jwt:
+      # Seeded staff accounts are used by browser automation and workshops.
+      # Real deployments inherit the secure default and must complete MFA.
+      require-privileged-mfa: false
+
   sla:
     # Sweep every 20 seconds, so the escalation lands while the slide is still
     # on screen rather than up to five minutes later.

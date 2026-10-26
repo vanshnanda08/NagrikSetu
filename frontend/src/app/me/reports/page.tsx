@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
+import { MeNav } from "@/components/MeNav";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { LoadingState } from "@/components/LoadingState";
@@ -74,6 +75,7 @@ export default function MyReportsPageRoute() {
 
   return (
     <PageShell wide>
+      <MeNav current="/me/reports" />
       <h1 className="text-display">Your reports</h1>
 
       {reports.isPending && <LoadingState label="Loading your reports" />}

@@ -16,6 +16,8 @@ import java.util.UUID;
 
 public interface IssueRepository extends JpaRepository<Issue, UUID> {
 
+    boolean existsByResolutionPhotoHash(String resolutionPhotoHash);
+
     /**
      * Serialises every transaction that could plausibly interact, by taking a
      * transaction-scoped advisory lock on a hash of (category, ~200 m cell).

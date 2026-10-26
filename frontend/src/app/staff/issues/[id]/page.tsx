@@ -65,7 +65,7 @@ export default function StaffWorkViewPage({ params }: { params: Promise<{ id: st
   const wards = useWards();
 
   const issue = useQuery({
-    queryKey: ["staff", "issue", id],
+    queryKey: ["staff", "issue", id, session?.userId],
     queryFn: () => authed((token) => request<StaffIssue>(`/issues/${id}`, { token })),
     enabled: Boolean(session),
     staleTime: 0,
@@ -97,7 +97,7 @@ export default function StaffWorkViewPage({ params }: { params: Promise<{ id: st
           proofPhotoUrl = (await uploadPhoto(proof.blob, setUploadFraction)).url;
           setUploadFraction(null);
         }
-        body = { proofPhotoUrl, note };
+        body = { proofPhotoUrl, proofPhotoHash: proof?.perceptualHash ?? null, note };
       }
 
       return authed((token) =>

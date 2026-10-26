@@ -15,6 +15,7 @@ import jakarta.validation.constraints.Size;
  */
 public record ResolveRequest(
         @NotBlank(message = "proofPhotoUrl is required") String proofPhotoUrl,
+        @Size(max = 64, message = "proofPhotoHash is too long") String proofPhotoHash,
         @NotBlank(message = "note is required")
         @Size(min = 20, max = 2000, message = "note must be at least 20 characters") String note) {
 }

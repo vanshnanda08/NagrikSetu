@@ -18,11 +18,16 @@ public record TokenResponse(
         long expiresInSeconds,
         UUID userId,
         String fullName,
-        String role
+        String role,
+        boolean mfaSetupRequired
 ) {
-    public static TokenResponse of(TokenService.TokenPair pair, AppUser user) {
+    public static TokenResponse of(TokenService.TokenPair pair, AppUser user,
+                                   boolean requirePrivilegedMfa) {
         return new TokenResponse(
                 pair.accessToken(), pair.refreshToken(), "Bearer", pair.expiresInSeconds(),
-                user.getId(), user.getFullName(), user.getRole().name());
+                user.getId(), user.getFullName(), user.getRole().name(),
+                requirePrivilegedMfa
+                        && com.civictrack.user.auth.TotpService.required(user)
+                        && !user.isMfaEnabled());
     }
 }

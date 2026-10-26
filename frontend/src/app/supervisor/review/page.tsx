@@ -162,6 +162,13 @@ function Row({ item }: { item: ReviewItem }) {
             >
               Split or merge
             </Link>
+            <Link
+              href={`/supervisor/issues/${item.id}`}
+              className="inline-flex items-center px-4 text-dense font-medium border border-ink text-ink no-underline u-press"
+              style={{ minHeight: "var(--hit-min)", borderRadius: "var(--radius)" }}
+            >
+              More actions
+            </Link>
             <Button variant="secondary" aria-expanded={panel === "recategorise"} onClick={() => setPanel(panel === "recategorise" ? null : "recategorise")}>
               Recategorise
             </Button>

@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useId, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/Button";
@@ -47,6 +49,8 @@ export function SignInDialog({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [mfaCode, setMfaCode] = useState("");
+  const [needsMfa, setNeedsMfa] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,6 +68,8 @@ export function SignInDialog({
       setMode(initialMode);
       setError(null);
       setPassword("");
+      setMfaCode("");
+      setNeedsMfa(false);
       d.showModal();
     }
     if (!open && d.open) d.close();
@@ -84,12 +90,18 @@ export function SignInDialog({
     setBusy(true);
     setError(null);
     try {
-      if (mode === "in") await signIn(email, password);
+      if (mode === "in") await signIn(email, password, needsMfa ? mfaCode : undefined);
       else await register({ email, password, fullName });
       // Success and dismissal are different events. Only this one may navigate.
       if (onSuccess) onSuccess();
       else onClose();
     } catch (err) {
+      const type = (err as { problem?: { type?: string } })?.problem?.type;
+      if (mode === "in" && type?.endsWith("/mfa-required")) {
+        setNeedsMfa(true);
+        setError(null);
+        return;
+      }
       // The server's own words where it gave any. It knows why it refused and
       // this component does not.
       const detail =
@@ -160,6 +172,16 @@ export function SignInDialog({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+
+        {mode === "in" && needsMfa && (
+          <TextField
+            label="Authenticator or recovery code"
+            autoCapitalize="characters"
+            autoComplete="one-time-code"
+            value={mfaCode}
+            onChange={(e) => setMfaCode(e.target.value)}
+          />
+        )}
         <TextField
           label="Password"
           type="password"
@@ -167,6 +189,8 @@ export function SignInDialog({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+        {mode === "in" && <Link href="/forgot-password" onClick={onClose} className="underline text-body">Forgot password?</Link>}
 
         {error && (
           <p className="text-dense" style={{ color: "var(--st-breached)" }} role="alert">
@@ -177,7 +201,7 @@ export function SignInDialog({
         <Button type="submit" disabled={busy}>
           {busy
             ? mode === "in"
-              ? "Signing in…"
+              ? needsMfa ? "Verifying…" : "Signing in…"
               : "Creating…"
             : mode === "in"
               ? "Sign in"

@@ -73,6 +73,21 @@ public class AppUser {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
+    /** AES-GCM encrypted Base32 TOTP secret. Never exposed after enrolment starts. */
+    @Column(name = "mfa_secret", length = 512)
+    private String mfaSecret;
+
+    @Column(name = "mfa_enabled", nullable = false)
+    private boolean mfaEnabled;
+
+    /** Last accepted TOTP time-step, which prevents a code being replayed. */
+    @Column(name = "mfa_last_counter")
+    private Long mfaLastCounter;
+
+    /** Comma-separated NotificationType names this person has switched off. See V7. */
+    @Column(name = "muted_notification_types", nullable = false, length = 200)
+    private String mutedNotificationTypes = "";
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 

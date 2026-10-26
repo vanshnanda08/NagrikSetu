@@ -472,6 +472,8 @@ const ACTION_WORD: Record<ModerationEntry["action"], string> = {
   SPLIT: "Split",
   MERGE: "Merged",
   RECATEGORISE: "Recategorised",
+  REASSIGN_WARD: "Ward reassigned",
+  REDACT: "Description redacted",
 };
 
 function History({ issueId }: { issueId: string }) {

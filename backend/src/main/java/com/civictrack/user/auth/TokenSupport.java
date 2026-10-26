@@ -39,14 +39,20 @@ public final class TokenSupport {
      * meaning for, and every guard would then have to decide which of a user's
      * roles applies.
      */
-    public static JwtAuthenticationConverter roleClaimConverter() {
+    public static JwtAuthenticationConverter roleClaimConverter(JwtProperties properties) {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(TokenSupport::authorities);
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> authorities(jwt, properties.requirePrivilegedMfa()));
         return converter;
     }
 
-    private static List<GrantedAuthority> authorities(Jwt jwt) {
+    private static List<GrantedAuthority> authorities(Jwt jwt, boolean enforcementEnabled) {
         String role = jwt.getClaimAsString(TokenService.CLAIM_ROLE);
-        return role == null ? List.of() : List.of(new SimpleGrantedAuthority("ROLE_" + role));
+        if (role == null) return List.of();
+        boolean privileged = role.equals("STAFF") || role.equals("SUPERVISOR") || role.equals("ADMIN");
+        if (enforcementEnabled && privileged
+                && !Boolean.TRUE.equals(jwt.getClaimAsBoolean(TokenService.CLAIM_MFA))) {
+            return List.of(new SimpleGrantedAuthority("ROLE_MFA_SETUP_REQUIRED"));
+        }
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 }

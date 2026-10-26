@@ -6,7 +6,10 @@
     "contract": "node contract.mjs ../frontend/src/lib/types.ts",
     "transitions": "node table.mjs",
     "uiwalk": "node uiwalk.mjs",
-    "sweep": "node sweep.mjs"
+    "sweep": "node sweep.mjs",
+    "features": "node features.mjs",
+    "audit": "node audit.mjs",
+    "browsers": "node browsers.mjs"
   },
   "devDependencies": {
     "playwright": "1.63.0"

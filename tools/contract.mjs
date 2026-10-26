@@ -19,6 +19,7 @@ function keysOf(iface) {
 }
 
 const sup = await login('head.roads@civictrack.example');
+const admin = await login('commissioner@civictrack.example');
 const citizenTok = sup; // any authenticated principal for /me/reports shape
 
 const j = (path, token) => json(path, { token });
@@ -29,6 +30,11 @@ const staffQueue = await j('/staff/queue?limit=1', sup);
 const board = await j('/supervisor/queue?tab=all&limit=1', sup);
 const review = await j('/supervisor/review', sup);
 const metrics = await j('/dashboard/metrics');
+const wards = await j('/wards');
+const wardPage = await j(`/dashboard/wards/${wards[0].id}`);
+const analytics = await j('/supervisor/analytics', sup);
+const audit = await j('/admin/audit?limit=5', admin);
+const wardOptions = await j(`/supervisor/issues/${issue.id}/ward-options`, admin);
 
 const checks = [
   ['PublicIssuePage', page],
@@ -55,6 +61,16 @@ const checks = [
   ['ComplianceDay', metrics.slaCompliance?.trend[0]],
   ['TopCluster', metrics.topClusters?.[0]],
   ...((await j('/dashboard/breaching')).map(value => ['BreachingIssue', value])),
+  // Profile, ward page, department analytics, audit log and ward reassignment.
+  ['Profile', await j('/me/profile', sup)],
+  ['WardDashboard', wardPage],
+  ['ScopeMetrics', wardPage.metrics],
+  ['DepartmentAnalytics', analytics],
+  ['ScopeMetrics (department)', analytics.metrics, 'ScopeMetrics'],
+  ...(analytics.staff.length ? [['StaffAnalyticsRow', analytics.staff[0]]] : []),
+  ['AuditPage', audit],
+  ...(audit.items.length ? [['AuditEntry', audit.items[0]]] : []),
+  ['WardOption', wardOptions[0]],
 ];
 
 let problems = 0;

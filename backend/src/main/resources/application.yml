@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${SMTP_STARTTLS:false}
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
   application:
     name: civictrack
 
@@ -79,8 +90,15 @@ spring:
 server:
   port: ${PORT:8080}
   shutdown: graceful
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-exception: false
 
 management:
+  health:
+    mail:
+      enabled: ${MAIL_ENABLED:false}
   endpoints:
     web:
       exposure:
@@ -105,6 +123,12 @@ management:
         civictrack.ingest: 0.5, 0.95, 0.99
 
 civictrack:
+  media:
+    verify-evidence: ${VERIFY_PHOTO_EVIDENCE:true}
+  public-url: ${PUBLIC_APP_URL:http://localhost:3000}
+  mail:
+    enabled: ${MAIL_ENABLED:false}
+    from: ${MAIL_FROM:noreply@example.test}
   clustering:
     # Properties of the sensing apparatus and of the concurrency strategy.
     # Anything that varies by defect type lives in the categories table
@@ -126,6 +150,17 @@ civictrack:
     # Demo profile only; see application-demo.yml. Zero everywhere else, and
     # SlaServiceTest asserts that it is zero so it cannot be left switched on.
     demo-override-hours: 0
+  moderation:
+    # Ward guard for reassigning an issue to another ward: its centroid must lie
+    # within this many metres of the target ward's boundary (blueprint 3.19).
+    reassign-max-distance-m: 300
+  abuse:
+    nearby-window: PT5M
+    nearby-radius-m: 50
+    account-daily-limit: 20
+    login-attempts: 5
+    login-window: PT15M
+    exif-warning-gap: P2D
   verification:
     # Settles timed-out votes and auto-closes settled issues. Every five
     # minutes is plenty against a 72-hour window; the demo profile tightens it.
@@ -141,6 +176,7 @@ civictrack:
       issuer: civictrack
       access-ttl: PT15M
       refresh-ttl: P30D
+      require-privileged-mfa: ${REQUIRE_PRIVILEGED_MFA:true}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:3001}
 

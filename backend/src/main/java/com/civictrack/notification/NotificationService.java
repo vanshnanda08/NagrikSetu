@@ -35,6 +35,10 @@ public class NotificationService {
     private final NotificationRepository notifications;
     private final CategoryRepository categories;
     private final VerificationProperties verificationProps;
+    private final com.civictrack.user.UserRepository users;
+    private final MailDelivery mail;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbc;
+    private final java.time.Clock clock;
 
     @EventListener
     public void onTransition(IssueTransitioned event) {
@@ -53,7 +57,7 @@ public class NotificationService {
                     + " hours, it counts as fixed.");
 
             case RESOLVED -> send(
-                    notifications.findReporterIds(issue.getId(), false), issue,
+                    transitionAudience(issue.getId()), issue,
                     NotificationType.RESOLVED,
                     "Resolved: " + what + " " + ref,
                     issue.isResolvedWithoutVerification()
@@ -64,7 +68,7 @@ public class NotificationService {
 
             case REOPENED -> {
                 Set<UUID> recipients = new LinkedHashSet<>(
-                        notifications.findReporterIds(issue.getId(), false));
+                        transitionAudience(issue.getId()));
                 // The crew whose fix did not hold hears about it too -- they
                 // are the ones with something to do next.
                 if (issue.getAssignedTo() != null) {
@@ -80,7 +84,7 @@ public class NotificationService {
             // counts towards the other ticket. "Not taken forward" would be a
             // false statement to them, so a merge says what happened instead.
             case REJECTED -> send(
-                    notifications.findReporterIds(issue.getId(), false), issue,
+                    transitionAudience(issue.getId()), issue,
                     NotificationType.REJECTED,
                     issue.getMergedIntoId() != null
                             ? "Joined with another report: " + what + " " + ref
@@ -93,13 +97,41 @@ public class NotificationService {
         }
     }
 
+    /** Used by the clarification thread, which is not itself a status transition. */
+    public void sendDirect(List<UUID> userIds, Issue issue, NotificationType type,
+                           String title, String body) {
+        send(userIds, issue, type, title, body);
+    }
+
+    private List<UUID> transitionAudience(UUID issueId) {
+        Set<UUID> recipients = new LinkedHashSet<>(notifications.findReporterIds(issueId, false));
+        recipients.addAll(jdbc.queryForList("SELECT user_id FROM issue_followers WHERE issue_id=?",
+                UUID.class, issueId));
+        return List.copyOf(recipients);
+    }
+
     private void send(List<UUID> userIds, Issue issue, NotificationType type, String title, String body) {
         if (userIds.isEmpty()) {
             return;
         }
-        notifications.saveAll(userIds.stream()
+        // Honour switched-off preferences (blueprint 3.13). A request to verify a
+        // fix is never skipped: silence on a verification round counts as
+        // agreement, so it cannot be muted (see ProfileService.MUTABLE).
+        Set<UUID> muted = type == NotificationType.VERIFY_REQUESTED
+                ? Set.of()
+                : Set.copyOf(users.findIdsMuting(userIds, type.name()));
+        List<UUID> recipients = userIds.stream().filter(id -> !muted.contains(id)).toList();
+        if (recipients.isEmpty()) {
+            return;
+        }
+        notifications.saveAll(recipients.stream()
                 .map(uid -> Notification.of(uid, issue.getId(), type, title, body,
-                        issue.getUpdatedAt()))
+                        clock.instant()))
                 .toList());
+        for (UUID uid : recipients) {
+            jdbc.queryForList("SELECT email FROM users WHERE id = ? AND active AND email_notifications AND email IS NOT NULL",
+                    String.class, uid).forEach(email -> mail.enqueue(email, title,
+                    (body == null ? "" : body) + "\n\n" + mail.publicUrl() + "/issues/" + issue.getId()));
+        }
     }
 }

@@ -14,7 +14,7 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.UUID;
 
-/** One message to one user, in-app only. Email is on the cut list. */
+/** One durable in-app notification; opted-in email delivery is queued separately. */
 @Entity
 @Table(name = "notifications")
 @Getter

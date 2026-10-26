@@ -72,6 +72,24 @@ public class Report {
     @Column(name = "photo_hash", length = 64)
     private String photoHash;
 
+    @Column(name = "photo_captured_at")
+    private Instant photoCapturedAt;
+
+    @Column(name = "abuse_flags", nullable = false, length = 200)
+    private String abuseFlags = "";
+
+    @Column(name = "description_redacted", nullable = false)
+    private boolean descriptionRedacted;
+
+    @Column(name = "redacted_at")
+    private Instant redactedAt;
+
+    @Column(name = "redacted_by")
+    private UUID redactedBy;
+
+    @Column(name = "redaction_reason", length = 500)
+    private String redactionReason;
+
     // ---- clustering audit trail ---------------------------------------
 
     @Enumerated(EnumType.STRING)
