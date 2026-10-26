@@ -4,7 +4,7 @@
 > are implemented locally. See [PROGRESS.md](PROGRESS.md) for current evidence
 > and [FINAL_AUDIT.md](../FINAL_AUDIT.md) for security fixes and pending production
 > checks. Figures in this milestone report remain historical; the current audit
-> records 273 backend tests passed (275 total, 2 intentional skips) and 82 frontend tests.
+> records 274 backend tests passed (276 total, 2 intentional skips) and 82 frontend tests.
 
 Phases 6 and 7 of the eight-week plan (weeks 5 and 6). Written to be checkable:
 every claim below is a route you can open, a test you can run, or a commit you

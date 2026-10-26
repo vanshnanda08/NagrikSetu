@@ -1,24 +1,39 @@
 package com.civictrack.notification;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
+
+import java.util.List;
+import java.util.Map;
 
 /** Transactional outbox: network failures never roll back a civic transition. */
 @Service
-@RequiredArgsConstructor
 public class MailDelivery {
     private final JdbcTemplate jdbc;
     private final ObjectProvider<JavaMailSender> sender;
-    @Value("${civictrack.mail.enabled:false}") private boolean enabled;
-    @Value("${civictrack.mail.from:noreply@example.test}") private String from;
-    @Value("${civictrack.public-url:http://localhost:3000}") private String publicUrl;
+    private final MailProperties properties;
+    private final RestClient brevo;
+    private final String publicUrl;
+
+    public MailDelivery(JdbcTemplate jdbc, ObjectProvider<JavaMailSender> sender,
+                        MailProperties properties, RestClient.Builder restClient,
+                        @org.springframework.beans.factory.annotation.Value(
+                                "${civictrack.public-url:http://localhost:3000}") String publicUrl) {
+        this.jdbc = jdbc;
+        this.sender = sender;
+        this.properties = properties;
+        this.brevo = restClient.build();
+        this.publicUrl = publicUrl;
+    }
 
     public void enqueue(String recipient, String subject, String body) {
         jdbc.update("INSERT INTO mail_outbox(recipient,subject,body) VALUES (?,?,?)", recipient, subject, body);
@@ -34,23 +49,49 @@ public class MailDelivery {
         jdbc.update("UPDATE mail_outbox SET sent_at = now(), body = '[Expired before delivery]' "
                 + "WHERE sent_at IS NULL AND created_at < now() - interval '30 minutes' "
                 + "AND subject = 'Reset your NagrikSetu password'");
-        if (!enabled || sender.getIfAvailable() == null) return;
+        if (!deliveryConfigured()) return;
         var rows = jdbc.queryForList("SELECT * FROM mail_outbox WHERE sent_at IS NULL "
                 + "AND attempts < 8 AND next_attempt_at <= now() ORDER BY id LIMIT 10 FOR UPDATE SKIP LOCKED");
         for (var row : rows) {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(from);
-            message.setTo((String) row.get("recipient"));
-            message.setSubject((String) row.get("subject"));
-            message.setText((String) row.get("body"));
             try {
-                sender.getObject().send(message);
+                send((String) row.get("recipient"), (String) row.get("subject"),
+                        (String) row.get("body"));
                 jdbc.update("UPDATE mail_outbox SET sent_at = now(), body = '[Delivered]', attempts = attempts + 1 WHERE id = ?", row.get("id"));
-            } catch (org.springframework.mail.MailException ex) {
+            } catch (MailException | RestClientException ex) {
                 // Do not log credentials, reset links, addresses, or message bodies.
                 jdbc.update("UPDATE mail_outbox SET attempts = attempts + 1, "
                         + "next_attempt_at = now() + interval '1 minute' * power(2, attempts) WHERE id = ?", row.get("id"));
             }
         }
+    }
+
+    private boolean deliveryConfigured() {
+        if (!properties.enabled()) return false;
+        if ("brevo".equalsIgnoreCase(properties.provider())) {
+            return properties.brevoApiKey() != null && !properties.brevoApiKey().isBlank();
+        }
+        return sender.getIfAvailable() != null;
+    }
+
+    private void send(String recipient, String subject, String body) {
+        if ("brevo".equalsIgnoreCase(properties.provider())) {
+            brevo.post().uri(properties.brevoUrl())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("api-key", properties.brevoApiKey())
+                    .body(Map.of(
+                            "sender", Map.of("name", properties.fromName(), "email", properties.from()),
+                            "to", List.of(Map.of("email", recipient)),
+                            "subject", subject,
+                            "textContent", body))
+                    .retrieve().toBodilessEntity();
+            return;
+        }
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(properties.from());
+        message.setTo(recipient);
+        message.setSubject(subject);
+        message.setText(body);
+        sender.getObject().send(message);
     }
 }
