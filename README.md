@@ -30,7 +30,7 @@ verified locally (see the end of this file).
 | Frontend | https://civic-track-six.vercel.app (deployed from `main` by Vercel; whether the live site already has the latest redesign has not been checked) |
 | API | https://civictrack-api.onrender.com |
 | API docs (Swagger) | https://civictrack-api.onrender.com/swagger-ui/index.html |
-| Backend tests | **275 total: 273 passed, 2 opt-in evaluation tests skipped, 0 failures/errors**, against real PostGIS via Testcontainers |
+| Backend tests | **276 total: 274 passed, 2 opt-in evaluation tests skipped, 0 failures/errors**, against real PostGIS via Testcontainers |
 | Frontend tests | **82** passing, plus lint, typecheck and production build |
 | CI | GitHub Actions: backend suite, frontend lint/typecheck/tests/build, then the API/browser verification job before the deploy hook. It was last confirmed green before 2026-10-07; runs since then have not been checked from this environment |
 | Deployed corpus | 113 issues / 254 reports in the verified backup taken 2026-10-07; counts change with usage |
@@ -241,6 +241,11 @@ needs `SMTP_HOST`, `SMTP_PORT`, optional SMTP credentials/TLS, `MAIL_FROM`, and
 `PUBLIC_APP_URL`. With mail disabled, messages remain in the outbox and issue work
 continues normally.
 
+On hosting plans that block SMTP, set `MAIL_PROVIDER=brevo`, `MAIL_ENABLED=true`,
+`BREVO_API_KEY`, `MAIL_FROM` (a verified Brevo sender), `MAIL_FROM_NAME`, and
+`PUBLIC_APP_URL`. The Brevo integration uses HTTPS; the API key belongs only in
+the backend environment and must never use a `NEXT_PUBLIC_` name.
+
 Seeded logins, all with the password passed above:
 
 | Role | Email |
@@ -256,7 +261,7 @@ account at all.
 ## Testing
 
 ```bash
-cd backend  && mvn clean test    # 275 total: 273 passed, 2 opt-in evaluations skipped
+cd backend  && mvn clean test    # 276 total: 274 passed, 2 opt-in evaluations skipped
 cd frontend && npm run test      # 82 unit tests
 cd frontend && npm run lint      # includes the Leaflet import boundary rule
 ```

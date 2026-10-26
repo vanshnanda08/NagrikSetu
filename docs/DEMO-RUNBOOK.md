@@ -1,7 +1,7 @@
 # Final demonstration runbook
 
 Current implementation and exact test totals are in [PROGRESS.md](PROGRESS.md).
-Use 273 backend tests passed plus 2 intentional skips (275 total), and 82
+Use 274 backend tests passed plus 2 intentional skips (276 total), and 82
 frontend tests passed. This runbook describes the demo to perform; it is not
 evidence that the newest screens or production deployment have been exercised.
 

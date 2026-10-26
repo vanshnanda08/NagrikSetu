@@ -128,7 +128,12 @@ civictrack:
   public-url: ${PUBLIC_APP_URL:http://localhost:3000}
   mail:
     enabled: ${MAIL_ENABLED:false}
+    # `brevo` sends over HTTPS and is suitable for hosts that block SMTP.
+    provider: ${MAIL_PROVIDER:smtp}
     from: ${MAIL_FROM:noreply@example.test}
+    from-name: ${MAIL_FROM_NAME:NagrikSetu}
+    brevo-api-key: ${BREVO_API_KEY:}
+    brevo-url: ${BREVO_API_URL:https://api.brevo.com/v3/smtp/email}
   clustering:
     # Properties of the sensing apparatus and of the concurrency strategy.
     # Anything that varies by defect type lives in the categories table

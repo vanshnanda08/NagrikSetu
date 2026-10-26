@@ -83,7 +83,7 @@ the 190-route sweep preceded those markup-only fixes.
 
 | Executed check | Result |
 |---|---|
-| Complete backend `mvn test` after dependency/security changes | **275 total: 273 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers |
+| Complete backend `mvn test` after dependency/security and HTTPS-mail changes | **276 total: 274 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers |
 | Backend packaging | `mvn -DskipTests package` passed; packaged server started and health returned UP |
 | Frontend Vitest | **82 tests passed across 12 files** |
 | Frontend ESLint / TypeScript | Passed |
@@ -227,6 +227,12 @@ code 0. This resolves the missing-secret/backup-artifact gate above; application
 startup against a restored current-release database remains a separate check.
 The user subsequently authorized committing and pushing the audited changes to
 `main`, including the configured automatic deployment triggers.
+
+Production follow-up found that the Render service uses the Free plan, which
+blocks common outbound SMTP ports. The user verified an individual sender in
+Brevo. A server-side Brevo HTTPS delivery provider and regression test were
+added locally; it remains disabled until the API key and sender environment
+variables are configured and this follow-up change is deployed.
 
 **CONDITIONAL.** Confirmed security and functional defects were repaired and
 local backend/frontend/build/browser gates were exercised. Production deployment,

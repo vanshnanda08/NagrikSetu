@@ -14,8 +14,8 @@ decision for public inspection and supervisor correction.
 The completed system includes all planned phases: reporting, clustering,
 lifecycle and escalation, public dashboards, deployment automation, citizen
 verification, supervisor tools, quantitative evaluation, abuse controls, and
-the remaining administrative screens. The 2026-10-26 backend run records 275 tests:
-273 passed, 2 opt-in evaluations skipped, and zero failures/errors. All 82
+the remaining administrative screens. The 2026-10-26 backend run records 276 tests:
+274 passed, 2 opt-in evaluations skipped, and zero failures/errors. All 82
 frontend tests, lint, TypeScript, and the production build pass. See
 [PROGRESS.md](PROGRESS.md) and [FINAL_AUDIT.md](../FINAL_AUDIT.md) for current
 verification, security changes and the conditional production-readiness verdict.
@@ -139,7 +139,7 @@ Source tables and vector plots are in `artifacts/evaluation/`.
 
 ## Verification and reproducibility
 
-- Backend: 275 JUnit tests recorded: 273 passed, 2 intentionally skipped,
+- Backend: 276 JUnit tests recorded: 274 passed, 2 intentionally skipped,
   zero failures/errors. Coverage includes real PostGIS migrations, clustering,
   concurrency, lifecycle, MFA/session security, issue engagement, moderation,
   dashboards, and scheduled jobs.

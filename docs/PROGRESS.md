@@ -28,7 +28,7 @@ access tokens retain their bounded lifetime of up to 15 minutes.
 
 | Check | Result |
 |---|---|
-| Full backend `mvn test` | 275 total: **273 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers |
+| Full backend `mvn test` | 276 total: **274 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers |
 | Skipped backend tests | Two opt-in evaluation tests; retained evaluation results are documented separately |
 | Security regressions | MFA enrollment replacement/recovery regeneration and private-message MFA bypass reproduced then fixed; four security integration tests passed in the full suite |
 | Frontend Vitest | **82 passed** across 12 test files |
