@@ -33,7 +33,7 @@ verified locally (see the end of this file).
 | API docs (Swagger) | https://civictrack-api.onrender.com/swagger-ui/index.html |
 | Backend tests | **277 total: 275 passed, 2 opt-in evaluation tests skipped, 0 failures/errors**, against real PostGIS via Testcontainers |
 | Frontend tests | **82** passing, plus lint, typecheck and production build |
-| CI | GitHub Actions run #53 passed on commit `10481bf`; backend, frontend and API/browser gates completed before the Render deploy hook |
+| CI | GitHub Actions run #54 passed on commit `afe7ce4`; backend, frontend and Chrome/Firefox/WebKit gates completed before the Render deploy hook |
 | Deployed corpus | 113 issues / 254 reports in the verified backup taken 2026-10-07; counts change with usage |
 
 > The API runs on Render's free tier and sleeps after 15 minutes idle. The
@@ -430,7 +430,7 @@ Verification on 2026-10-27: backend tests, frontend tests, typecheck and lint pa
 The production frontend builds with `npm run build -- --webpack`; this environment
 rejects the local worker port used by Turbopack. The normal build command is unchanged.
 
-Deployment follow-up on 2026-10-27: CI run #53 passed at `10481bf`, the Render
+Deployment follow-up on 2026-10-27: CI run #54 passed at `afe7ce4`, the Render
 health endpoint returned `UP`, and the Vercel dashboard returned HTTP 200.
 Firefox and WebKit each passed the 10-route responsive/keyboard smoke suite;
 Firefox uses an isolated temporary home on macOS 27 to avoid an upstream
