@@ -8,7 +8,7 @@ changed. Browser writes used a dedicated scratch PostGIS database and local Mail
 
 ## Current closeout status
 
-Commit `10481bf` passed GitHub Actions run #53 and triggered the deployment gate.
+Commit `afe7ce4` passed GitHub Actions run #54 and triggered the deployment gate.
 On 2026-10-27 the Render health endpoint returned `UP` and the Vercel dashboard
 returned HTTP 200. The scheduled encrypted-backup rerun passed dump restoration
 and artifact upload; the downloaded artifact decrypted locally with GPG exit code
@@ -95,7 +95,7 @@ the 190-route sweep preceded those markup-only fixes.
 
 | Executed check | Result |
 |---|---|
-| Complete backend `mvn test` after dependency/security and HTTPS-mail changes | **277 total: 275 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers in CI run #53 |
+| Complete backend `mvn test` after dependency/security and HTTPS-mail changes | **277 total: 275 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers in CI run #54 |
 | Backend packaging | `mvn -DskipTests package` passed; packaged server started and health returned UP |
 | Frontend Vitest | **82 tests passed across 12 files** |
 | Frontend ESLint / TypeScript | Passed |
@@ -237,7 +237,7 @@ The user subsequently authorized committing and pushing the audited changes to
 `main`, including the configured automatic deployment triggers.
 
 **Current verdict (2026-10-27): complete within the agreed application scope.**
-The full CI pipeline passed on `10481bf`, both public services are healthy, backup
+The full CI pipeline passed on `afe7ce4`, both public services are healthy, backup
 creation/restoration/encryption recovery is verified, and Chrome, Firefox and
 WebKit checks pass. Live transactional email delivery is the one expressly
 deferred integration. The remaining items in section 7 are operating controls

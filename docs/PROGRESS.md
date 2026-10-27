@@ -28,7 +28,7 @@ access tokens retain their bounded lifetime of up to 15 minutes.
 
 | Check | Result |
 |---|---|
-| Full backend `mvn test` | 277 total: **275 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers in CI run #53 |
+| Full backend `mvn test` | 277 total: **275 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers in CI run #54 |
 | Skipped backend tests | Two opt-in evaluation tests; retained evaluation results are documented separately |
 | Security regressions | MFA enrollment replacement/recovery regeneration and private-message MFA bypass reproduced then fixed; four security integration tests passed in the full suite |
 | Frontend Vitest | **82 passed** across 12 test files |
@@ -56,7 +56,7 @@ Backup gate update: the user confirmed successful backup/temporary restore and
 encrypted artifact upload on rerun, downloaded the artifact, and verified GPG
 decryption with exit code 0. The earlier failed attempt below is historical.
 
-Deployment follow-up on 2026-10-27: CI run #53 passed at commit `10481bf`; the
+Deployment follow-up on 2026-10-27: CI run #54 passed at commit `afe7ce4`; the
 Render health endpoint returned `UP` and the Vercel dashboard returned HTTP 200.
 The scheduled backup rerun passed restore verification and encrypted upload; the
 downloaded artifact subsequently decrypted with GPG exit code 0.
