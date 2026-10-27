@@ -1,7 +1,7 @@
 # NagrikSetu — current progress
 
-Updated 2026-10-26. The agreed application scope is implemented in the local
-repository. Production deployment and live-service verification remain open.
+Updated 2026-10-27. The agreed application scope is implemented and deployed.
+Production transactional email delivery is intentionally deferred.
 This record supersedes older progress counts and original scope exclusions;
 historical milestone reports retain their original dated results.
 
@@ -10,7 +10,7 @@ historical milestone reports retain their original dated results.
 | Area | Current state |
 |---|---|
 | Phases 0–4 | Setup, PostGIS schema, clustering, lifecycle, priority, SLA escalation, authentication and public/staff frontend implemented |
-| Phase 5 | Deployment configuration, CI, health checks, backup/restore tooling and media cleanup implemented; latest remote activation unverified |
+| Phase 5 | Deployment, CI, live health checks and encrypted backup recovery verified; destructive media cleanup remains opt-in pending dry-run review |
 | Phases 6–7 | Citizen verification, notifications, supervisor assignment/moderation, analytics and live dashboard implemented |
 | Phases 8–9 | Evaluation artifacts, abuse controls, privacy redaction, remaining screens, final report and demo runbook implemented |
 | Previously excluded features | Password reset, refresh-token rotation/reuse detection, opt-in email outbox, audited admin configuration and background offline submission implemented |
@@ -28,7 +28,7 @@ access tokens retain their bounded lifetime of up to 15 minutes.
 
 | Check | Result |
 |---|---|
-| Full backend `mvn test` | 276 total: **274 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers |
+| Full backend `mvn test` | 277 total: **275 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers in CI run #53 |
 | Skipped backend tests | Two opt-in evaluation tests; retained evaluation results are documented separately |
 | Security regressions | MFA enrollment replacement/recovery regeneration and private-message MFA bypass reproduced then fixed; four security integration tests passed in the full suite |
 | Frontend Vitest | **82 passed** across 12 test files |
@@ -36,7 +36,7 @@ access tokens retain their bounded lifetime of up to 15 minutes.
 | Production build | `npm run build -- --webpack` passed; 31 static pages generated, plus dynamic routes |
 | Diff whitespace check | Passed |
 | Chrome responsive / axe | 70 authenticated layout checks across 320–1920px and light/dark; 14 page/theme axe scans with zero violations |
-| WebKit / Firefox | WebKit: 10 responsive checks plus keyboard dialog smoke passed. Firefox: browser launch blocked by local profile error, not verified |
+| WebKit / Firefox | Both engines passed 10 responsive checks plus keyboard dialog smoke; local macOS 27 Firefox uses an isolated-home workaround for the upstream profile-access defect |
 
 The API contract, lifecycle transition and lifecycle UI harnesses passed. The
 expanded five-role browser sweep passed **190 checks with zero failures**.
@@ -50,27 +50,24 @@ responsive/accessibility results, precise limitations and CONDITIONAL production
 verdict. It supersedes earlier blanket completion claims, not the historical
 evaluation evidence.
 
-## Remaining work before production sign-off
+## Remaining operational work
 
 Backup gate update: the user confirmed successful backup/temporary restore and
 encrypted artifact upload on rerun, downloaded the artifact, and verified GPG
 decryption with exit code 0. The earlier failed attempt below is historical.
 
-Deployment follow-up on 2026-10-26: public frontend responds, but current audit
-changes remain uncommitted and the latest successful remote CI covers the older
-2026-10-11 commit. The latest scheduled backup failed before encrypted artifact
-upload and produced no artifacts; authenticated logs are needed to diagnose it.
-See [follow-up evidence](../FINAL_AUDIT.md#follow-up-step-1--deployment-checks-2026-10-26).
+Deployment follow-up on 2026-10-27: CI run #53 passed at commit `10481bf`; the
+Render health endpoint returned `UP` and the Vercel dashboard returned HTTP 200.
+The scheduled backup rerun passed restore verification and encrypted upload; the
+downloaded artifact subsequently decrypted with GPG exit code 0.
 
 - Complete physical-device/screen-reader and actual PWA installation checks;
   automated browser coverage does not certify full accessibility or OS-level sync.
 - Review the final audit's dependency applicability, key-rotation and rate-limit
   operating conditions before production sign-off.
-- Deploy the current changes and verify Render/Vercel health and user flows;
-  the live applications are not confirmed to match the local repository.
-- Configure and verify production mail, Cloudinary and authentication secrets.
-- Confirm a scheduled encrypted backup artifact can be downloaded and restored.
-- Review Cloudinary orphan-cleanup dry-run results before enabling deletion.
+- Production transactional mail delivery is deferred until work resumes on that
+  external integration; the outbox, retry path and local SMTP flow remain tested.
+- Verify Cloudinary management credentials and inspect the orphan-cleanup dry run.
 - Record the final demonstration if required for submission.
 
 Push notifications, passkeys, Open311/municipal ERP integration, multilingual

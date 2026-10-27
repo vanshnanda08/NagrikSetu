@@ -1,9 +1,21 @@
 # NagrikSetu — implementation and production-readiness audit
 
-Audit date: 2026-10-26. This is a local source/build/test audit, not a production
-deployment or a claim that every possible interaction has been exhaustively tested.
+Audit date: 2026-10-26; closeout updated 2026-10-27. This is a source/build/test
+and public-health audit, not a claim that every possible interaction has been
+exhaustively tested.
 Existing uncommitted work was preserved. No production data or infrastructure was
 changed. Browser writes used a dedicated scratch PostGIS database and local Mailpit.
+
+## Current closeout status
+
+Commit `10481bf` passed GitHub Actions run #53 and triggered the deployment gate.
+On 2026-10-27 the Render health endpoint returned `UP` and the Vercel dashboard
+returned HTTP 200. The scheduled encrypted-backup rerun passed dump restoration
+and artifact upload; the downloaded artifact decrypted locally with GPG exit code
+0. Firefox and WebKit now both pass the cross-browser smoke suite, with an isolated
+temporary home used to avoid an upstream macOS 27 Firefox profile-access defect.
+Production transactional email delivery is explicitly deferred at the user's
+request; the implemented outbox/retry code and local SMTP path remain tested.
 
 ## 1. Project overview
 
@@ -17,7 +29,7 @@ changed. Browser writes used a dedicated scratch PostGIS database and local Mail
 - Extended functionality includes password reset, opt-in email notifications,
   MFA/recovery codes, session revocation, following, private clarification,
   persistent drafts and offline worker delivery, and an installable manifest.
-- External production dependencies: Cloudinary, SMTP, hosted database and
+- External production dependencies: Cloudinary, transactional email, hosted database and
   Render/Vercel deployment. GitHub Actions provides test/build/deploy gates.
 
 The repository structure, routes, migrations, configuration, test harnesses and
@@ -83,7 +95,7 @@ the 190-route sweep preceded those markup-only fixes.
 
 | Executed check | Result |
 |---|---|
-| Complete backend `mvn test` after dependency/security and HTTPS-mail changes | **276 total: 274 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers |
+| Complete backend `mvn test` after dependency/security and HTTPS-mail changes | **277 total: 275 passed, 2 skipped, 0 failures, 0 errors**; real PostGIS through Testcontainers in CI run #53 |
 | Backend packaging | `mvn -DskipTests package` passed; packaged server started and health returned UP |
 | Frontend Vitest | **82 tests passed across 12 files** |
 | Frontend ESLint / TypeScript | Passed |
@@ -96,7 +108,7 @@ the 190-route sweep preceded those markup-only fixes.
 | Security/engagement browser journeys | Passed MFA enrollment/recovery/single-use rejection, session revocation, unsafe redirect fallback, following, private two-way messages and simulated failed-write feedback |
 | Final Chrome responsive/accessibility audit | **70 authenticated route/theme/width checks passed** (7 routes × 2 themes × 320/375/768/1280/1920px); **14 axe scans, zero violations** using WCAG 2 A/AA, 2.1 AA and 2.2 AA tags; manifest/icon requests passed; no page runtime errors |
 | WebKit browser smoke | **10 responsive route checks passed** at 320/1280px; sign-in dialog keyboard order/Escape and runtime-error checks passed |
-| Firefox browser smoke | **Blocked at browser launch**, before application code ran: downloaded Firefox reports “Could not find profile folder”; retry with `/tmp` also failed. Combined cross-browser command correctly exits nonzero |
+| Firefox browser smoke | **10 responsive route checks passed** at 320/1280px; dialog keyboard/Escape and runtime-error checks passed. The harness isolates Firefox's home on macOS 27 to work around the confirmed upstream profile-access defect |
 | Frontend/tools dependency audit | Zero known vulnerabilities reported by npm audit |
 | Backend OSV runtime scan | 116 runtime artifacts checked; only Spring MVC 6.2.19 matched remaining advisories |
 | Whitespace check | `git diff --check` passed |
@@ -169,30 +181,26 @@ dashboard summary p50 **13.5ms**, p95 **28.6ms**. No architectural or database
 optimization was justified by this small sample. It is not a load test, a browser
 Web Vitals measurement or a replacement for the historical 10k/50k benchmarks.
 
-## 7. Remaining work / production prerequisites
+## 7. Remaining operational work
 
-1. Verify the actual deployment and CI on the exact reviewed commit; this audit
-   neither pushed nor deployed changes. A fresh production container image was
-   not built; the Java package and frontend production build were verified.
-2. Configure HTTPS origins, production JWT key, database credentials, Cloudinary,
-   SMTP/TLS/from identity and **`PUBLIC_APP_URL`**. Test real reset links and
-   notification delivery with non-demo configuration in staging.
-3. Confirm encrypted scheduled backups can be downloaded and restored. Preserve
-   encryption keys separately and rehearse rollback with migration compatibility.
-   Review orphan-cleanup dry-run output before authorizing deletions.
-4. Complete real-device keyboard/screen-reader, PWA installation and closed-browser
-   background-sync checks. Worker delivery after tab closure is verified; OS-level
-   background execution is browser-dependent, not guaranteed.
-   Re-run Firefox once the local browser-profile launch failure is resolved.
-5. Validate expected-load behavior, shared-peer throttling, mail retry operations
-   and monitoring. Clarification threads and session history need pagination or
-   retention planning for very large installations.
-6. Keep the Spring applicability assessment current; plan supported-framework
-   upgrades. Complete full credential-history and deployment configuration scans.
+1. Production transactional email delivery is deferred. Before enabling it,
+   verify the provider account/sender, real reset links, retries and monitoring
+   under the non-demo profile. Do not expose the provider key to the frontend.
+2. Review the Cloudinary orphan-cleanup dry run before authorizing deletion.
+   Production evidence verification must remain enabled.
+3. Complete physical-device keyboard/screen-reader, installed-PWA and
+   closed-browser background-sync checks where formal sign-off requires them.
+   OS-level background execution remains browser-dependent and is not guaranteed.
+4. Validate shared-peer throttling and expected production load before scaling.
+   Clarification threads and session history need pagination or retention
+   planning for very large installations.
+5. Preserve JWT/MFA and backup keys securely, rehearse rollback across migrations,
+   keep the Spring advisory assessment current, and plan supported-framework
+   upgrades plus a full credential-history/configuration scan.
 
 ## 8. Production-readiness verdict
 
-### Follow-up step 1 — deployment checks (2026-10-26)
+### Historical follow-up step 1 — deployment checks (2026-10-26)
 
 Read-only public checks found:
 
@@ -227,6 +235,13 @@ code 0. This resolves the missing-secret/backup-artifact gate above; application
 startup against a restored current-release database remains a separate check.
 The user subsequently authorized committing and pushing the audited changes to
 `main`, including the configured automatic deployment triggers.
+
+**Current verdict (2026-10-27): complete within the agreed application scope.**
+The full CI pipeline passed on `10481bf`, both public services are healthy, backup
+creation/restoration/encryption recovery is verified, and Chrome, Firefox and
+WebKit checks pass. Live transactional email delivery is the one expressly
+deferred integration. The remaining items in section 7 are operating controls
+or physical-device validation, not unfinished core features.
 
 Production follow-up found that the Render service uses the Free plan, which
 blocks common outbound SMTP ports. The user verified an individual sender in

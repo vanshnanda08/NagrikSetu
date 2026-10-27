@@ -32,11 +32,12 @@ Restart the frontend after building so it serves matching chunks.
 | `audit.mjs` | MFA/recovery/session controls, redirect/origin defenses, following/private messages, failed-write feedback, 70 authenticated responsive checks, 14 axe scans and manifest assets. Uses the axe-core installed through the frontend lint dependency tree. |
 | `browsers.mjs` | Firefox and WebKit public routes at 320/1280px, keyboard dialog navigation, Escape and runtime errors; attempts both engines and exits nonzero if either fails. |
 
-Recorded on 2026-10-26: contract, transitions, UI walk and sweep passed; the sweep
+Recorded on 2026-10-27: contract, transitions, UI walk and sweep passed; the sweep
 completed 190 checks with zero failures. Features and the final Chrome audit
-passed, including 70 layouts and 14 axe scans with no violations. WebKit passed
-10 route checks and keyboard smoke; Firefox could not start its profile locally,
-so the combined cross-browser command failed and Firefox remains unverified.
+passed, including 70 layouts and 14 axe scans with no violations. Firefox and
+WebKit each passed 10 route checks and keyboard smoke. On macOS 27 the harness
+automatically gives Firefox an isolated temporary CoreFoundation home to avoid
+the upstream Playwright/Firefox shared-profile access defect.
 See [FINAL_AUDIT.md](../FINAL_AUDIT.md). The lifecycle scripts create demo issues
 as they run, so expect the ticket numbers to climb.
 
@@ -49,7 +50,8 @@ disable media verification in production. No live SMTP or Cloudinary upload
 credentials are required. Both extended scripts create unique test accounts.
 
 All scripts exit nonzero on failed checks. The CI verification job runs the
-original four against a fresh PostGIS service and gates Render deployment. It uses
+original four plus the cross-browser smoke against a fresh PostGIS service and
+gates Render deployment. It uses
 `demo,seed`, which disables scheduled writers while the harness mutates its
 fixtures. Browser checks cover routes and lifecycle actions; the backend suite
 checks vote/quorum, split/merge, assignment guards and SSE behavior.
