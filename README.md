@@ -13,12 +13,13 @@ dashboard publishes the resulting numbers without a login.
 
 ## Project status
 
-**Phases 0–9 implemented; production sign-off is conditional.**
+**Phases 0–9 implemented and deployed; production mail delivery is deferred.**
 The application, evaluation, hardening, demo profile, and final write-up are
-built and tested. Production credential checks (deployment, backup artifact,
-and Cloudinary deletion) remain operator tasks because they require the live
-accounts and secrets. See [the 2026-10-26 audit](FINAL_AUDIT.md) for security fixes,
-fresh verification and the remaining operational/accessibility checks.
+built and tested. CI, the live frontend/API, and encrypted backup recovery have
+been verified. Cloudinary deletion remains deliberately disabled until its dry
+run is reviewed; real transactional email delivery will be completed later.
+See [the audit](FINAL_AUDIT.md) for security fixes, fresh verification and the
+remaining operational/accessibility checks.
 
 Outside the numbered phases, the frontend was reworked on 2026-10-11: it is now
 branded **NagrikSetu**, has a glass-style theme in light and dark, fits a
@@ -27,12 +28,12 @@ verified locally (see the end of this file).
 
 | | |
 |---|---|
-| Frontend | https://civic-track-six.vercel.app (deployed from `main` by Vercel; whether the live site already has the latest redesign has not been checked) |
+| Frontend | https://civic-track-six.vercel.app (HTTP 200 verified 2026-10-27) |
 | API | https://civictrack-api.onrender.com |
 | API docs (Swagger) | https://civictrack-api.onrender.com/swagger-ui/index.html |
-| Backend tests | **276 total: 274 passed, 2 opt-in evaluation tests skipped, 0 failures/errors**, against real PostGIS via Testcontainers |
+| Backend tests | **277 total: 275 passed, 2 opt-in evaluation tests skipped, 0 failures/errors**, against real PostGIS via Testcontainers |
 | Frontend tests | **82** passing, plus lint, typecheck and production build |
-| CI | GitHub Actions: backend suite, frontend lint/typecheck/tests/build, then the API/browser verification job before the deploy hook. It was last confirmed green before 2026-10-07; runs since then have not been checked from this environment |
+| CI | GitHub Actions run #53 passed on commit `10481bf`; backend, frontend and API/browser gates completed before the Render deploy hook |
 | Deployed corpus | 113 issues / 254 reports in the verified backup taken 2026-10-07; counts change with usage |
 
 > The API runs on Render's free tier and sleeps after 15 minutes idle. The
@@ -49,7 +50,7 @@ verified locally (see the end of this file).
 | 2 | Clustering engine: candidate query, accuracy-weighted centroid, adaptive radius, extent cap, advisory lock, post-lock re-read, concurrency test; seed corpus with ground-truth labels | ✅ done |
 | 3 | State machine and `TransitionPolicy`, status history, staff queue, SLA clock, escalation ladder, ShedLock sweep, priority ageing, JWT auth and RBAC | ✅ done |
 | 4 | Public read API; Next.js frontend: report composer, map, issue detail, **cluster inspector**, staff queue and work view, public dashboard, auth with httpOnly refresh cookie | ✅ done |
-| 5 | Deployment: Docker image with CDS, Supabase, Render, Vercel, GitHub Actions CI, keep-alive, backup with a tested restore, Swagger UI, Cloudinary photo upload and nightly orphan sweep | 🟡 Implemented; remote activation checks pending |
+| 5 | Deployment: Docker image with CDS, Supabase, Render, Vercel, GitHub Actions CI, keep-alive, backup with a tested restore, Swagger UI, Cloudinary photo upload and nightly orphan sweep | ✅ done; destructive orphan deletion remains opt-in |
 | 6 | Citizen verification: quorum, one vote per citizen per fix, timeout sweep, auto-close, reopen on rejection, `/me/verify`, notification centre, resolved-without-verification rate per department | ✅ done |
 | 7 | Supervisor tools (assignment board, review queue, split/merge with full recomputation and a permanent log, recategorise), full dashboard aggregates behind expandable headings, SSE live updates | ✅ done |
 | 8 | Evaluation: labelled clustering quality, radius sweep, latency at 1k/10k/50k issues, extent-cap ablation, and live concurrency cohorts | ✅ done; reproducible scripts and CSV/PDF results are in `evaluation/` and `artifacts/evaluation/` |
@@ -60,9 +61,9 @@ verified locally (see the end of this file).
 
 ### Remaining operator checks
 
-- Confirm the newest deployment on Render and Vercel with production credentials.
-- Confirm one scheduled encrypted backup artifact can be downloaded and restored.
+- Complete production transactional email delivery when that integration resumes.
 - Review Cloudinary orphan-sweep dry-run output before enabling deletion.
+- Complete physical-device/screen-reader and installed-PWA checks where required.
 - Record the final demo using `docs/DEMO-RUNBOOK.md` if a submission video is required.
 
 ## Features
@@ -262,7 +263,7 @@ account at all.
 ## Testing
 
 ```bash
-cd backend  && mvn clean test    # 276 total: 274 passed, 2 opt-in evaluations skipped
+cd backend  && mvn clean test    # 277 total: 275 passed, 2 opt-in evaluations skipped
 cd frontend && npm run test      # 82 unit tests
 cd frontend && npm run lint      # includes the Leaflet import boundary rule
 ```
@@ -402,8 +403,9 @@ encrypts it with GPG, and retains only the encrypted artifact for 56 days.
 Configure these GitHub Actions secrets before running the workflow:
 `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP_DATABASE_PASSWORD`, and
 `BACKUP_PASSPHRASE` (a strong passphrase also kept in your password manager).
-The workflow is active on GitHub as of 2026-10-07, but has no recorded runs.
-Secrets and encrypted artifact recovery remain unverified.
+The scheduled workflow completed successfully on 2026-10-24: it created a dump,
+restored it into a temporary database, uploaded only the encrypted artifact, and
+the downloaded artifact was decrypted locally with GPG exit code 0.
 
 For a local backup, use `backend/.env.seed` or the `DATABASE_*` environment
 variables, then run `./scripts/backup.sh` and
@@ -424,9 +426,15 @@ Cloudinary cleanup needs `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and
 setting `CLOUDINARY_DRY_RUN=false`. Those management credentials are not configured
 in the available local environment, so production deletion remains unverified.
 
-Verification on 2026-10-24: backend tests, frontend tests, typecheck and lint pass.
+Verification on 2026-10-27: backend tests, frontend tests, typecheck and lint pass.
 The production frontend builds with `npm run build -- --webpack`; this environment
 rejects the local worker port used by Turbopack. The normal build command is unchanged.
+
+Deployment follow-up on 2026-10-27: CI run #53 passed at `10481bf`, the Render
+health endpoint returned `UP`, and the Vercel dashboard returned HTTP 200.
+Firefox and WebKit each passed the 10-route responsive/keyboard smoke suite;
+Firefox uses an isolated temporary home on macOS 27 to avoid an upstream
+Playwright/Firefox profile-access defect. Production email delivery is deferred.
 
 
 Phase 7 verification follow-up (2026-10-07): all 224 backend tests and 68

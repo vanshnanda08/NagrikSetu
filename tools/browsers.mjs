@@ -1,12 +1,26 @@
 // Local cross-engine smoke checks; not a substitute for physical-device testing.
 import { firefox, webkit } from 'playwright';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { APP } from './http.mjs';
 
 for (const [name, engine] of Object.entries({ firefox, webkit })) {
   let browser;
+  let browserHome;
   try {
-    browser = await engine.launch();
+    // Firefox bundled with Playwright <=1.64 resolves Mozilla's shared app-data
+    // directory on macOS 27, which TCC rejects before it reads the test profile.
+    // A private CoreFoundation home avoids that upstream launch bug. Remove this
+    // workaround once the project moves to Playwright 1.65+ / Firefox 158+.
+    if (name === 'firefox' && process.platform === 'darwin') {
+      browserHome = await mkdtemp(join(tmpdir(), 'nagrik-firefox-home-'));
+    }
+    browser = await engine.launch({
+      env: browserHome ? { ...process.env, CFFIXED_USER_HOME: browserHome } : process.env,
+    });
     const context = await browser.newContext();
     const page = await context.newPage();
     const errors = [];
@@ -34,5 +48,12 @@ for (const [name, engine] of Object.entries({ firefox, webkit })) {
   } catch (error) {
     console.error(`FAIL ${name}: ${error.message}`);
     process.exitCode = 1;
-  } finally { await browser?.close(); }
+  } finally {
+    await browser?.close();
+    if (browserHome) {
+      // macOS adds a deny-delete ACL to the synthetic Downloads directory.
+      execFileSync('/bin/chmod', ['-RN', browserHome]);
+      await rm(browserHome, { recursive: true, force: true });
+    }
+  }
 }
