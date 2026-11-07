@@ -1,285 +1,79 @@
 @import "tailwindcss";
-@import "./liquid-glass.css";
+@import "./civic-interface.css";
+@import "./dashboard.css";
+@import "./committed-light.css";
+@import "./viewport-layout.css";
+@import "./team-performance.css";
 
-/* ==========================================================================
-   NagrikSetu design tokens
-   --------------------------------------------------------------------------
-   Blueprint 1.3 (colour), 1.4 (type), 1.5 (layout).
-
-   THE ONE RULE THIS FILE EXISTS TO ENFORCE:
-   colour means status, and nothing else is coloured. There is no brand accent,
-   no hero gradient, no tinted illustration. If a component needs colour and it
-   is not encoding a status value, the component is wrong -- reach for weight,
-   size, rule, or space instead.
-
-   Status is never encoded by colour ALONE. Every status carries a colour, a
-   shape (the left rule treatment plus a glyph) and a word. That is not a
-   nicety for colour-blind users bolted on afterwards; it is the only reason
-   this palette can work at all, because three statuses deliberately share one
-   colour (see below) and the word is what separates them.
-
-   HOW TO SWAP PALETTES: replace the :root block below with token set B or C.
-   Everything else follows, because @theme inline emits var() references rather
-   than copying values. The one thing a swap does NOT carry is the font, which
-   is loaded in src/app/layout.tsx -- each set names the two families it wants
-   and the swap is a one-line change there.
-   ========================================================================== */
-
+/* Light presentation from origin/main at 011ecb5c04192b1823065a2d4c248630c853add8.
+   Independent of saved preferences and operating-system appearance.
+   Status hues remain paired with their centralized labels and shapes. */
 :root {
-  /* ---- TOKEN SET A -- "Cool paper" (ACTIVE) ------------------------------
-     Fonts: IBM Plex Sans / IBM Plex Mono.
-     Plex is chosen for three specific reasons, not as a default: genuine
-     tabular figures, which the queues and dashboard need for column
-     alignment; legibility held at 14px on low-density screens; and IBM Plex
-     Sans Devanagari exists as a sibling family, so a future Hindi or Punjabi
-     interface is not a typographic redesign. */
-
-  /* The brand accent. It is deliberately TEAL and not green.
-     `--st-resolved` is #15803d, and a brand green at the same hue means a
-     brand chip and a "resolved" badge are the same colour on the same page --
-     the one confusion this palette cannot afford, because green here is a
-     claim that a problem was fixed. Teal keeps the deep-green character and
-     moves the hue clear of it.
-     Brand colour marks identity and navigation only. It never encodes a
-     status, and it is never used on a tile whose number is a status. */
-  --brand-primary: #0f766e;
-  --brand-dark: #134e4a;
-  /* Foreground ON the brand fills, as tokens rather than a literal `white`.
-     Dark mode inverts these fills to a bright teal, and white on bright teal
-     measures 1.86 -- the logo mark was doing exactly that, and the active nav
-     pill measured 3.74 against a 4.5 requirement. A hard-coded `text-white`
-     cannot follow a fill that changes lightness between themes. */
-  --brand-ink: #ffffff;
-  --brand-dark-ink: #ffffff;
-
-  /* Paper, not Tailwind grey. A very slightly warm off-white with a warm
-     near-black on it -- the pairing that makes a page of municipal records
-     read as a record. Every status colour below is re-measured against it. */
-  --ink: #14161A;
-  --ink-muted: #565B61;
-  /* The third ink, for micro-labels and field captions. #8A8A83 looked
-     right and measured 3.24 -- below AA, and these are real words rather
-     than decoration. 4.72/5.06. */
-  --ink-faint: #6F6F68;
-  --surface: #F7F7F4;
-  --surface-raised: #FFFFFF;
+  color-scheme: only light;
+  --surface: #eaf3fa;
+  --surface-raised: #f4f8fc;
   --surface-sunk: #EFEFEA;
-  --rule: #E2E1D9;
-  --rule-strong: #C9C7BC;
+  --ink: #0b2540;
+  --ink-muted: #46607a;
+  --ink-faint: #46607a;
+  --rule: rgba(11, 59, 94, .16);
+  --rule-strong: #6f879d;
+  --brand-primary: #0b3b5e;
+  --brand-primary-hover: #082c47;
+  --brand-ink: #FFFFFF;
+  --nav-selected: #0b3b5e;
+  --brand-orange: #c85a0a;
+  --logo-detail: #e8761e;
+  --logo-pin: #0b3b5e;
+  --logo-bridge: #FFFFFF;
+  --logo-highlight: #5aa9d6;
 
-  /* The saturated colours that encode status.
-     Re-measured after the surface moved from #F7F8F7 to #F3F4F6 -- a darker
-     ground lowers every one of these, and `rejected` fell through AA at 4.36.
-     Contrast against #F3F4F6 (surface) / #FFFFFF (raised), sRGB:
-       new 6.89/7.58  active 6.09/6.70  pending 4.56/5.02  resolved 4.56/5.02
-       reopened 6.46/7.10  breached 5.88/6.47  closed 6.93/7.63
-       rejected 5.28/5.81
-     All clear WCAG AA on both surfaces. `pending` and `resolved` sit at 4.56
-     with almost no margin: darken them before moving the surface again or
-     using them below 13px. */
+  --glass-fill: rgba(255, 255, 255, .45);
+  --glass-thin-fill: rgba(255, 255, 255, .6);
+  --glass-edge: rgba(255, 255, 255, .6);
+  --glass-solid: #f8fbff;
+  --glass-highlight: rgba(255, 255, 255, .4);
+  --glass-shadow: inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(255,255,255,.15), 0 8px 32px rgba(15,23,42,.08);
+
   --st-new: #4A5568;
   --st-active: #1D4ED8;
   --st-pending: #A2570A;
   --st-resolved: #15713C;
-  /* Charts (phase 7). The context series in an emphasis chart: a gray that
-     clears 3:1 on the surface and sits ΔE 21 from --st-resolved in normal
-     vision, 16.8 under protanopia -- checked with the dataviz validator, not
-     by eye. Gray on purpose: colour means status, and "new issues reported"
-     is context for the resolved line, not a status of its own. */
-  --chart-context: #8A919B;
-  --chart-mark: #565B61;
   --st-reopened: #6828C4;
   --st-breached: #B01818;
   --st-closed: #55524C;
   --st-rejected: #6B645F;
+  --chart-context: #6d7784;
+  --chart-mark: #565B61;
+  --tile-emph-bg: #B91C1C;
+  --tile-emph-ink: #FFFFFF;
+  --tile-emph-ink-muted: #FEE2E2;
 
-  --font-stack-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-stack-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
-  /* Headings and figures. See the note in layout.tsx for why a serif. */
-  --font-stack-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
-
-  /* Type. Sentence case throughout; no all-caps labels, no eyebrow text. */
-  --size-display: 2rem;      --lh-display: 2.25rem;  --ls-display: -0.02em;
-  --size-heading: 1.25rem;   --lh-heading: 1.75rem;  --ls-heading: -0.01em;
-  --size-body: 1rem;         --lh-body: 1.625rem;
-  --size-dense: 0.875rem;    --lh-dense: 1.25rem;
-  --size-meta: 0.8125rem;    --lh-meta: 1.125rem;
-  --size-ref: 0.875rem;      --lh-ref: 1.25rem;
-
-  /* Layout. Base unit 4px; sections 32px apart, related items 8px.
-     Radius was capped at 4px in the original token set. This set raises it to
-     16px deliberately; the cap was a house style, not an accessibility rule. */
-  /* The one filled tile on the dashboard. Its fill is --st-breached, because
-     the number on it is a breach count -- an emphasised tile still obeys the
-     rule that colour encodes status, so this is red and never brand green.
-     Foreground has to be a token rather than a literal `white`: in dark mode
-     the fill inverts, and white on the dark theme's lighter red measures 2.28,
-     which fails. Light 6.47/5.30, dark 9.16/6.93. */
-  --tile-emph-bg: #b91c1c;
-  --tile-emph-ink: #ffffff;
-  --tile-emph-ink-muted: #fee2e2;
-
-  --measure-prose: 68ch;
-  --measure-form: 44ch;
-  --radius: 16px;
-  --radius-sm: 8px;
-  --hit-min: 48px;     /* one-handed outdoor use, blueprint 8 */
-  --sidebar-width: 260px;
+  --font-stack-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, sans-serif;
+  --font-stack-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-stack-serif: var(--font-stack-sans);
+  --size-display: 2rem; --lh-display: 2.5rem; --ls-display: -0.025em;
+  --size-heading: 1.25rem; --lh-heading: 1.75rem; --ls-heading: -0.015em;
+  --size-body: 1rem; --lh-body: 1.625rem;
+  --size-dense: 0.875rem; --lh-dense: 1.375rem;
+  --size-meta: 0.8125rem; --lh-meta: 1.25rem;
+  --size-ref: 0.875rem; --lh-ref: 1.375rem;
+  --measure-prose: 68ch; --measure-form: 48ch;
+  --radius: 28px; --radius-sm: 8px;
+  --radius-pill: 999px;
+  --space-panel: 24px; --space-gap: 20px;
+  --overlay: rgb(23 43 58 / 0.42);
+  --hit-min: 44px;
+  --shadow-1: 0 1px 3px rgb(23 43 58 / 0.04);
+  --shadow-2: 0 3px 12px rgb(23 43 58 / 0.06);
+  --shadow-3: 0 12px 36px rgb(23 43 58 / 0.14);
+  --dur-instant: 80ms; --dur-fast: 140ms; --dur-base: 200ms; --dur-slow: 240ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-spring: var(--ease-standard);
 }
 
-/* Dark theme.
-   Blueprint 1.7 argued against a second palette on the grounds that it is a
-   second palette to keep accessible. That argument was right, and this block
-   is what paying it looks like: the status colours MUST be redefined here.
-   Left at their light values they measured 1.92-3.70 against these surfaces
-   -- every one of the eight below AA, on the exact colours the whole system
-   exists to make readable. The values below are the same eight hues lifted
-   for a dark ground, re-measured against #111827 / #1F2937:
-     new 8.37/6.93  active 7.42/6.14  pending 9.63/7.97  resolved 9.53/7.88
-     reopened 8.57/7.09  breached 7.77/6.43  closed 8.24/6.82
-     rejected 9.34/7.73
-   Hue order is preserved, so the greyscale check still separates them and the
-   three statuses that share --st-active still share it. */
-.dark {
-  color-scheme: dark;
-
-  /* Surfaces are deliberately not Tailwind's gray-900/800. Those are the
-     default everything ships with, and they are slightly blue. Re-measured
-     against these: the worst status contrast improves from 6.14 to 7.09 and
-     every one of the eight clears AA with margin. */
-  --ink: #F3F2EE;
-  --ink-muted: #A7A49D;
-  /* Same correction on the dark ground: #7B7872 measured 3.79 on the
-     raised surface. 5.10/4.71. */
-  --ink-faint: #8B887F;
-  --surface: #15161A;
-  --surface-raised: #1C1E23;
-  --surface-sunk: #101115;
-  --rule: #2C2E34;
-  --rule-strong: #3D4047;
-
-  /* Both brand fills are the bright teal here, with DARK ink on them --
-     9.40, against 3.74 and 1.86 for the white-on-teal this replaces. A bright
-     fill also reads as a fill against a near-black surface, which a dark teal
-     pill did not. */
-  --brand-primary: #2dd4bf;
-  --brand-dark: #2dd4bf;
-  --brand-ink: #0F1B22;
-  --brand-dark-ink: #0F1B22;
-
-  --st-new: #A9B4C4;
-  --st-active: #86A9FF;
-  --st-pending: #F0B45F;
-  --st-resolved: #5FD48B;
-  /* Validated separately against the dark surface: ΔE 28.2 normal, 24.9 deutan. */
-  --chart-context: #6B7280;
-  --chart-mark: #A7A49D;
-  --st-reopened: #C0A6FF;
-  --st-breached: #FF8E82;
-  --st-closed: #B5B0AA;
-  --st-rejected: #C4BDB5;
-
-  --tile-emph-bg: #7f1d1d;
-  --tile-emph-ink: #fef2f2;
-  --tile-emph-ink-muted: #fecaca;
-}
-
-/* --------------------------------------------------------------------------
-   TOKEN SET B -- "Public notice"
-   Fonts: Source Sans 3 / Source Code Pro (swap in layout.tsx).
-   A warmer paper and a heavier, higher-contrast status palette, closer to
-   printed municipal signage. The statuses sit darker so they hold up when a
-   page is photocopied or screenshotted and recompressed, which is what
-   actually happens to a councillor's office screenshot.
-   Same rule holds: colour AND shape AND word, never colour alone.
-
-:root {
-  --ink: #1a1714;
-  --ink-muted: #635c54;
-  --surface: #faf8f4;
-  --surface-raised: #ffffff;
-  --rule: #ded8cd;
-
-  --st-new: #44403c;
-  --st-active: #1e40af;
-  --st-pending: #92400e;
-  --st-resolved: #166534;
-  --st-reopened: #5b21b6;
-  --st-breached: #991b1b;
-  --st-closed: #57534e;
-  --st-rejected: #6b7280;
-
-  --font-stack-sans: var(--font-alt-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-stack-mono: var(--font-alt-mono), ui-monospace, "SF Mono", monospace;
-
-  --size-display: 2.125rem;  --lh-display: 2.375rem; --ls-display: -0.015em;
-  --size-heading: 1.3125rem; --lh-heading: 1.75rem;  --ls-heading: -0.005em;
-  --size-body: 1.0625rem;    --lh-body: 1.6875rem;
-  --size-dense: 0.9375rem;   --lh-dense: 1.3125rem;
-  --size-meta: 0.8125rem;    --lh-meta: 1.125rem;
-  --size-ref: 0.9375rem;     --lh-ref: 1.3125rem;
-
-  --measure-prose: 66ch;
-  --measure-form: 44ch;
-  --radius: 2px;
-  --radius-sm: 1px;
-  --hit-min: 48px;
-  --sidebar-width: 260px;
-}
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   TOKEN SET C -- "High glare"
-   Fonts: Inter Tight / JetBrains Mono (swap in layout.tsx).
-   Tuned for the constraint the blueprint says wins every conflict: a cheap
-   Android in Punjab daylight. Near-white ground for maximum panel brightness,
-   a near-black ink, and statuses pushed darker still so they survive both the
-   glare and the aggressive auto-contrast cheap panels apply. Type runs one
-   step larger at body and dense sizes, because at arm's length in sun the
-   14px row is the first thing to go.
-   Same rule holds: colour AND shape AND word, never colour alone.
-
-:root {
-  --ink: #0b0d0e;
-  --ink-muted: #4b5459;
-  --surface: #fdfdfd;
-  --surface-raised: #ffffff;
-  --rule: #cfd4d6;
-
-  --st-new: #334155;
-  --st-active: #1e3a8a;
-  --st-pending: #9a3412;
-  --st-resolved: #14532d;
-  --st-reopened: #4c1d95;
-  --st-breached: #7f1d1d;
-  --st-closed: #44403c;
-  --st-rejected: #57534e;
-
-  --font-stack-sans: var(--font-alt-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-stack-mono: var(--font-alt-mono), ui-monospace, "SF Mono", monospace;
-
-  --size-display: 2.25rem;   --lh-display: 2.5rem;   --ls-display: -0.02em;
-  --size-heading: 1.375rem;  --lh-heading: 1.875rem; --ls-heading: -0.01em;
-  --size-body: 1.0625rem;    --lh-body: 1.75rem;
-  --size-dense: 0.9375rem;   --lh-dense: 1.375rem;
-  --size-meta: 0.875rem;     --lh-meta: 1.25rem;
-  --size-ref: 0.9375rem;     --lh-ref: 1.375rem;
-
-  --measure-prose: 64ch;
-  --measure-form: 44ch;
-  --radius: 4px;
-  --radius-sm: 2px;
-  --hit-min: 48px;
-  --sidebar-width: 260px;
-}
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Tailwind theme.
-   `inline` matters: it makes the generated utilities emit var(--ink) rather
-   than baking #14181a into the stylesheet, which is what lets a :root swap
-   above change the whole interface without regenerating anything.
-   -------------------------------------------------------------------------- */
 @theme inline {
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
@@ -289,11 +83,9 @@
   --color-rule: var(--rule);
   --color-rule-strong: var(--rule-strong);
   --color-ink-faint: var(--ink-faint);
-  
+
   --color-brand-primary: var(--brand-primary);
-  --color-brand-dark: var(--brand-dark);
   --color-brand-ink: var(--brand-ink);
-  --color-brand-dark-ink: var(--brand-dark-ink);
 
   --color-tile-emph-bg: var(--tile-emph-bg);
   --color-tile-emph-ink: var(--tile-emph-ink);
@@ -312,14 +104,11 @@
   --font-mono: var(--font-stack-mono);
   --font-serif: var(--font-stack-serif);
 
-  /* `text-display` and `text-heading` set the SERIF, so every h1 and h2 in
-     the application picks it up without touching a single component. The
-     weight drops from 600 to 500: Newsreader at 600 is heavy enough to look
-     shouted where Plex at 600 looked merely firm. */
+
   --text-display: var(--size-display);
   --text-display--line-height: var(--lh-display);
   --text-display--letter-spacing: var(--ls-display);
-  --text-display--font-weight: 500;
+  --text-display--font-weight: 600;
 
   --text-heading: var(--size-heading);
   --text-heading--line-height: var(--lh-heading);
@@ -344,69 +133,7 @@
 
   --radius-token: var(--radius);
   --radius-token-sm: var(--radius-sm);
-  /* NO --sidebar-width here. @theme inline emits its own --sidebar-width on
-     :root, so `--sidebar-width: var(--sidebar-width)` was a self-reference and
-     resolved to nothing -- it shipped in the built CSS exactly like that.
-     The :root token above is a plain custom property; read it with
-     var(--sidebar-width). */
-}
 
-/* ==========================================================================
-   Motion
-   --------------------------------------------------------------------------
-   Durations and easing curves are Material Design 3's published tokens rather
-   than numbers picked by eye. Two reasons: they are calibrated as a set, so
-   things that move together stay coherent, and "why 220ms" has an answer that
-   is not "it looked right".
-
-     m3.material.io/styles/motion/easing-and-duration/tokens-specs
-
-   THE RULE THIS FILE ENFORCES: motion carries meaning or it does not ship.
-   Every animation below either shows where something came from, confirms a
-   press, or holds a place while data loads. Nothing moves to be impressive --
-   this is a tool people open when something in their street is broken, and a
-   page that shimmers at them while they are trying to read a deadline is
-   working against its own purpose.
-
-   Enter and exit use DIFFERENT curves. Entering decelerates: quick to arrive,
-   gentle to settle. Leaving accelerates: reluctant to start, quick to go. Using
-   one curve for both is the single most common way motion ends up feeling
-   cheap.
-   ========================================================================== */
-:root {
-  /* Micro-interactions: a press, a hover, a checkbox. Below ~100ms a change
-     reads as instant rather than animated, which is what these want. */
-  --dur-instant: 80ms;
-  --dur-fast: 140ms;
-  /* Component-level: a card lifting, a badge settling. */
-  --dur-base: 200ms;
-  /* Entrances and anything that travels a distance. */
-  --dur-slow: 320ms;
-
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
-  --ease-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
-  /* A small overshoot, for a control confirming it took your input. Used only
-     on the category picker, where the tap target is large and the feedback has
-     to survive being looked at through a cracked screen in daylight. */
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  /* Elevation. The original token set allowed no shadow at all except the
-     header hairline; this set uses cards, and a card with no elevation against
-     a near-white surface relies entirely on its border. These are deliberately
-     shallow -- depth enough to separate, not enough to float. */
-  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.05);
-  --shadow-2: 0 2px 8px rgb(0 0 0 / 0.07), 0 1px 2px rgb(0 0 0 / 0.04);
-  --shadow-3: 0 8px 24px rgb(0 0 0 / 0.10), 0 2px 6px rgb(0 0 0 / 0.05);
-}
-
-/* Shadows tuned for light surfaces disappear on dark ones -- black on near
-   black is nothing. Dark mode leans on a deeper, wider shadow plus the
-   surface-raised step to separate layers. */
-.dark {
-  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-2: 0 2px 10px rgb(0 0 0 / 0.5), 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-3: 0 10px 30px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.45);
 }
 
 @keyframes rise {
@@ -444,13 +171,9 @@
   animation: fade var(--dur-base) var(--ease-standard) backwards;
 }
 
-/* Stagger. Set --i on each child; the cap keeps a fifty-row queue from making
-   the last row wait two seconds, which is the point at which a stagger stops
-   being an entrance and becomes a delay. */
-.u-stagger > * {
-  animation: rise var(--dur-slow) var(--ease-decelerate) backwards;
-  animation-delay: calc(min(var(--i, 0) * 28ms, 340ms));
-}
+/* Keep populated lists fully opaque so status text remains readable while
+   asynchronous results arrive. */
+.u-stagger > * { animation: none; }
 
 /* Lift on hover, settle on press. The press state matters more than the hover:
    phones have no hover, and a card that visibly takes the tap is the only
@@ -474,9 +197,7 @@
 
 .u-pop { animation: pop var(--dur-base) var(--ease-spring); }
 
-/* Skeletons. `--surface` and `--rule` rather than a grey, so it follows the
-   theme; both stops are already AA-irrelevant because a skeleton carries no
-   text. */
+/* Skeletons use the shared surface and border tokens. */
 .u-skeleton {
   background: linear-gradient(
     90deg,
@@ -555,128 +276,26 @@
   animation: dialogIn var(--dur-base) var(--ease-decelerate);
 }
 .ct-dialog::backdrop {
-  /* A literal rgba rather than a token: ::backdrop resolves custom properties
-     against the ROOT element, not the dialog, which works today and is exactly
-     the sort of subtlety that breaks quietly. A fixed scrim is safe in both
-     themes because it is a shadow, not a surface. */
-  background: rgb(20 22 26 / 0.45);
-  backdrop-filter: blur(3px);
+  background: rgb(23 43 58 / 0.42);
+
 }
 @keyframes dialogIn {
   from { opacity: 0; transform: translateY(10px) scale(0.985); }
   to   { opacity: 1; transform: none; }
 }
 
-/* --------------------------------------------------------------------------
-   Type roles
-   --------------------------------------------------------------------------
-   The serif is attached HERE rather than in each component, so a heading is a
-   heading everywhere and nothing has to remember to ask for it. `.text-figure`
-   is the dashboard's big numeral: Newsreader with tabular figures on, which is
-   what keeps a column of counts aligned.
-   -------------------------------------------------------------------------- */
-.text-display,
-.text-heading,
-.text-figure {
-  font-family: var(--font-stack-serif);
-  font-variant-numeric: tabular-nums lining-nums;
-}
-.text-figure {
-  font-size: 1.9rem;
-  line-height: 1.1;
-  font-weight: 500;
-  letter-spacing: -0.012em;
-}
-/* An uppercase micro-label: the key of a key/value pair, a section eyebrow.
-   Mono, because these sit beside data and a proportional face makes a column
-   of them ragged. */
-.text-key {
-  font-family: var(--font-stack-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  font-weight: 400;
-}
 
-/* --------------------------------------------------------------------------
-   Base
-   -------------------------------------------------------------------------- */
-html {
-  /* Declared light, and overridden to dark by `.dark` above -- NOT
-     `light dark`. `light dark` hands the choice to the operating system, so a
-     user on a dark-mode phone who picks light mode in this app gets a light
-     page with dark-rendered form controls on it. The scheme has to follow the
-     app's own theme state, which is what the class does. */
-  color-scheme: light;
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  background: var(--surface);
-  color: var(--ink);
-  font-family: var(--font-stack-sans);
-  font-size: var(--size-body);
-  line-height: var(--lh-body);
-  /* Plex ships genuine tabular figures. Queues and the dashboard depend on
-     them for column alignment, and turning them on globally is cheaper than
-     remembering to on every numeric cell. */
-  font-variant-numeric: tabular-nums;
-}
-
-/* One visible focus ring, everywhere, on everything focusable by keyboard.
-   Blueprint 8 makes this non-negotiable. It is deliberately ink rather than a
-   status colour: focus is not a status. */
-:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
-/* Reduced motion.
-   
-   Two layers, because one is not enough. Zeroing the DURATION TOKENS stops
-   anything declared through them, including transitions on elements this
-   selector cannot reach into. The blanket rule then catches anything that
-   hard-codes a duration -- a third-party style, or a future component whose
-   author forgot the tokens exist.
-   
-   Note what is NOT switched off: `scroll-behavior`, and any transform that is
-   the only indication a control was pressed. A user who asks for reduced
-   motion is asking for less movement, not for less feedback. Opacity and
-   colour changes are kept; travel and scale are what go. */
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--surface); color: var(--ink); font-family: var(--font-stack-sans); font-size: var(--size-body); line-height: var(--lh-body); font-variant-numeric: tabular-nums; }
+.text-display, .text-heading, .text-figure { font-family: var(--font-stack-sans); font-variant-numeric: tabular-nums; }
+.text-figure { font-size: 2rem; line-height: 1.15; font-weight: 600; letter-spacing: -0.025em; }
+.text-key { font-size: var(--size-meta); font-weight: 500; color: var(--ink-muted); }
+:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 3px; border-radius: var(--radius-sm); }
+::selection { background: var(--surface-sunk); color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --dur-instant: 0.01ms;
-    --dur-fast: 0.01ms;
-    --dur-base: 0.01ms;
-    --dur-slow: 0.01ms;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  /* The shimmer is a loop, so zeroing its duration is not enough -- it would
-     sit frozen on whichever frame it stopped at. Replace it with a flat fill. */
-  .u-skeleton {
-    animation: none !important;
-    background: var(--rule);
-  }
-
-  .ct-dialog[open] { animation: none !important; }
-
-  /* Entrances become instant appearances rather than invisible elements. */
-  .u-rise, .u-fade, .u-stagger > * {
-    animation: none !important;
-    opacity: 1;
-    transform: none;
-  }
-
+  :root { --dur-instant: 0.01ms; --dur-fast: 0.01ms; --dur-base: 0.01ms; --dur-slow: 0.01ms; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .u-rise, .u-fade, .u-stagger > *, .ct-dialog[open] { animation: none !important; opacity: 1; transform: none; }
+  .u-skeleton { animation: none !important; background: var(--rule); }
   .u-lift:hover, .u-press:active { transform: none; }
 }

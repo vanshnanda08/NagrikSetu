@@ -28,7 +28,10 @@ public enum QueueTab {
      * the commissioner, so an escalated NEW issue has a holder and still needs
      * a crew. Filtering on a null assignee hid exactly that work.
      */
-    TO_ASSIGN;
+    TO_ASSIGN,
+
+    /** Already-resolved complaints, available only to administrators. */
+    READY_TO_CLOSE;
 
     public static QueueTab parse(String raw) {
         if (raw == null || raw.isBlank()) {

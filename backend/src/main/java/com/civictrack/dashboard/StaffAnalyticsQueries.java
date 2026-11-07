@@ -32,7 +32,7 @@ public class StaffAnalyticsQueries {
                       AND i.department_id = :dept)
                 SELECT u.id, u.full_name,
                        COUNT(i.id)                                              AS claimed,
-                       COUNT(i.id) FILTER (WHERE i.status IN %s)                AS resolved,
+                       COUNT(i.id) FILTER (WHERE i.status IN %s AND i.resolved_at IS NOT NULL)                AS resolved,
                        COUNT(i.id) FILTER (WHERE i.reopen_count > 0)            AS reopened,
                        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY %s)
                            FILTER (WHERE i.status IN %s AND i.resolved_at IS NOT NULL) AS median_hours,

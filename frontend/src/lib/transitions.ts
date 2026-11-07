@@ -104,9 +104,9 @@ export function waitingOn(status: IssueStatus, actor: ActorContext): string {
     case "PENDING_VERIFICATION":
       return "Waiting for the people who reported this to confirm the fix. The SLA clock is paused while they decide.";
     case "RESOLVED":
-      return "Citizens confirmed this was fixed. Nothing further is needed from the department.";
+      return "The verification process has settled this issue. See the outcome and history for whether citizens confirmed the fix.";
     case "CLOSED":
-      return "Closed. Only an administrator can reopen it.";
+      return "Closed. Check the history for the outcome and reason. Report a new problem if it happens again.";
     case "REJECTED":
       return "Rejected by a supervisor.";
     case "NEW":

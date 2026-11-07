@@ -70,12 +70,12 @@ export function MetricTile({
       </h2>
 
       {pending ? (
-        <div className="flex-1 flex items-start mt-2">
+        <div className="metric-pending flex-1 flex items-start mt-2">
           <p className="text-dense text-ink-muted">{pending}</p>
         </div>
       ) : (
-        <div className="mt-auto pt-4">
-          <p className="flex items-baseline gap-1.5">
+        <div className="metric-value mt-auto pt-4">
+          <p className="metric-figure flex items-baseline gap-1.5">
             <span className="text-[2.5rem] leading-[2.5rem] font-semibold tracking-tight">
               {value}
             </span>
@@ -87,7 +87,7 @@ export function MetricTile({
           </p>
           {trend && (
             <p
-              className={`mt-3 text-meta ${
+              className={`metric-caption mt-3 text-meta ${
                 filled ? "text-tile-emph-ink-muted" : "text-ink-muted"
               }`}
             >

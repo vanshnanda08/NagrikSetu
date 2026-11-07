@@ -59,6 +59,11 @@ export function ComposerProvider({ children }: { children: React.ReactNode }) {
   const [report, setReport] = useState<ComposedReport>(EMPTY_REPORT);
   const [hydrated, setHydrated] = useState(false);
   const [storageError, setStorageError] = useState(false);
+  // The provider owns draft previews across route changes; replacing or
+  // discarding the photo releases its old URL.
+  useEffect(() => () => {
+    if (report.photo) URL.revokeObjectURL(report.photo.previewUrl);
+  }, [report.photo]);
   useEffect(() => {
     let live = true;
     offlineStore<ComposedReport | undefined>("drafts", "get", "report").then(saved => {

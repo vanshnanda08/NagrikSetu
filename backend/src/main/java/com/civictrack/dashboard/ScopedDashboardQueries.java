@@ -20,7 +20,7 @@ import static com.civictrack.dashboard.DashboardQueries.RESOLVED;
  * The dashboard's figures for one ward or one department (blueprint 3.9, 3.20).
  *
  * <p>The definitions are {@link DashboardQueries}'s, imported rather than
- * restated: resolved is RESOLVED or CLOSED, resolution time is first report to
+ * restated: resolved is RESOLVED or CLOSED with a resolution timestamp, resolution time is first report to
  * resolution, on-time is judged at the claim. A scoped figure that quietly used
  * a different definition would make a ward look better or worse than the same
  * ward does inside the city total, which is exactly the comparison people make.
@@ -47,7 +47,7 @@ public class ScopedDashboardQueries {
     private final DashboardProperties props;
 
     /** One pass over the scope's issues for every count and the median. */
-    private record Counts(long open, long overdue, long resolved, long reported30, long resolved30, long onTime,
+    private record Counts(long open, long overdue, long resolved, long closedEarly, long reported30, long resolved30, long onTime,
                           long claimed, long reopened, long unverified, Double medianHours, long resolvedTimed) {
     }
 
@@ -56,13 +56,14 @@ public class ScopedDashboardQueries {
                 SELECT COUNT(*) FILTER (WHERE %s)                                                       AS open,
                        COUNT(*) FILTER (WHERE i.status IN %s
                                           AND CAST(:now AS timestamptz) > i.due_at + make_interval(secs => i.paused_seconds)) AS overdue,
-                       COUNT(*) FILTER (WHERE i.status IN %s)                                           AS resolved,
+                       COUNT(*) FILTER (WHERE i.status IN %s AND i.resolved_at IS NOT NULL)                                           AS resolved,
+                       COUNT(*) FILTER (WHERE i.status = 'CLOSED' AND i.resolved_at IS NULL) AS closed_early,
                        COUNT(*) FILTER (WHERE i.first_reported_at >= CAST(:now AS timestamptz) - interval '30 days') AS reported30,
                        COUNT(*) FILTER (WHERE i.status IN %s AND i.resolved_at >= CAST(:now AS timestamptz) - interval '30 days') AS resolved30,
-                       COUNT(*) FILTER (WHERE i.status IN %s AND %s)                                    AS on_time,
+                       COUNT(*) FILTER (WHERE i.status IN %s AND i.resolved_at IS NOT NULL AND %s)                                    AS on_time,
                        COUNT(*) FILTER (WHERE i.verification_round > 0)                                 AS claimed,
                        COUNT(*) FILTER (WHERE i.verification_round > 0 AND i.reopen_count > 0)          AS reopened,
-                       COUNT(*) FILTER (WHERE i.status IN %s AND i.resolved_without_verification)       AS unverified,
+                       COUNT(*) FILTER (WHERE i.status IN %s AND i.resolved_at IS NOT NULL AND i.resolved_without_verification)       AS unverified,
                        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY %s)
                            FILTER (WHERE i.status IN %s AND i.resolved_at IS NOT NULL)                  AS median_hours,
                        COUNT(*) FILTER (WHERE i.status IN %s AND i.resolved_at IS NOT NULL)             AS resolved_timed
@@ -71,13 +72,13 @@ public class ScopedDashboardQueries {
                 """.formatted(OPEN, CLOCK_RUNNING, RESOLVED, RESOLVED, RESOLVED, ON_TIME, RESOLVED,
                         HOURS_TO_RESOLVE, RESOLVED, RESOLVED, scope.column), params(scopeId, now),
                 (rs, n) -> new Counts(rs.getLong("open"), rs.getLong("overdue"), rs.getLong("resolved"),
-                        rs.getLong("reported30"), rs.getLong("resolved30"), rs.getLong("on_time"),
+                        rs.getLong("closed_early"), rs.getLong("reported30"), rs.getLong("resolved30"), rs.getLong("on_time"),
                         rs.getLong("claimed"), rs.getLong("reopened"), rs.getLong("unverified"),
                         rs.getObject("median_hours", Double.class), rs.getLong("resolved_timed")));
 
         boolean enough = c.resolvedTimed() >= props.minimumSample() && c.medianHours() != null;
         return new ScopeMetricsDto(
-                c.open(), c.overdue(), c.resolved(), c.reported30(), c.resolved30(),
+                c.open(), c.overdue(), c.resolved(), c.closedEarly(), c.reported30(), c.resolved30(),
                 enough ? Math.round(c.medianHours() * 10.0) / 10.0 : null, c.resolvedTimed(),
                 c.resolved(), c.onTime(),
                 c.resolved() < props.minimumSample() ? null : (double) c.onTime() / c.resolved(),

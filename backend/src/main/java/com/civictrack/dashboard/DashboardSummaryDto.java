@@ -16,6 +16,7 @@ import java.time.Instant;
 public record DashboardSummaryDto(
         Long overdueCount,
         long totalResolved,
+        long closedWithoutResolution,
         NamedCount topOverdueWard,
         NamedCount topOverdueDepartment,
         Instant generatedAt

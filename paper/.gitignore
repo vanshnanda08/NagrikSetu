@@ -1,0 +1,7 @@
+.venv/
+build/*.aux
+build/*.out
+build/*.synctex.gz
+build/main.pdf
+build/rendered/
+__pycache__/

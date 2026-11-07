@@ -37,6 +37,7 @@ backups/
 # Historical working documents stay local. Retain the final closeout evidence.
 docs/*
 !docs/DEMO-RUNBOOK.md
+!docs/PROJECT_ASSESSMENT.md
 !docs/PROGRESS.md
 !docs/DESIGN-DECISIONS.md
 !docs/FINAL-PROJECT-REPORT.md

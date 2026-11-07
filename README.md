@@ -1,15 +1,83 @@
 # NagrikSetu
 
+See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
+
 Municipal issue reporting with bounded incremental geo-clustering, SLA-driven
 escalation, and public accountability.
 
-Citizens report a civic problem with a photo in under twenty seconds. The
-system merges spatially and categorically similar reports into a single
+Citizens report a civic problem with a photo and location. The system merges
+spatially and categorically similar reports into a single
 prioritised work item in real time, so twenty people reporting one pothole
 produce one urgent ticket rather than twenty low-priority ones. Every issue
-carries a deadline that escalates automatically when breached, and no
-department can mark its own work resolved — citizens verify. A public
-dashboard publishes the resulting numbers without a login.
+carries a deadline that escalates automatically when breached, and staff
+submit fixes for citizen verification. Silent timeout resolutions are disclosed.
+A public dashboard publishes the resulting numbers without a login.
+
+## Current interface
+
+The local frontend uses one light theme and **two municipal workspaces**:
+
+- **Complaints** (`/work`): staff and supervisors share a queue/detail screen.
+  Staff use My work; supervisors also get Assignments, Needs review and Team
+  performance. Administrators use those three oversight views, including closure. Repair proof and permitted status updates
+  stay beside the selected complaint. Moderation and split/merge are contextual tools.
+- **Administration** (`/admin`): Configuration and Audit log tabs, including CSV export.
+
+Staff’s existing overview link now opens **Department overview** (`/dashboard`),
+with personal assignments/overdue/ready/in-progress counts and department open,
+overdue, assignment and citizen-verification totals. A single detail panel switches
+between personal priorities, department priorities and workload by status. Figures
+respect the account’s department and optional ward restriction; complaint links
+open the existing work screen. Other roles retain the city dashboard. See the
+[staff overview verification](frontend/STAFF_OVERVIEW_VERIFICATION.md).
+The subsequent [staff dry run](frontend/STAFF_VERIFICATION.md) adds complete queue
+pagination, stable priority ties, safe handling of repair-upload failures and
+denial of unscoped staff queues, with desktop/mobile and workflow checks.
+Supervisor [Team performance](frontend/TEAM_PERFORMANCE_VERIFICATION.md) now keeps
+department metrics alongside tabbed crew records and charts, with responsive
+mobile cards and the existing administrator department selector.
+Assignment ticket numbers and explicit **View ticket details** links open the full
+record, with report descriptions, photos, location and history. **Open work
+actions** retains the assignment/progress pane, and the full record can return
+to the selected queue. See [ticket detail access checks](frontend/TICKET_DETAILS_VERIFICATION.md).
+The [supervisor dry run](frontend/SUPERVISOR_VERIFICATION.md) adds paged assignments
+and grouping review, recoverable cluster loading, and independent work-panel scrolling.
+It records live read-only checks, isolated write exercises and the checks actually run.
+The [administrator review](frontend/ADMIN_VERIFICATION.md) adds audited administrator
+closure inside Assignments, searchable configuration, complete configuration history,
+CSV session recovery and mobile record editing. Admin navigation omits personal
+reporting shortcuts and the separate My work tab.
+
+Complaint details use a compact desktop summary and three panels for evidence/fix,
+location/grouping and activity. Photos open full-size; long histories and forms
+remain in internal panels. Shared viewport sizing also tightens navigation,
+metrics and configuration/profile forms without changing their data or actions.
+
+Public/citizen navigation remains Dashboard, Explore issues (List/Map), Report a
+problem and My reports, with notifications/account settings as utilities. Existing
+staff/supervisor URLs redirect to the shared workspace without changing backend
+API paths or role permissions. Desktop panels scroll internally; mobile focuses
+on the selected complaint with a Back to queue control.
+
+See [the complete screen map](frontend/SCREENS.md), [frontend setup](frontend/README.md),
+[the general public frontend review](frontend/PUBLIC_VERIFICATION.md), and the
+local screenshots under `artifacts/unified-workspace/`. These working-tree
+changes have not been deployed; the dated release checks below are historical.
+The [citizen dry-run review](frontend/CITIZEN_VERIFICATION.md) records the current
+citizen checks, pagination/feedback fixes and evidence-photo dialogs.
+
+## Current assessment and cleanup
+
+See [the implementation assessment](docs/PROJECT_ASSESSMENT.md) for the architecture,
+feature decisions, completed cleanup, fresh local checks, and remaining workflow
+gaps. Earlier deployment checks and benchmark results below are dated evidence,
+not a fresh verification of production. Administrators can close any nonterminal
+complaint with a required 20–2000-character reason and confirmation. Early closure
+is labelled closed before resolution, not counted as a repair or SLA success,
+and notifies reporters/followers according to their preferences. Evidence and
+public history remain. Citizen verification and the automatic settlement/closure
+jobs remain for the normal repair workflow. Review-queue category/rejection
+edits use the existing moderation screen; no migrations or complaint history were removed.
 
 ## Project status
 
@@ -21,10 +89,9 @@ run is reviewed; real transactional email delivery will be completed later.
 See [the audit](FINAL_AUDIT.md) for security fixes, fresh verification and the
 remaining operational/accessibility checks.
 
-Outside the numbered phases, the frontend was reworked on 2026-10-11: it is now
-branded **NagrikSetu**, has a glass-style theme in light and dark, fits a
-desktop window without scrolling the page, and opens on the dashboard. It was
-verified locally (see the end of this file).
+The 2026-10-11 frontend verification below records the earlier NagrikSetu
+glass theme and dashboard layout. The current interface retains its light
+appearance and uses the consolidated screen structure described above.
 
 | | |
 |---|---|

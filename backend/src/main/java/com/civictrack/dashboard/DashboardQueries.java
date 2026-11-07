@@ -96,7 +96,7 @@ public class DashboardQueries {
     public DashboardMetricsDto.SlaCompliance slaCompliance(Instant now) {
         long[] totals = jdbc.queryForObject("""
                 SELECT COUNT(*) AS resolved, COUNT(*) FILTER (WHERE %s) AS on_time
-                FROM issues i WHERE i.status IN %s
+                FROM issues i WHERE i.status IN %s AND i.resolved_at IS NOT NULL
                 """.formatted(ON_TIME, RESOLVED), new MapSqlParameterSource(),
                 (rs, n) -> new long[]{rs.getLong("resolved"), rs.getLong("on_time")});
 

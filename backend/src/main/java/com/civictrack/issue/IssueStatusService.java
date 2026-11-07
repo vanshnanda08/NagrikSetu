@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -42,7 +41,6 @@ public class IssueStatusService {
     private final IssueStatusHistoryRepository historyRepo;
     private final SlaProperties slaProps;
     private final ApplicationEventPublisher events;
-    private final Clock clock;
 
     /**
      * Moves an issue, or throws.
@@ -79,10 +77,6 @@ public class IssueStatusService {
     @Transactional
     public Issue systemTransition(Issue issue, IssueStatus to, TransitionContext ctx) {
         return transition(issue, to, Actor.system(), ctx);
-    }
-
-    public Instant now() {
-        return clock.instant();
     }
 
     /**

@@ -72,7 +72,7 @@ class ProfileIT extends IntegrationTestBase {
                 .andExpect(jsonPath("$.role").value("CITIZEN"))
                 .andExpect(jsonPath("$.mutedNotificationTypes").isEmpty())
                 .andExpect(jsonPath("$.mutableNotificationTypes[?(@ == 'VERIFY_REQUESTED')]").isEmpty())
-                .andExpect(jsonPath("$.mutableNotificationTypes.length()").value(5));
+                .andExpect(jsonPath("$.mutableNotificationTypes.length()").value(6));
         mvc.perform(get("/api/v1/me/profile")).andExpect(status().isUnauthorized());
     }
 

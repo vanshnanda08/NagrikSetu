@@ -24,11 +24,11 @@ export default function OutboxPage() {
     <Link href="/report" className="underline block mt-4">Back to reporting</Link>
     {error && <p role="alert">{error}</p>}
     {!jobs.length && <p className="mt-4">No queued reports on this device.</p>}
-    <ul className="mt-4 grid gap-4">{jobs.map(job => <li key={job.id} className="border border-rule p-4">
+    <ul className="mt-4 grid gap-4">{jobs.map(job => <li key={job.id} className="surface-card p-5">
       <h2 className="text-heading">{job.state === "sent" ? "Sent" : job.state === "failed" ? "Needs attention" : "Waiting to send"}</h2>
       <p>{new Date(job.createdAt).toLocaleString()} — {job.message ?? "Saved safely on this device."}</p>
       {job.publicRef && <Link className="underline" href={`/report/success/${job.publicRef}`}>{job.publicRef}</Link>}
-      <div className="flex gap-3 mt-3">
+      <div className="flex flex-wrap gap-3 mt-3">
         {job.state !== "sent" && <Button onClick={async () => {
           try { await offlineStore("outbox", "put",job.id,{ ...job,state:"pending",nextAttempt:0 }); await wakeOutbox(); await reload(); }
           catch(e) { setError(e instanceof Error ? e.message : "Could not retry."); }

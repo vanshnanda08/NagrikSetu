@@ -76,6 +76,7 @@ export function ColumnChart({
   const total = (c: Column) => c.values.reduce((a, b) => a + b, 0);
   const ticks = niceTicks(Math.max(1, ...columns.map(total)));
   const top = ticks[ticks.length - 1];
+  const axisEvery = Math.max(labelEvery, Math.ceil(columns.length / Math.max(1, Math.floor(plotW / 48))));
   const slot = columns.length ? plotW / columns.length : 0;
   // Leaves at least 2px of surface between neighbours even when slots are narrow.
   const barW = Math.max(2, Math.min(MAX_BAR, slot - 2));
@@ -101,7 +102,7 @@ export function ColumnChart({
   const active = hover === null ? null : columns[hover];
 
   return (
-    <figure className="m-0">
+    <figure className="chart-figure m-0">
       {parts.length > 1 && (
         <ul className="flex flex-wrap gap-x-5 gap-y-1 list-none p-0 m-0 mb-2 text-meta text-ink-muted">
           {parts.map((p) => (
@@ -162,7 +163,7 @@ export function ColumnChart({
                       {fmt(total(c))}
                     </text>
                   )}
-                  {(columns.length - 1 - i) % labelEvery === 0 && (
+                  {(columns.length - 1 - i) % axisEvery === 0 && (
                     <text x={cx} y={height - 8} textAnchor="middle" className="text-meta" fill="var(--ink-muted)">
                       {c.axisLabel ?? c.label}
                     </text>

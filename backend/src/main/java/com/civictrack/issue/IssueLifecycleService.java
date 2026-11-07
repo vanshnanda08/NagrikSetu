@@ -4,15 +4,11 @@ import com.civictrack.issue.policy.TransitionContext;
 import com.civictrack.user.Actor;
 import com.civictrack.user.AppUser;
 import com.civictrack.user.UserRepository;
-import com.civictrack.verification.VerificationProperties;
-import com.civictrack.verification.VerificationQuorumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +16,7 @@ import java.util.UUID;
  * The staff-facing verbs, each of which is one transition.
  *
  * <p>This layer exists to assemble a {@link TransitionContext} -- read the
- * clock, look up the proposed assignee, tally the votes -- and then hand off to
+ * clock, look up the proposed assignee -- and then hand off to
  * {@link IssueStatusService}. It holds no rules of its own. That matters: if
  * "who may reject an issue" were decided here, the state machine would be
  * declarative in one file and imperative in another, and the second one would
@@ -33,15 +29,13 @@ public class IssueLifecycleService {
     private final IssueRepository issues;
     private final UserRepository users;
     private final IssueStatusService statusService;
-    private final VerificationQuorumService quorum;
-    private final VerificationProperties verificationProps;
     private final Clock clock;
 
     @Transactional
     public Issue acknowledge(UUID issueId, Actor actor, String note) {
         Issue issue = load(issueId);
         return statusService.transition(issue, IssueStatus.ACKNOWLEDGED, actor,
-                context(issue).note(note).build());
+                context().note(note).build());
     }
 
     @Transactional
@@ -54,7 +48,7 @@ public class IssueLifecycleService {
         // from the caller's point of view, and distinguishing them would let a
         // supervisor probe for which user ids exist.
         return statusService.transition(issue, IssueStatus.ASSIGNED, actor,
-                context(issue)
+                context()
                         .assignee(assigneeId, assignee == null ? null : assignee.getDepartmentId())
                         .note(note)
                         .build());
@@ -64,7 +58,7 @@ public class IssueLifecycleService {
     public Issue start(UUID issueId, Actor actor, String note) {
         Issue issue = load(issueId);
         IssueStatus to = IssueStatus.IN_PROGRESS;
-        return statusService.transition(issue, to, actor, context(issue).note(note).build());
+        return statusService.transition(issue, to, actor, context().note(note).build());
     }
 
     /**
@@ -81,7 +75,7 @@ public class IssueLifecycleService {
             issue.flagForReview("REUSED_PROOF_PHOTO");
         }
         return statusService.transition(issue, IssueStatus.PENDING_VERIFICATION, actor,
-                context(issue).proofPhoto(proofPhotoUrl, proofPhotoHash).note(note).build());
+                context().proofPhoto(proofPhotoUrl, proofPhotoHash).note(note).build());
     }
 
     /** Compatibility overload for internal workflow callers without a hash. */
@@ -94,14 +88,15 @@ public class IssueLifecycleService {
     public Issue reject(UUID issueId, Actor actor, String reason) {
         Issue issue = load(issueId);
         return statusService.transition(issue, IssueStatus.REJECTED, actor,
-                context(issue).note(reason).build());
+                context().note(reason).build());
     }
 
+    /** Close only through the state machine; concurrent closure is serialized. */
     @Transactional
-    public Issue close(UUID issueId, Actor actor, String note) {
-        Issue issue = load(issueId);
+    public Issue close(UUID issueId, Actor actor, String reason) {
+        Issue issue = issues.findByIdForUpdate(issueId).orElseThrow(() -> new IssueNotFoundException(issueId));
         return statusService.transition(issue, IssueStatus.CLOSED, actor,
-                context(issue).note(note).build());
+                context().note(reason == null ? null : reason.strip()).build());
     }
 
     /**
@@ -114,6 +109,13 @@ public class IssueLifecycleService {
      */
     @Transactional(readOnly = true)
     public List<IssueRepository.QueueRow> queue(Actor actor, QueueTab tab, int limit, int offset) {
+        // A missing department must not turn staff scope into the SQL wildcard.
+        // Ward officers are supervisors explicitly scoped to a ward across departments.
+        if (!actor.isAdmin() && actor.departmentId() == null
+                && (actor.role() != com.civictrack.user.Role.SUPERVISOR || actor.wardId() == null)) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "A department assignment is required to access this work queue.");
+        }
         // Administrators see the whole city; everybody else sees their own
         // scope, applied in SQL rather than by filtering afterwards so that
         // paging returns a full page of things the caller may actually act on.
@@ -122,8 +124,12 @@ public class IssueLifecycleService {
         UUID assignedTo = tab == QueueTab.MINE ? actor.id() : null;
         boolean unassignedOnly = tab == QueueTab.UNASSIGNED;
         boolean toAssignOnly = tab == QueueTab.TO_ASSIGN;
+        boolean readyToCloseOnly = tab == QueueTab.READY_TO_CLOSE;
+        if (readyToCloseOnly && !actor.isAdmin()) {
+            throw new org.springframework.security.access.AccessDeniedException("Only administrators can access the closure queue.");
+        }
         return issues.findQueueRows(departmentId, wardId, assignedTo, unassignedOnly,
-                                    toAssignOnly, limit, offset);
+                                    toAssignOnly, readyToCloseOnly, limit, offset);
     }
 
     @Transactional(readOnly = true)
@@ -135,10 +141,7 @@ public class IssueLifecycleService {
         return issues.findById(issueId).orElseThrow(() -> new IssueNotFoundException(issueId));
     }
 
-    private TransitionContext.Builder context(Issue issue) {
-        Instant now = clock.instant();
-        return TransitionContext.at(now)
-                .tally(quorum.tally(issue, now))
-                .autoCloseAfter(Duration.ofDays(verificationProps.autoCloseDays()));
+    private TransitionContext.Builder context() {
+        return TransitionContext.at(clock.instant());
     }
 }

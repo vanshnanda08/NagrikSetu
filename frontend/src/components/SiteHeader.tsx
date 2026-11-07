@@ -2,555 +2,118 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/lib/auth";
-import { useTheme, useThemeSync, toggleTheme } from "@/lib/theme";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Bell, ClipboardList, LayoutDashboard, Flag, Inbox, Settings, UserRound, LogOut, LogIn, Menu, X, type LucideIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/lib/auth";
 import { useSignIn } from "@/lib/signInDialog";
 import { request } from "@/lib/api";
 import { keys } from "@/lib/queries";
+import { navigationActive, primaryNavigation, roleHome } from "@/lib/navigation";
 import { BrandMark } from "./BrandMark";
 
-/**
- * The primary navigation.
- *
- * A sidebar from `md` up, a collapsing bar below it. The two are one element:
- * on a phone the sidebar's own contents would be a logo plus six stacked
- * full-width rows, and with `sticky top-0` that is most of a 360px viewport
- * spent on navigation before any content is reached.
- *
- * Staff links appear only for staff. That is a convenience, not a security
- * boundary: every staff endpoint is guarded server-side by role AND by
- * `@issueGuard`, so hiding the link stops a citizen wondering what it is, and
- * nothing more.
- *
- * The current page is marked by weight and background, and the background is
- * `--brand-dark`, never a status colour. Navigation is not a status.
- */
-interface NavLink {
-  href: string;
-  label: string;
-  icon: IconName;
-  staffOnly?: boolean;
-  /** Supervisors and administrators: the moderation tools (blueprint 3.17). */
-  supervisorOnly?: boolean;
-  /** Administrators only: the audit log (blueprint 3.21). */
-  adminOnly?: boolean;
-  /**
-   * Work tools. Supervisors and administrators get these under one "Manage"
-   * menu, because nine links will not fit the top bar of a laptop; crew, who
-   * have exactly one, get it as an ordinary link.
-   */
-  group?: "manage";
-}
-
-const MENU_LINKS: NavLink[] = [
-  { href: "/dashboard", label: "Dashboard", icon: "grid" },
-  { href: "/issues", label: "Issues", icon: "list" },
-  { href: "/map", label: "Map", icon: "pin" },
-  { href: "/report", label: "Report a problem", icon: "flag" },
-  // "Work queue", not "Team". The link goes to a queue of work items; the
-  // blueprint's vocabulary rule (§9) is that the label names the thing.
-  { href: "/staff/queue", label: "Work queue", icon: "inbox", staffOnly: true, group: "manage" },
-  { href: "/supervisor/queue", label: "Assignment board", icon: "users", supervisorOnly: true, group: "manage" },
-  { href: "/supervisor/review", label: "Review queue", icon: "layers", supervisorOnly: true, group: "manage" },
-  { href: "/supervisor/analytics", label: "Analytics", icon: "chart", supervisorOnly: true, group: "manage" },
-  { href: "/admin/audit", label: "Audit log", icon: "scroll", adminOnly: true, group: "manage" },
-  { href: "/admin/configuration", label: "Configuration", icon: "scroll", adminOnly: true, group: "manage" },
+interface NavLink { href: string; label: string; icon: LucideIcon }
+const NAV_ICONS: Record<string, LucideIcon> = {
+  "/dashboard": LayoutDashboard, "/issues": ClipboardList, "/report": Flag,
+  "/me/reports": ClipboardList, "/work": Inbox, "/admin": Settings,
+};
+const ACCOUNT_LINKS: NavLink[] = [
+  { href: "/me/reports", label: "My reports", icon: ClipboardList },
+  { href: "/me/settings", label: "Account settings", icon: Settings },
 ];
 
-type IconName =
-  | "grid" | "list" | "pin" | "flag" | "inbox" | "users" | "layers" | "chart" | "scroll" | "bell" | "signOut" | "signIn";
-
-/** Decorative throughout: every icon here sits beside its own text label. */
-function Icon({ name }: { name: IconName }) {
-  const common = {
-    width: 20,
-    height: 20,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 2,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    "aria-hidden": true,
-    focusable: false,
-  };
-  switch (name) {
-    case "grid":
-      return (
-        <svg {...common}>
-          <rect x="3" y="3" width="7" height="9" rx="1" />
-          <rect x="14" y="3" width="7" height="5" rx="1" />
-          <rect x="14" y="12" width="7" height="9" rx="1" />
-          <rect x="3" y="16" width="7" height="5" rx="1" />
-        </svg>
-      );
-    case "list":
-      return (
-        <svg {...common}>
-          <line x1="8" y1="6" x2="21" y2="6" />
-          <line x1="8" y1="12" x2="21" y2="12" />
-          <line x1="8" y1="18" x2="21" y2="18" />
-          <line x1="3" y1="6" x2="3.01" y2="6" />
-          <line x1="3" y1="12" x2="3.01" y2="12" />
-          <line x1="3" y1="18" x2="3.01" y2="18" />
-        </svg>
-      );
-    case "pin":
-      return (
-        <svg {...common}>
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-          <circle cx="12" cy="10" r="3" />
-        </svg>
-      );
-    case "flag":
-      return (
-        <svg {...common}>
-          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-          <line x1="4" y1="22" x2="4" y2="15" />
-        </svg>
-      );
-    case "inbox":
-      return (
-        <svg {...common}>
-          <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
-          <path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" />
-        </svg>
-      );
-    case "users":
-      return (
-        <svg {...common}>
-          <circle cx="9" cy="8" r="3.5" />
-          <path d="M2.5 20a6.5 6.5 0 0113 0" />
-          <path d="M16 4.5a3.5 3.5 0 010 7M18 20a6.5 6.5 0 00-2.5-5.1" />
-        </svg>
-      );
-    case "layers":
-      return (
-        <svg {...common}>
-          <circle cx="9" cy="10" r="5" />
-          <circle cx="15" cy="14" r="5" />
-        </svg>
-      );
-    case "chart":
-      return (
-        <svg {...common}>
-          <line x1="4" y1="20" x2="20" y2="20" />
-          <rect x="6" y="11" width="3" height="9" />
-          <rect x="11" y="6" width="3" height="14" />
-          <rect x="16" y="13" width="3" height="7" />
-        </svg>
-      );
-    case "scroll":
-      return (
-        <svg {...common}>
-          <path d="M6 3h11a2 2 0 012 2v14a2 2 0 01-2 2H6z" />
-          <line x1="9" y1="8" x2="16" y2="8" />
-          <line x1="9" y1="12" x2="16" y2="12" />
-          <line x1="9" y1="16" x2="13" y2="16" />
-        </svg>
-      );
-    case "bell":
-      return (
-        <svg {...common}>
-          <path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-          <path d="M13.73 21a2 2 0 01-3.46 0" />
-        </svg>
-      );
-    case "signOut":
-      return (
-        <svg {...common}>
-          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" y1="12" x2="9" y2="12" />
-        </svg>
-      );
-    case "signIn":
-      return (
-        <svg {...common}>
-          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
-          <polyline points="10 17 15 12 10 7" />
-          <line x1="15" y1="12" x2="3" y2="12" />
-        </svg>
-      );
-  }
-}
-
-/**
- * Shared row shape. Deliberately carries NO background utility.
- *
- * It used to include `bg-transparent`, so that the <button> rows would not
- * show a user-agent button background. That silently broke the active link:
- * the active state appends `bg-brand-dark`, but which of two background
- * utilities wins is decided by their order in the stylesheet, not by their
- * order in the class attribute -- and `bg-transparent` came later. The active
- * item rendered white-on-white and vanished, in light mode only, while the
- * build stayed green.
- *
- * Each caller now sets exactly one background, so there is nothing to resolve.
- */
-const ROW =
-  "flex items-center gap-3 px-4 rounded-2xl font-medium no-underline w-full text-left " +
-  "border-0 cursor-pointer u-press transition-colors duration-[var(--dur-fast)]";
-
-/** The non-active background, for links and buttons alike. */
-const ROW_IDLE = "bg-transparent text-ink-muted hover:bg-rule hover:text-ink";
-
+/** Compact role-aware navigation. Endpoints remain the permission boundary. */
 export function SiteHeader() {
   const { session, signOut, initialising, authed } = useAuth();
-  const pathname = usePathname();
-  const theme = useTheme();
-  const isStaff = session && session.role !== "CITIZEN";
-  const isSupervisor = session && (session.role === "SUPERVISOR" || session.role === "ADMIN");
-
-  // Restores the theme class after React's dev-only remount clears it. See
-  // useThemeSync -- no-op in production.
-  useThemeSync();
-
-  /*
-   * `md:self-start` on the <header> below is what makes `sticky` work, and its
-   * absence is why the sidebar scrolled away with the page.
-   *
-   * PageShell lays this out as a flex row, and a flex row stretches its
-   * children to the row's height by default. So the header was already as tall
-   * as the entire page -- and `position: sticky; top: 0` has nothing to do for
-   * an element as tall as its own containing block. It never stuck because it
-   * never needed to move.
-   *
-   * `align-self: flex-start` shrinks it to its own height, the inner
-   * `h-screen` makes that one viewport, and sticky then pins it while the
-   * column beside it scrolls. `overflow-y-auto` sits on the INNER element so a
-   * menu taller than the viewport scrolls inside the sidebar rather than
-   * pushing the sticky container past screen height, which would break it
-   * again for exactly the same reason.
-   */
-
-  // Mobile disclosure. Closed by the link's own onClick rather than by an
-  // effect watching `pathname` -- an event handler needs no effect, and
-  // setting state inside an effect body is what the compiler rules reject.
-  const [open, setOpen] = useState(false);
-  const close = () => setOpen(false);
-
-  // The desktop "Manage" menu. Closed by an outside press or Escape, and by
-  // choosing a link; the listeners are attached only while it is open.
-  const [manageOpen, setManageOpen] = useState(false);
-  const manageRef = useRef<HTMLDivElement | null>(null);
-  const manageToggleRef = useRef<HTMLButtonElement | null>(null);
-  useEffect(() => {
-    if (!manageOpen) return;
-    const onPress = (e: MouseEvent) => {
-      if (!manageRef.current?.contains(e.target as Node)) setManageOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setManageOpen(false);
-        manageToggleRef.current?.focus();
-      }
-    };
-    document.addEventListener("mousedown", onPress);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onPress);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [manageOpen]);
-
-  // Sign-in is a dialog now, not /login. See lib/signInDialog for why.
   const { openSignIn } = useSignIn();
-
-  // The unread badge. Polled, because until the event stream lands (phase 7)
-  // nothing pushes; once a minute is cheap -- the endpoint is one index-only
-  // count -- and a request to verify has a 72-hour window, so a minute's lag
-  // costs nobody anything.
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [menu, setMenu] = useState<"account" | null>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const accountRef = useRef<HTMLButtonElement>(null);
+  const mobileRef = useRef<HTMLButtonElement>(null);
+  const close = () => { setMobileOpen(false); setMenu(null); };
+  const handleSignOut = () => {
+    close();
+    void signOut().catch((error: unknown) => {
+      window.alert(error instanceof Error ? error.message : "Could not sign out. Please retry.");
+    });
+  };
+  const primaryLinks = primaryNavigation(session?.role).map(link => ({ ...link, icon: NAV_ICONS[link.href] }));
+  const municipal = Boolean(session && session.role !== "CITIZEN");
+  const accountLinks = [
+    ...ACCOUNT_LINKS.filter(link => link.href !== "/me/reports" || (municipal && session?.role !== "ADMIN")),
+    ...(session?.role === "STAFF" ? [{ href: "/report", label: "Report a problem", icon: Flag }] : []),
+  ];
+  const accountActive = pathname.startsWith("/me/settings");
+  const identity = useQuery({
+    queryKey: ["me", "profile", session?.userId],
+    queryFn: () => authed(token => request<{ fullName: string }>("/me/profile", { token })),
+    enabled: Boolean(session), staleTime: 60_000,
+  });
+  const displayName = identity.data?.fullName ?? session?.fullName;
   const unread = useQuery({
     queryKey: keys.myUnread(session?.userId),
-    queryFn: () =>
-      authed((token) => request<{ unread: number }>("/me/notifications/unread-count", { token })),
-    enabled: Boolean(session),
-    refetchInterval: 60_000,
-    staleTime: 30_000,
+    queryFn: () => authed(token => request<{ unread: number }>("/me/notifications/unread-count", { token })),
+    enabled: Boolean(session), refetchInterval: 60_000, staleTime: 30_000,
   });
   const unreadCount = unread.data?.unread ?? 0;
-  const notificationsActive = pathname === "/me/notifications";
 
-  const renderLink = (l: NavLink) => {
-    if (l.staffOnly && !isStaff) return null;
-    if (l.supervisorOnly && !isSupervisor) return null;
-    if (l.adminOnly && session?.role !== "ADMIN") return null;
-    // Exact match, or a child route under it. Plain `startsWith` would light
-    // up "/issues" while sitting on "/issues-archive".
-    const isActive = pathname === l.href || pathname.startsWith(`${l.href}/`);
+  useEffect(() => {
+    if (!menu && !mobileOpen) return;
+    const dismiss = (event: PointerEvent) => {
+      if (!headerRef.current?.contains(event.target as Node)) { setMenu(null); setMobileOpen(false); }
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (menu) { accountRef.current?.focus(); setMenu(null); }
+      else { mobileRef.current?.focus(); setMobileOpen(false); }
+    };
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("keydown", escape);
+    return () => { document.removeEventListener("pointerdown", dismiss); document.removeEventListener("keydown", escape); };
+  }, [menu, mobileOpen]);
 
-    return (
-      <Link
-        key={l.href}
-        href={l.href}
-        onClick={() => {
-          close();
-          setManageOpen(false);
-        }}
-        aria-current={isActive ? "page" : undefined}
-        className={`${ROW} ${
-          isActive ? "bg-brand-dark text-brand-dark-ink font-semibold" : ROW_IDLE
-        }`}
-        style={{ minHeight: "var(--hit-min)" }}
-      >
-        <Icon name={l.icon} />
-        <span className="flex-1">{l.label}</span>
-      </Link>
-    );
-  };
+  const renderLink = ({ href, label, icon: Icon }: NavLink) => (
+    <Link key={href} href={href} onClick={close} aria-current={navigationActive(pathname, href) ? "page" : undefined} className="nav-link">
+      <Icon size={18} aria-hidden="true" /><span>{label}</span>
+    </Link>
+  );
 
   return (
-    <header className="sticky top-0 z-[500] md:self-start bg-surface-raised border-b md:border-b-0 md:border-r border-rule shrink-0 w-full md:w-[var(--sidebar-width)]">
-      <div className="site-header-inner md:h-screen md:overflow-y-auto flex flex-col p-4 md:p-6">
-        <div className="site-brand flex items-center justify-between">
-          <Link
-            href="/"
-            onClick={close}
-            className="site-logo text-ink no-underline flex items-center gap-3 px-2"
-          >
-            <span className="flex items-center justify-center flex-shrink-0">
-              <BrandMark size={36} />
-            </span>
-            <span className="text-heading font-semibold tracking-tight">
-              Nagrik<span className="brand-setu">Setu</span>
-            </span>
-          </Link>
-
-          {/* Below md only: the disclosure for everything under this row. */}
-          <button
-            type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-            aria-controls="site-nav"
-            aria-label={open ? "Close menu" : "Open menu"}
-            className="md:hidden flex items-center justify-center rounded-xl border border-rule bg-transparent text-ink cursor-pointer"
-            style={{ width: "var(--hit-min)", height: "var(--hit-min)" }}
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              aria-hidden="true"
-              focusable="false"
-            >
-              {open ? (
-                <>
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="18" x2="21" y2="18" />
-                </>
-              )}
-            </svg>
-          </button>
-        </div>
-
-        {/*
-          The mobile disclosure animates via `grid-template-rows: 0fr -> 1fr`,
-          not by toggling `hidden`.
-
-          Height cannot be transitioned to or from `auto`. The usual
-          workarounds either hard-code a max-height, which clips the menu the
-          day a link is added, or give up and snap. The grid trick animates to
-          whatever the content's real height turns out to be.
-
-          `invisible` while collapsed is not cosmetic: it takes the links out
-          of the tab order. A menu that looks closed but is still focusable is
-          a keyboard trap, and it is invisible to sighted testing.
-
-          Above `md` every one of these is neutralised -- `md:grid-rows-none`,
-          `md:visible`, `md:overflow-visible` -- and the nav is a plain column
-          again. One element, one copy of the links.
-        */}
-        <nav
-          id="site-nav"
-          aria-label="Main"
-          className={`grid md:block flex-1 mt-6 md:mt-8
-                      transition-[grid-template-rows] duration-[var(--dur-base)]
-                      ease-[var(--ease-standard)] md:transition-none
-                      md:grid-rows-none ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
-        >
-        <div
-          className={`overflow-hidden md:overflow-visible flex flex-col md:h-full
-                      ${open ? "" : "invisible md:visible"}`}
-        >
-          <p className="text-meta text-ink-muted uppercase tracking-wider mb-2 px-4">
-            Menu
-          </p>
-          <div className="site-links flex flex-col gap-1">
-            {MENU_LINKS.filter((l) => !l.group).map(renderLink)}
-            {isSupervisor ? (
-              <ManageMenu
-                links={MENU_LINKS.filter((l) => l.group === "manage")}
-                renderLink={renderLink}
-                active={MENU_LINKS.some(
-                  (l) => l.group === "manage" && (pathname === l.href || pathname.startsWith(`${l.href}/`)),
-                )}
-                open={manageOpen}
-                onToggle={() => setManageOpen((o) => !o)}
-                groupRef={manageRef}
-                toggleRef={manageToggleRef}
-              />
-            ) : (
-              MENU_LINKS.filter((l) => l.group === "manage").map(renderLink)
-            )}
+    <header ref={headerRef} className="site-header">
+      <div className="site-header-inner">
+        <Link href={roleHome(session?.role)} onClick={close} className="site-logo" aria-label="NagrikSetu home">
+          <BrandMark size={36} /><span>Nagrik<span className="brand-setu">Setu</span></span>
+        </Link>
+        <nav id="site-nav" aria-label="Main" data-open={mobileOpen}>
+          <div className="site-links">
+            {primaryLinks.map(renderLink)}
+            <div className="mobile-secondary">
+              {session && <p className="nav-panel-label">Your account</p>}
+              {session && accountLinks.map(renderLink)}
+              {session && <button type="button" className="nav-link" onClick={handleSignOut}><LogOut size={18} aria-hidden="true" />Sign out</button>}
+            </div>
           </div>
-
-          <div className="site-actions flex flex-col gap-1 mt-8 md:mt-auto md:pt-8">
-            {!initialising && session && (
-              <>
-                <Link
-                  href="/me/notifications"
-                  aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
-                  title="Notifications"
-                  onClick={close}
-                  aria-current={notificationsActive ? "page" : undefined}
-                  className={`${ROW} ${
-                    notificationsActive ? "bg-brand-dark text-brand-dark-ink font-semibold" : ROW_IDLE
-                  }`}
-                  style={{ minHeight: "var(--hit-min)" }}
-                >
-                  <Icon name="bell" />
-                  <span className="flex-1">Notifications</span>
-                  {unreadCount > 0 && (
-                    // Ink, not a status colour: unread is not a status.
-                    <span className="min-w-6 px-2 rounded-full bg-ink text-surface-raised text-meta text-center font-semibold">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                      <span className="sr-only"> unread</span>
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  href="/me/reports"
-                  aria-label={`${session.fullName}, my reports`}
-                  title={`${session.fullName}, my reports`}
-                  onClick={close}
-                  className={`${ROW} ${ROW_IDLE}`}
-                  style={{ minHeight: "var(--hit-min)" }}
-                >
-                  <Icon name="signIn" />
-                  <span className="flex-1 truncate">{session.fullName}</span>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    close();
-                    void signOut().catch((error: unknown) => window.alert(error instanceof Error ? error.message : "Could not sign out. Please retry."));
-                  }}
-                  aria-label="Sign out"
-                  title="Sign out"
-                  className={`${ROW} ${ROW_IDLE}`}
-                  style={{ minHeight: "var(--hit-min)" }}
-                >
-                  <Icon name="signOut" />
-                  <span>Sign out</span>
-                </button>
-              </>
-            )}
-            {!initialising && !session && (
-              <button
-                type="button"
-                onClick={() => {
-                  close();
-                  openSignIn();
-                }}
-                aria-label="Sign in"
-                title="Sign in"
-                className={`${ROW} ${ROW_IDLE}`}
-                style={{ minHeight: "var(--hit-min)" }}
-              >
-                <Icon name="signIn" />
-                <span>Sign in</span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={toggleTheme}
-              aria-label={theme === "dark" ? "Light mode" : "Dark mode"}
-              title={theme === "dark" ? "Light mode" : "Dark mode"}
-              className={`${ROW} ${ROW_IDLE}`}
-              style={{ minHeight: "var(--hit-min)" }}
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                focusable="false"
-              >
-                {theme === "dark" ? (
-                  <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                ) : (
-                  <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-                )}
-              </svg>
-              <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
-            </button>
-          </div>
-        </div>
         </nav>
+        <div className="site-actions">
+          {!initialising && session && <>
+            <Link href="/me/notifications" onClick={close} className="utility-control notification-control" aria-current={pathname === "/me/notifications" ? "page" : undefined} aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"} title="Notifications">
+              <Bell size={20} aria-hidden="true" />{unreadCount > 0 && <span className="notification-count">{unreadCount > 99 ? "99+" : unreadCount}</span>}
+            </Link>
+            <div className="nav-disclosure account-disclosure" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setMenu(current => current === "account" ? null : current); }}>
+              <button ref={accountRef} type="button" className="utility-control" data-active={accountActive} aria-expanded={menu === "account"} aria-controls="account-menu" aria-label="Your account" title={displayName} onClick={() => setMenu(menu === "account" ? null : "account")}><UserRound size={20} aria-hidden="true" /></button>
+              <div id="account-menu" className="nav-panel account-menu" data-open={menu === "account"}>
+                <div className="account-summary"><strong>{displayName}</strong><span>{session.role.toLowerCase()}</span></div>
+                {accountLinks.map(renderLink)}
+                <button type="button" className="nav-link" onClick={handleSignOut}><LogOut size={18} aria-hidden="true" />Sign out</button>
+              </div>
+            </div>
+          </>}
+          {!initialising && !session && <button type="button" className="sign-in-control" aria-label="Sign in" onClick={() => { close(); openSignIn(); }}><LogIn size={18} aria-hidden="true" /><span>Sign in</span></button>}
+          <button ref={mobileRef} type="button" className="utility-control mobile-toggle" aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} aria-controls="site-nav" onClick={() => { setMobileOpen(!mobileOpen); setMenu(null); }}>{mobileOpen ? <X size={21} aria-hidden="true" /> : <Menu size={21} aria-hidden="true" />}</button>
+        </div>
       </div>
     </header>
-  );
-}
-
-/**
- * The "Manage" group: a button that opens the work tools on a desktop window,
- * and -- in the stacked mobile menu -- is hidden by CSS while its links are
- * shown flat, so a phone never has to open a menu inside a menu.
- */
-function ManageMenu({
-  links,
-  renderLink,
-  active,
-  open,
-  onToggle,
-  groupRef,
-  toggleRef,
-}: {
-  links: NavLink[];
-  renderLink: (l: NavLink) => React.ReactNode;
-  active: boolean;
-  open: boolean;
-  onToggle: () => void;
-  groupRef: React.RefObject<HTMLDivElement | null>;
-  toggleRef: React.RefObject<HTMLButtonElement | null>;
-}) {
-  return (
-    <div ref={groupRef} className="manage-group">
-      <button
-        ref={toggleRef}
-        type="button"
-        aria-expanded={open}
-        aria-controls="manage-panel"
-        onClick={onToggle}
-        className={`manage-toggle ${ROW} ${active ? "bg-brand-dark text-brand-dark-ink font-semibold" : ROW_IDLE}`}
-        style={{ minHeight: "var(--hit-min)" }}
-      >
-        <span className="flex-1">Manage</span>
-        <ChevronDown aria-hidden="true" size={16} className={`transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-      <div id="manage-panel" className="manage-panel" data-open={open ? "true" : "false"}>
-        {links.map(renderLink)}
-      </div>
-    </div>
   );
 }

@@ -52,6 +52,7 @@ public class DashboardService {
         return new DashboardSummaryDto(
                 overdue,
                 resolved,
+                tile("closed without resolution", issues::countClosedWithoutResolution, 0L),
                 tile("top overdue ward", () -> issues.findTopBreachedWard(now)
                         .map(r -> new DashboardSummaryDto.NamedCount(r.getName(), r.getTotal()))
                         .orElse(null)),

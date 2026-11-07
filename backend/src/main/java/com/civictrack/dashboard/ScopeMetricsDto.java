@@ -15,6 +15,7 @@ public record ScopeMetricsDto(
         long openCount,
         long overdueCount,
         long resolvedCount,
+        long closedWithoutResolution,
         long reportedLast30Days,
         long resolvedLast30Days,
         Double medianResolutionHours,

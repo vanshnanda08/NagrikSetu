@@ -91,8 +91,8 @@ function Moderate({ i }: { i: PublicIssue }) {
   return (
     <PageShell wide>
       <p className="text-meta">
-        <Link href={`/issues/${i.id}`} className="underline text-ink">
-          ← The issue
+        <Link href={`/work?view=assignments&issue=${i.id}`} className="underline text-ink">
+          ← Back to complaints
         </Link>
       </p>
       <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">
@@ -108,6 +108,7 @@ function Moderate({ i }: { i: PublicIssue }) {
         Nothing here deletes a report. Every action is permanently logged with who did it and when.
       </p>
 
+      <div className="workspace-scroll" tabIndex={0} role="region" aria-label="Issue moderation tools">
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-8">
         <div className="flex flex-col gap-8">
           <Recategorise i={i} allowed={RECATEGORISABLE.includes(i.status)} />
@@ -137,6 +138,7 @@ function Moderate({ i }: { i: PublicIssue }) {
 
       <Redactions i={i} />
       <ModerationLog issueId={i.id} />
+      </div>
     </PageShell>
   );
 }

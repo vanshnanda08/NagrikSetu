@@ -1,0 +1,22 @@
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+IHAIZV+NimbusRomNo9L-Regu            Type 1C           Custom           yes yes yes      4  0
+BZIVMZ+NimbusRomNo9L-MediItal        Type 1C           Custom           yes yes yes      5  0
+IXFAWU+NimbusRomNo9L-Medi            Type 1C           Custom           yes yes yes      6  0
+TQTHRL+NimbusRomNo9L-ReguItal        Type 1C           Custom           yes yes yes     10  0
+YEUUOC+CMMI10                        Type 1C           Builtin          yes yes yes     26  0
+AKHCZK+CMMI7                         Type 1C           Builtin          yes yes yes     27  0
+VDVGTR+CMR10                         Type 1C           Builtin          yes yes yes     28  0
+CAFSZL+CMR7                          Type 1C           Builtin          yes yes yes     29  0
+DDIEWW+CMEX10                        Type 1C           Builtin          yes yes yes     30  0
+FKPJSN+CMSY7                         Type 1C           Builtin          yes yes yes     31  0
+PVTTLK+NimbusMonL-Regu               Type 1C           Custom           yes yes yes     32  0
+JAGKKY+CMSY10                        Type 1C           Builtin          yes yes yes     34  0
+EVICAO+DejaVuSans-Bold               CID TrueType      Identity-H       yes yes yes     39  0
+BMQQDV+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     46  0
+BMQQDV+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     66  0
+EVICAO+DejaVuSans-Bold               CID TrueType      Identity-H       yes yes yes     79  0
+BMQQDV+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     86  0
+NOMARO+CMMI9                         Type 1C           Builtin          yes yes yes    109  0
+KPXLOM+CMR6                          Type 1C           Builtin          yes yes yes    110  0
+BMQQDV+DejaVuSans                    CID TrueType      Identity-H       yes yes yes    116  0

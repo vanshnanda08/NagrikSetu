@@ -80,6 +80,7 @@ function WardBody({ w }: { w: WardDashboard }) {
         Figures generated {absoluteDateTime(w.generatedAt)}.
       </p>
 
+      <div className="workspace-scroll" tabIndex={0} role="region" aria-label="Ward metrics, map and recurring issues">
       <div className="mt-5">
         <ScopeOverview m={w.metrics} />
       </div>
@@ -148,6 +149,7 @@ function WardBody({ w }: { w: WardDashboard }) {
           </ul>
         </section>
       )}
+      </div>
     </>
   );
 }

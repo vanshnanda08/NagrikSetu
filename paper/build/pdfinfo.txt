@@ -1,0 +1,19 @@
+Title:           NagrikSetu: Bounded Online Geospatial Clustering and Citizen Verification for Municipal Complaints
+Author:          Maurya Raheja, Udhey Goyal, Vansh Nanda
+Creator:         LaTeX with hyperref
+Producer:        xdvipdfmx (0.1)
+CreationDate:    Thu Oct 29 11:34:11 2026 IST
+Custom Metadata: no
+Metadata Stream: no
+Tagged:          no
+UserProperties:  no
+Suspects:        no
+Form:            none
+JavaScript:      no
+Pages:           7
+Encrypted:       no
+Page size:       595.28 x 841.89 pts (A4)
+Page rot:        0
+File size:       152509 bytes
+Optimized:       no
+PDF version:     1.5

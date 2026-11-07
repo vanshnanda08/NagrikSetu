@@ -23,7 +23,8 @@ import java.util.UUID;
  * -- a transition happens once, so its notifications are written once, and a
  * sweep that re-runs and finds nothing to settle writes nothing.
  *
- * <p>Only four transitions notify. The intermediate staff steps --
+ * <p>Verification requests, settlement, reopening, rejection and administrator
+ * closure notify. The intermediate staff steps --
  * acknowledged, assigned, started -- are visible on the issue's public
  * timeline, and a message for each would teach a citizen to ignore the one
  * that needs an answer from them.
@@ -90,6 +91,17 @@ public class NotificationService {
                             ? "Joined with another report: " + what + " " + ref
                             : "Not taken forward: " + what + " " + ref,
                     event.note());
+
+            case CLOSED -> {
+                if (event.actor().isAdmin()) {
+                    send(transitionAudience(issue.getId()), issue, NotificationType.CLOSED,
+                            "Closed by an administrator: " + what + " " + ref,
+                            (issue.getResolvedAt() == null
+                                    ? "Closed before resolution. This is not a verified repair. "
+                                    : "The remaining reopening window has ended. ")
+                                    + "Reason: " + event.note());
+                }
+            }
 
             default -> {
                 // No message. See the class comment.

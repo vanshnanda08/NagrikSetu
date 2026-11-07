@@ -82,7 +82,7 @@ export default function SplitMergePage({ params }: { params: Promise<{ id: strin
         {isUnknownTicket(err) ? (
           <h1 className="text-display">No such ticket</h1>
         ) : (
-          <ErrorState action="Loading this cluster" problem={err?.problem} onRetry={() => void issue.refetch()} />
+          <ErrorState action="Loading this cluster" problem={err?.problem} onRetry={() => void Promise.allSettled([issue.refetch(), reports.refetch()])} />
         )}
       </PageShell>
     );
@@ -134,6 +134,7 @@ function Tool({ issue, reports }: { issue: PublicIssue; reports: PublicReport[] 
 
   return (
     <PageShell wide>
+      <Link href={`/work?view=review&issue=${issue.id}`} className="underline text-dense mb-3">← Back to complaints</Link>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
         <TicketRef publicRef={issue.publicRef} issueId={issue.id} copyable />
         <StatusRule status={issue.status} audience="staff" />
@@ -160,6 +161,7 @@ function Tool({ issue, reports }: { issue: PublicIssue; reports: PublicReport[] 
         </p>
       )}
 
+      <div className="workspace-scroll" tabIndex={0} role="region" aria-label="Split, merge and moderation history">
       {merged ? (
         <p className="mt-6 text-body">
           This issue was merged into{" "}
@@ -248,6 +250,7 @@ function Tool({ issue, reports }: { issue: PublicIssue; reports: PublicReport[] 
       )}
 
       <History issueId={issue.id} />
+      </div>
     </PageShell>
   );
 }

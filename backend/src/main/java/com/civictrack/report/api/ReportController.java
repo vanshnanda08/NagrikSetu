@@ -1,8 +1,6 @@
 package com.civictrack.report.api;
 
-import com.civictrack.abuse.RateLimitService;
 import com.civictrack.clustering.ClusterOutcome;
-import com.civictrack.clustering.ClusteringService;
 import com.civictrack.department.Department;
 import com.civictrack.department.DepartmentRepository;
 import com.civictrack.issue.Issue;
@@ -31,11 +29,9 @@ import java.util.UUID;
 /**
  * The ingest endpoint.
  *
- * <p>Phase 3 accepts a JSON body carrying an already-hosted {@code photoUrl}.
- * The multipart variant, where the server uploads to Cloudinary itself, arrives
- * with the photo pipeline -- and when it does the upload will happen
- * <em>before</em> this transaction opens, because a slow third-party call must
- * never be made while holding the spatial advisory lock.
+ * <p>Accepts JSON carrying an already-hosted {@code photoUrl}. The browser
+ * uploads directly to Cloudinary; this controller verifies the evidence before
+ * opening the submission transaction and its spatial advisory lock.
  *
  * <p><b>Reporting stays open to anonymous submission (DD-017).</b> A civic
  * platform that demands registration before somebody can report a pothole
@@ -60,7 +56,6 @@ public class ReportController {
     private final IssueRepository issues;
     private final WardRepository wards;
     private final DepartmentRepository departments;
-    private final RateLimitService rateLimits;
     private final com.civictrack.media.PhotoEvidenceService photos;
 
     @PostMapping

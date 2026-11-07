@@ -1,0 +1,347 @@
+{
+  "kind": "Independent recount of retained artifacts; no new benchmark run",
+  "pairwise": {
+    "baseline": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 541,
+      "fp": 0,
+      "fn": 144,
+      "precision": 1.0,
+      "recall": 0.7897810218978102,
+      "f1": 0.8825448613376834
+    },
+    "radius-10": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 162,
+      "fp": 0,
+      "fn": 523,
+      "precision": 1.0,
+      "recall": 0.2364963503649635,
+      "f1": 0.38252656434474613
+    },
+    "radius-15": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 221,
+      "fp": 0,
+      "fn": 464,
+      "precision": 1.0,
+      "recall": 0.32262773722627736,
+      "f1": 0.4878587196467991
+    },
+    "radius-20": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 393,
+      "fp": 0,
+      "fn": 292,
+      "precision": 1.0,
+      "recall": 0.5737226277372263,
+      "f1": 0.7291280148423005
+    },
+    "radius-25": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 406,
+      "fp": 0,
+      "fn": 279,
+      "precision": 1.0,
+      "recall": 0.5927007299270073,
+      "f1": 0.7442713107241063
+    },
+    "radius-30": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 425,
+      "fp": 0,
+      "fn": 260,
+      "precision": 1.0,
+      "recall": 0.6204379562043796,
+      "f1": 0.7657657657657658
+    },
+    "radius-35": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 515,
+      "fp": 0,
+      "fn": 170,
+      "precision": 1.0,
+      "recall": 0.7518248175182481,
+      "f1": 0.8583333333333333
+    },
+    "radius-40": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 551,
+      "fp": 0,
+      "fn": 134,
+      "precision": 1.0,
+      "recall": 0.8043795620437956,
+      "f1": 0.8915857605177994
+    },
+    "radius-45": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 629,
+      "fp": 0,
+      "fn": 56,
+      "precision": 1.0,
+      "recall": 0.9182481751824818,
+      "f1": 0.9573820395738204
+    },
+    "radius-50": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 649,
+      "fp": 0,
+      "fn": 36,
+      "precision": 1.0,
+      "recall": 0.9474452554744526,
+      "f1": 0.9730134932533733
+    },
+    "radius-55": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "radius-60": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "radius-65": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "radius-70": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "radius-75": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "radius-80": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "radius-85": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "radius-90": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "radius-95": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "radius-100": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 673,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.9824817518248176,
+      "f1": 0.9911634756995582
+    },
+    "seed-cap-true": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 541,
+      "fp": 0,
+      "fn": 144,
+      "precision": 1.0,
+      "recall": 0.7897810218978102,
+      "f1": 0.8825448613376834
+    },
+    "seed-cap-false": {
+      "corpus": "seeded",
+      "reports": 250,
+      "tp": 597,
+      "fp": 0,
+      "fn": 88,
+      "precision": 1.0,
+      "recall": 0.8715328467153285,
+      "f1": 0.9313572542901716
+    },
+    "linear-cap-true": {
+      "corpus": "linear-stress",
+      "reports": 18,
+      "tp": 18,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "linear-cap-false": {
+      "corpus": "linear-stress",
+      "reports": 18,
+      "tp": 12,
+      "fp": 13,
+      "fn": 6,
+      "precision": 0.48,
+      "recall": 0.6666666666666666,
+      "f1": 0.5581395348837209
+    }
+  },
+  "http_latency": [
+    {
+      "scale": "1000",
+      "requests": "500",
+      "p50_ms": "55.986384",
+      "p95_ms": "126.5379177",
+      "p99_ms": "492.25513358",
+      "average_ms": "71.56475817599998",
+      "failure_rate": "0"
+    },
+    {
+      "scale": "10000",
+      "requests": "500",
+      "p50_ms": "52.6521555",
+      "p95_ms": "79.77517999999999",
+      "p99_ms": "144.26490298",
+      "average_ms": "55.848512173999985",
+      "failure_rate": "0"
+    },
+    {
+      "scale": "50000",
+      "requests": "500",
+      "p50_ms": "57.6996485",
+      "p95_ms": "81.08168079999999",
+      "p99_ms": "167.61485945",
+      "average_ms": "61.207730019999985",
+      "failure_rate": "0"
+    }
+  ],
+  "direct_service_latency": [
+    {
+      "scale": "1000",
+      "requests": "300",
+      "p50_ms": "3.4079",
+      "p95_ms": "7.2090",
+      "p99_ms": "13.5004",
+      "mean_ms": "4.0847",
+      "max_ms": "39.7158",
+      "measurement": "Micrometer_civictrack.ingest_direct_service"
+    },
+    {
+      "scale": "10000",
+      "requests": "300",
+      "p50_ms": "4.3254",
+      "p95_ms": "11.9276",
+      "p99_ms": "26.0833",
+      "mean_ms": "6.2149",
+      "max_ms": "129.0409",
+      "measurement": "Micrometer_civictrack.ingest_direct_service"
+    },
+    {
+      "scale": "50000",
+      "requests": "300",
+      "p50_ms": "7.9954",
+      "p95_ms": "10.3547",
+      "p99_ms": "14.5490",
+      "mean_ms": "7.3042",
+      "max_ms": "24.3565",
+      "measurement": "Micrometer_civictrack.ingest_direct_service"
+    }
+  ],
+  "concurrency": [
+    {
+      "simultaneous_reports": "2",
+      "issues_created_or_selected": "1",
+      "correct": "True",
+      "elapsed_ms": "637.4"
+    },
+    {
+      "simultaneous_reports": "5",
+      "issues_created_or_selected": "1",
+      "correct": "True",
+      "elapsed_ms": "825.9"
+    },
+    {
+      "simultaneous_reports": "10",
+      "issues_created_or_selected": "1",
+      "correct": "True",
+      "elapsed_ms": "545.4"
+    },
+    {
+      "simultaneous_reports": "20",
+      "issues_created_or_selected": "1",
+      "correct": "True",
+      "elapsed_ms": "807.4"
+    },
+    {
+      "simultaneous_reports": "50",
+      "issues_created_or_selected": "1",
+      "correct": "True",
+      "elapsed_ms": "939.8"
+    }
+  ],
+  "sha256": {
+    "production-predictions.csv": "b7b26930de4b5e608cf682160cb24d1c8f823c5bb2428463a24abc3dc98c1ac4",
+    "production-quality.csv": "2841e17cab694bd176d75819772197a553879fe55dc6a75dc870cbec3671b4a7",
+    "clustering-quality.csv": "5005fbfb89a12ee4c5e5f9793e17e453a8b717fad386be023ae2fed8c923998e",
+    "extent-cap-ablation.csv": "674463d418f9163d2efa0c4e8d7dad3f0baead304650427067bd2d222a92b327",
+    "ingest-latency.csv": "b4d9ae269318397c76d1fd97673f7f03561d01739d0f52452a95b20e30802889",
+    "production-server-latency.csv": "4e454b7d331c834c38dc098736c6888f2ded4bd35874a87e43e8881c83c2b2f7",
+    "concurrency-correctness.csv": "88c1cbb8b1df8023ac708f21aa7f4bcbde8de22ec423c0e80fd03940837514b3"
+  }
+}

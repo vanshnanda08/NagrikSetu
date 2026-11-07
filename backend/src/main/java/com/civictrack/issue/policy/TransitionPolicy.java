@@ -39,7 +39,8 @@ import static com.civictrack.user.Role.SYSTEM;
  * <p><b>The structural rule.</b> No edge into {@link IssueStatus#RESOLVED} or
  * {@link IssueStatus#CLOSED} admits {@link Role#STAFF}. Staff reach
  * PENDING_VERIFICATION and stop; the system resolves, after citizens weigh in,
- * and an administrator or the auto-close job closes. That is the claim the
+ * and the auto-close job closes after the settling period. Administrators may
+ * close any nonterminal complaint with a recorded reason, without recording a repair. That is the claim the
  * whole project makes about accountability, so it is enforced in two places
  * that fail loudly rather than in a comment: this class refuses to construct if
  * the table ever violates it, and {@code TransitionPolicyTest} attempts a STAFF
@@ -71,34 +72,16 @@ public class TransitionPolicy {
         allow(PENDING_VERIFICATION, RESOLVED, of(SYSTEM), Guards.QUORUM_MET);
         allow(PENDING_VERIFICATION, REOPENED, of(SYSTEM), Guards.REJECTIONS_PREVAIL);
         allow(RESOLVED, REOPENED, of(SYSTEM), Guards.RECURRENCE_IN_WINDOW);
-        // SUPERVISOR closes too, as of the role merge.
-        //
-        // The objection to this is real and was raised: a department head who
-        // can close their own department's breaches makes the overdue figure
-        // self-reported. What answers it is that SETTLED_7_DAYS is the guard
-        // actually doing the protective work -- an issue cannot be closed
-        // until it has sat RESOLVED for seven days, and that window is what
-        // gives a citizen time to object. Once it has passed with nobody
-        // objecting, who presses the button matters far less.
-        //
-        // The second answer is that the close is not silent: it writes an
-        // issue_status_history row naming the actor, on a page that needs no
-        // account to read. This project's position throughout is that
-        // publishing a weakness beats prohibiting it -- it publishes its own
-        // resolved-without-verification rate rather than burying it. Blocking
-        // the close by role while a supervisor could already REJECT anything
-        // they liked was the inconsistent half.
-        //
-        // What does NOT move: STAFF_MAY_NEVER_REACH still contains RESOLVED
-        // and CLOSED. A crew member marking their own work finished is the
-        // person doing the job certifying it, and no waiting period fixes that.
-        allow(RESOLVED, CLOSED, of(SYSTEM, ADMIN, SUPERVISOR), Guards.SETTLED_7_DAYS);
+        // Automatic closure retains its quiet period. Administrators may close
+        // an already-resolved complaint sooner with a recorded reason.
+        allow(RESOLVED, CLOSED, of(SYSTEM, ADMIN), Guards.SETTLED_OR_ADMIN_REASON);
 
         // -- rejection, from any open state -----------------------------
         for (IssueStatus from : List.of(NEW, ACKNOWLEDGED, ASSIGNED, IN_PROGRESS,
                 PENDING_VERIFICATION, REOPENED)) {
             allow(from, REJECTED, of(SUPERVISOR, ADMIN),
                     Guards.SAME_DEPARTMENT, Guards.REASON_MIN_20);
+            allow(from, CLOSED, of(ADMIN), Guards.NOTE_MIN_20);
         }
 
         assertStaffCannotResolveOrClose();

@@ -2746,3 +2746,26 @@ weight. Clarification messages are private to the issue's authenticated
 reporters and municipally scoped staff, with direction inferred from the role
 instead of trusted from request data. This adds a communication path without
 making public descriptions a channel for personal information.
+
+
+## DD-073 — Administrators may close resolved complaints with an audited reason
+
+**Date:** 7 November 2026. **Status:** Implemented at the user's request.
+
+- `POST /api/v1/issues/{id}/close` accepts only administrators and an already-RESOLVED complaint. A public reason of 20–2000 characters is required.
+- The existing transition writer records actor, reason, CLOSED status and closed time. Repair evidence, resolution time, verification outcome and report membership are preserved. Row locking prevents duplicate concurrent closure writes.
+- Automatic SYSTEM closure still observes its configured quiet period (seven days in production). Manual closure explicitly ends the remaining reopening window; the confirmation explains that later reports start a new complaint.
+- Staff and supervisors cannot close; pending/open complaints retain the citizen-verification workflow. This does not add an administrator resolve override or a generic status editor.
+- Administrators use Ready to close inside the existing Assignments pane. No extra page/window was introduced. My work/personal-reporting shortcuts were removed from admin navigation, with shared routes/API access retained for other roles and existing links.
+- See [administrator verification](../frontend/ADMIN_VERIFICATION.md) for role, validation, evidence/history and UI checks.
+
+
+## DD-074 — Administrative early closure is not a successful resolution
+
+**Date:** 7 November 2026. **Status:** Implemented after the user explicitly requested “Also allow early closure with a reason”. Supersedes DD-073's resolved-only restriction.
+
+- ADMIN can close NEW, ACKNOWLEDGED, ASSIGNED, IN_PROGRESS, PENDING_VERIFICATION, REOPENED or RESOLVED with a trimmed 20–2000-character public reason and confirmation. CLOSED and REJECTED remain terminal. Staff/supervisor permissions do not change.
+- The same row-locked transition writer stops the clock and records actor, reason and closure time. Early closure does not set `resolved_at`, fabricate evidence, change verification votes, or claim citizen confirmation. Pending votes/sweeps cannot settle a closed complaint.
+- CLOSED without `resolved_at` is disclosed as **Closed before resolution** on work/public/verification records. City and scoped dashboards publish its count separately. Resolution, unverified-resolution and SLA calculations require a real resolution timestamp; staff performance uses the same definition.
+- A dedicated CLOSED notification tells reporters and followers what happened and includes the reason, subject to their notification preferences. Automatic quiet-period closure does not generate this administrator notification.
+- The action stays in Assignments; Ready to close is a resolved shortlist and All open exposes early closure. No additional screen, status, migration, reset, deployment or generic status editor was introduced.

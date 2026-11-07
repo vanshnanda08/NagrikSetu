@@ -1,5 +1,6 @@
 "use client";
 
+import "./report.css";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { offlineStore, queueReport } from "@/lib/offlineStore";
@@ -8,11 +9,11 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PageShell } from "@/components/PageShell";
 import { PhotoUploader } from "@/components/PhotoUploader";
-import { CategoryPicker } from "@/components/CategoryPicker";
 import { UploadProgress } from "@/components/UploadProgress";
 import { Button } from "@/components/Button";
 import { MapCanvas } from "@/components/MapCanvas";
 import { LoadingState } from "@/components/LoadingState";
+import { ErrorState } from "@/components/ErrorState";
 import { useCategories } from "@/lib/queries";
 import { useComposer } from "@/lib/composer";
 import { useAuth } from "@/lib/auth";
@@ -34,8 +35,8 @@ import type { ClusterResult } from "@/lib/types";
 /**
  * Report composer (blueprint §3.2).
  *
- * Three sections on ONE SCROLLING PAGE, not a wizard. A wizard costs a tap per
- * step and provides no benefit when there are three inputs.
+ * A single form: desktop columns keep the photo, details, location and submit
+ * action visible together; small screens use natural document flow.
  *
  * Validation is React Hook Form driven by the Zod schema in lib/schemas.ts
  * (blueprint §6). Every rule in that schema mirrors one the server already
@@ -56,7 +57,7 @@ import type { ClusterResult } from "@/lib/types";
  */
 export default function ReportComposerPage() {
   const { hydrated } = useComposer();
-  return hydrated ? <ReportComposerForm /> : <PageShell><LoadingState label="Restoring your draft" /></PageShell>;
+  return hydrated ? <ReportComposerForm /> : <PageShell className="report-page"><LoadingState label="Restoring your draft" /></PageShell>;
 }
 
 function ReportComposerForm() {
@@ -249,10 +250,10 @@ function ReportComposerForm() {
   }
 
   return (
-    <PageShell wide>
-      <div className="mb-6">
+    <PageShell wide className="report-page">
+      <div className="report-heading mb-6">
         <h1 className="text-display">Report a problem</h1>
-        <p className="mt-3 text-body">Drafts, photos and queued reports are saved on this device. Only pressing submit authorizes sending. <Link href="/report/outbox" className="underline">View outbox</Link></p>
+        <p className="mt-3 text-body">Your draft stays on this device until you submit. <Link href="/report/outbox" className="underline">View outbox</Link></p>
         {storageError && <p role="alert">Browser storage is unavailable. Keep this tab open to preserve your draft.</p>}
         <Button type="button" variant="secondary" className="mt-3" onClick={async () => {
           if (!confirm("Discard this draft and its saved photo from this device?")) return;
@@ -274,12 +275,11 @@ function ReportComposerForm() {
           form then failed validation with no visible error, because the failing
           fields had no rendered control to attach a message to.
         */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* LEFT COLUMN: Photo & Details */}
-          <div className="flex flex-col gap-8">
+        <div className="report-fields grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12" tabIndex={0} role="region" aria-label="Photo, category and location fields">
             <section className="report-photo">
               <h2 className="text-heading mb-3">Photo</h2>
               <PhotoUploader
+                value={report.photo}
                 onChange={(img) => {
                   patch({ photo: img, photoUrl: null });
                   setValue("hasPhoto", (img != null) as true, { shouldValidate: formState.isSubmitted });
@@ -292,27 +292,32 @@ function ReportComposerForm() {
               <h2 className="text-heading mb-3">Details</h2>
               
               {categories.isPending && <LoadingState label="Loading categories" />}
+              {categories.isError && <ErrorState action="Loading categories" problem={(categories.error as ApiError)?.problem} onRetry={() => void categories.refetch()} />}
               {categories.data && (
-                <CategoryPicker
-                  categories={categories.data.map((c) => ({ code: c.code, displayName: c.displayName }))}
-                  value={categoryCode || undefined}
-                  onChange={(code) => {
-                    setValue("categoryCode", code, { shouldValidate: true });
-                    patch({ categoryCode: code });
-                  }}
-                />
+                <label className="flex flex-col gap-1">
+                  <span className="text-meta">What is the problem?</span>
+                  <select
+                    value={categoryCode || ""}
+                    onChange={(event) => {
+                      setValue("categoryCode", event.target.value, { shouldValidate: true });
+                      patch({ categoryCode: event.target.value });
+                    }}
+                    aria-invalid={Boolean(errors.categoryCode)}
+                    aria-describedby={errors.categoryCode ? "category-error" : undefined}
+                    className="text-body"
+                  >
+                    <option value="" disabled>Choose a category</option>
+                    {categories.data.map((category) => <option key={category.code} value={category.code}>{category.displayName}</option>)}
+                  </select>
+                </label>
               )}
               {errors.categoryCode && (
-                <p className="mt-2 text-meta" style={{ color: "var(--st-breached)" }} role="alert">
+                <p id="category-error" className="mt-2 text-meta" style={{ color: "var(--st-breached)" }} role="alert">
                   {errors.categoryCode.message}
                 </p>
               )}
 
             </section>
-          </div>
-
-          {/* RIGHT COLUMN: Location & Submit */}
-          <div className="flex flex-col gap-8">
             <section className="report-location">
               <h2 className="text-heading mb-3">Location</h2>
 
@@ -350,7 +355,7 @@ function ReportComposerForm() {
               {(needsManualPin || manualPin) && (
                 <div className="report-map-wrap">
                   <p className="text-meta text-ink-muted mb-3">
-                    Tap the map where the problem is. Accuracy worse than {MAX_ACCURACY_M} m is
+                    Tap the map where the problem is, or focus the map, use arrow keys to move and press Enter to place the pin at its centre. Accuracy worse than {MAX_ACCURACY_M} m is
                     not precise enough for a crew to find it.
                   </p>
                   {/* Leaflet is downloaded ONLY at this point. */}
@@ -362,13 +367,13 @@ function ReportComposerForm() {
                       onPinPlace={placePin}
                       markers={
                         lat != null && lng != null
-                          ? [{ id: "pin", lat, lng, kind: "report" as const, color: "#14181A", label: "Your pin" }]
+                          ? [{ id: "pin", lat, lng, kind: "report" as const, color: "var(--ink)", label: "Your pin" }]
                           : []
                       }
                     />
                   </div>
                   {lat != null && lng != null && (
-                    <p className="mt-2 text-meta text-ink-muted font-mono">
+                    <p className="mt-2 text-meta text-ink-muted font-mono" role="status">
                       {lat.toFixed(5)}, {lng.toFixed(5)}
                     </p>
                   )}
@@ -394,9 +399,7 @@ function ReportComposerForm() {
               )}
             </section>
 
-            {/* Landmark and description describe the location, so they sit with it; this also
-                keeps the left column short enough for a one-screen layout. */}
-            <section className="report-notes">
+            <section className="report-notes" tabIndex={0} role="region" aria-label="Additional report details">
               <div className="flex flex-col gap-4">
                 <label className="flex flex-col gap-1">
                   <span className="text-meta">Landmark (optional)</span>
@@ -415,24 +418,16 @@ function ReportComposerForm() {
                   <textarea
                     {...register("description", { onChange: (e) => patch({ description: e.target.value }) })}
                     maxLength={2000}
-                    rows={3}
+                    rows={2}
                     className="bg-surface-raised border border-rule px-3 py-2 text-body"
                     style={{ borderRadius: "var(--radius)" }}
                   />
                 </label>
               </div>
             </section>
-
-            {/*
-              Sticky to the bottom of the viewport on one column, static once
-              the layout splits in two. On a phone this section sits below the
-              map, and the map is 240px tall -- without the sticky the submit
-              button is off screen for the whole of the location step, on the
-              screen whose blueprint target is the entire flow in under twenty
-              seconds, held one-handed, outdoors.
-            */}
+        </div>
             <section
-              className="bg-surface-raised p-6 rounded-3xl report-submit border border-rule flex flex-col gap-4 sticky bottom-0 z-10 lg:static lg:mt-auto"
+              className="report-submit bg-surface-raised p-6 border border-rule flex flex-col gap-4"
             >
               {uploadFraction !== null && (
                 <UploadProgress fraction={uploadFraction} />
@@ -475,12 +470,10 @@ function ReportComposerForm() {
               {!CLOUDINARY_CONFIGURED && (
                 <p className="text-meta text-ink-muted">
                   Photo hosting is not configured, so a placeholder image URL is sent.
-                  Everything else works normally.
+                  Submission still depends on the server’s photo verification settings.
                 </p>
               )}
             </section>
-          </div>
-        </div>
       </form>
     </PageShell>
   );

@@ -100,7 +100,7 @@ for (const [role, email] of [
       await p.waitForTimeout(1600);
       const t = await p.locator('body').innerText();
       if (failedPhotos.length) {
-        const remaining = await p.locator('img').evaluateAll((images, urls) => images.some(image => urls.includes(image.src)), failedPhotos);
+        const remaining = await p.locator('img').evaluateAll((images, urls) => images.some(image => image.getClientRects().length > 0 && urls.includes(image.src)), failedPhotos);
         if (remaining || !t.includes('Photo unavailable')) errs.push('Failed photo did not render its fallback');
       }
       const crashed = /This page couldn.t load/.test(t);

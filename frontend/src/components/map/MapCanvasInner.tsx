@@ -66,7 +66,7 @@ function markerIcon(m: MapMarker): L.DivIcon {
         ? // Selected (the split tool) is a dark ring around the dot: a shape
           // cue, so the dot's own colour can stay its status.
           `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-             ${m.selected ? `<circle cx="${c}" cy="${c}" r="${c - 1}" fill="none" stroke="#14181A" stroke-width="2"/>` : ""}
+             ${m.selected ? `<circle cx="${c}" cy="${c}" r="${c - 1}" fill="none" stroke="var(--ink)" stroke-width="2"/>` : ""}
              <circle cx="${c}" cy="${c}" r="5" fill="${m.color}" stroke="#fff" stroke-width="2"/>
            </svg>`
         : // An issue on the browse map. Heavier stroke when overdue, so the
@@ -80,7 +80,7 @@ function markerIcon(m: MapMarker): L.DivIcon {
                  : ""
              }
              <circle cx="${c}" cy="${c}" r="${r}" fill="${m.color}" stroke="${
-               m.overdue ? "#14181A" : "#ffffff"
+               m.overdue ? "var(--ink)" : "var(--surface-raised)"
              }" stroke-width="${stroke}"/>
              ${
                (m.reporters ?? 1) > 1
@@ -94,19 +94,20 @@ function markerIcon(m: MapMarker): L.DivIcon {
   return L.divIcon({
     html: svg,
     className: "civictrack-marker",
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
+    // Generous hit area around the unchanged status glyph.
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
   });
 }
 
 const CIRCLE_STYLE = {
   // A report's own GPS accuracy. Translucent fill, because several overlapping
   // accuracy circles is the honest picture of a cluster's uncertainty.
-  accuracy: { color: "#5A6469", weight: 1, fillOpacity: 0.08 },
+  accuracy: { color: "var(--ink-muted)", weight: 1, fillOpacity: 0.08 },
   // The current effective merge radius.
-  merge: { color: "#1D4ED8", weight: 2, fillOpacity: 0, dashArray: "6 4" },
+  merge: { color: "var(--st-active)", weight: 2, fillOpacity: 0, dashArray: "6 4" },
   // DD-001's extent cap: maxExtentMultiplier x mergeRadiusM.
-  extentCap: { color: "#B45309", weight: 2, fillOpacity: 0, dashArray: "2 5" },
+  extentCap: { color: "var(--st-pending)", weight: 2, fillOpacity: 0, dashArray: "2 5" },
 } as const;
 
 export default function MapCanvasInner({
@@ -163,6 +164,10 @@ export default function MapCanvasInner({
 
     layerRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
+    // The desktop workspace changes size when a detail panel or disclosure
+    // opens. Leaflet observes window resize, but also needs container resize.
+    const resize = new ResizeObserver(() => map.invalidateSize({ pan: false }));
+    resize.observe(nodeRef.current);
 
     let timer: number | undefined;
     if (viewportCb.current) {
@@ -221,6 +226,7 @@ export default function MapCanvasInner({
 
     return () => {
       window.clearTimeout(timer);
+      resize.disconnect();
       map.remove();
       mapRef.current = null;
       layerRef.current = null;
@@ -247,7 +253,7 @@ export default function MapCanvasInner({
     if (boundaryGeoJson) {
       try {
         const outline = L.geoJSON(JSON.parse(boundaryGeoJson), {
-          style: { color: "#0b3b5e", weight: 2, fillColor: "#0b3b5e", fillOpacity: 0.04 },
+          style: { color: "var(--brand-primary)", weight: 2, fillColor: "var(--brand-primary)", fillOpacity: 0.04 },
         }).addTo(layer);
         map.fitBounds(outline.getBounds(), { padding: [16, 16], animate: false });
       } catch {
@@ -258,9 +264,9 @@ export default function MapCanvasInner({
     for (const cell of density) {
       L.circle([cell.lat, cell.lng], {
         radius: 45 + 28 * Math.sqrt(cell.issues),
-        color: "#0b3b5e",
+        color: "var(--brand-primary)",
         weight: 1,
-        fillColor: "#0b3b5e",
+        fillColor: "var(--brand-primary)",
         fillOpacity: Math.min(0.55, 0.18 + 0.08 * cell.issues),
       })
         .bindTooltip(`${cell.issues} issue${cell.issues === 1 ? "" : "s"}, ${cell.open} open`)
@@ -298,7 +304,15 @@ export default function MapCanvasInner({
       // The map is an interactive region; naming it stops a screen reader
       // announcing an unlabelled group of tile images.
       role="region"
-      aria-label="Map"
+      aria-label={onPinPlace ? "Map: use arrow keys to move, Enter to place a pin at the centre" : "Map"}
+      onKeyDown={event => {
+        // Leaflet provides keyboard panning; expose the same pin placement
+        // action as a pointer click without intercepting its child controls.
+        if (event.key !== "Enter" || event.target !== event.currentTarget || !pinCb.current || !mapRef.current) return;
+        event.preventDefault();
+        const point = mapRef.current.getCenter();
+        pinCb.current(point.lat, point.lng);
+      }}
     />
   );
 }

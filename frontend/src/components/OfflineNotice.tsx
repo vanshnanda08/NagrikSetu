@@ -17,7 +17,7 @@ export function OfflineNotice() {
   return (
     <div
       role="status"
-      className="glass offline-notice fixed left-1/2 z-[900] flex items-start gap-3 px-5 py-3 text-dense"
+      className="surface-card offline-notice fixed left-1/2 z-[900] flex items-start gap-3 px-5 py-3 text-dense"
       style={{ bottom: 16, transform: "translateX(-50%)", maxWidth: "min(560px, calc(100vw - 32px))" }}
     >
       <WifiOff size={18} aria-hidden="true" className="mt-0.5 shrink-0" />

@@ -35,7 +35,7 @@ export function SkeletonLine({
 export function SkeletonIssueRow() {
   return (
     <div
-      className="border-b border-rule py-3 px-2 -mx-2 flex flex-col gap-2"
+      className="skeleton-row border-b border-rule py-3 px-2 flex flex-col gap-2 overflow-hidden"
       style={{ minHeight: "var(--hit-min)" }}
       aria-hidden="true"
     >
@@ -97,7 +97,7 @@ export function SkeletonTileGrid({ tiles = 4, label = "Loading the dashboard" }:
       <span className="sr-only" aria-live="polite">
         {label}…
       </span>
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="skeleton-grid grid grid-cols-2 gap-4">
         {Array.from({ length: tiles }, (_, i) => (
           <SkeletonTile key={i} />
         ))}

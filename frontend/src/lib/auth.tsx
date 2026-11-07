@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { ApiError, apiBase } from "./api";
+import { ApiError } from "./api";
 import { useQueryClient } from "@tanstack/react-query";
 
 /**
@@ -131,6 +131,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!res.ok) throw new ApiError(res.status, await res.json().catch(() => null));
     queryClient.clear();
     setSession(null);
+    // Every role leaves its current workspace on logout. A fresh document also
+    // drops the previous page's in-memory authenticated state and cached UI.
+    window.location.replace("/dashboard");
   }, [queryClient]);
 
   const authed = useCallback(
@@ -166,12 +169,4 @@ export function useAuth(): AuthValue {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
-}
-
-/** Convenience for the authenticated endpoints, which all live off apiBase(). */
-export function authedFetch(token: string, path: string, init?: RequestInit) {
-  return fetch(`${apiBase()}${path}`, {
-    ...init,
-    headers: { ...init?.headers, Authorization: `Bearer ${token}` },
-  });
 }

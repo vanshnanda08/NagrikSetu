@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { IssueStatus } from "@/lib/status";
 import { StatusRule } from "./StatusRule";
 import { DeadlineCountdown } from "./DeadlineCountdown";
+import { PriorityBadge } from "./PriorityBadge";
+import type { Priority } from "@/lib/types";
 
 /**
  * One ruled row of an issue list.
@@ -35,6 +37,8 @@ export interface IssueRowProps {
   resolvedAt?: string | null;
   landmark?: string | null;
   audience?: "public" | "staff";
+  priority?: Priority;
+  priorityScore?: number;
   href?: string;
   /** Carries the stagger index (`--i`) when rendered inside `.u-stagger`. */
   style?: React.CSSProperties;
@@ -54,6 +58,8 @@ export function IssueRow({
   resolvedAt = null,
   landmark,
   audience = "public",
+  priority,
+  priorityScore,
   href,
   style,
 }: IssueRowProps) {
@@ -77,6 +83,7 @@ export function IssueRow({
         {/* Mono, because a reference is read aloud over a phone, compared digit
             by digit, and pasted into WhatsApp. Fixed-width serves all three. */}
         <span className="text-ref font-mono">{publicRef}</span>
+        {priority && <PriorityBadge priority={priority} score={priorityScore} />}
 
         <span className="text-dense">{categoryName}</span>
 

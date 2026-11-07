@@ -1,5 +1,7 @@
 "use client";
 
+import { AdministrativeClosureNotice } from "@/components/AdministrativeClosureNotice";
+
 import Link from "next/link";
 import { Photo } from "@/components/Photo";
 import { StatusRule } from "@/components/StatusRule";
@@ -22,10 +24,8 @@ import type { PublicIssue } from "@/lib/types";
  *
  * Staff and officers do need them: it is how you tell one pothole from two.
  *
- * THE HISTORY IS NOT DECORATION. Since supervisors gained the close, the audit
- * trail is what keeps the accountability property -- a department head closing
- * their own department's breaches is recorded here by name, on a panel that
- * needs no account to read. It is fetched, not faked.
+ * The public history records work, verification and automatic closure, making
+ * the accountability trail inspectable without an account.
  */
 export function IssueDetailPanel({
   issue,
@@ -46,7 +46,7 @@ export function IssueDetailPanel({
 
   return (
     <aside
-      className="glass issue-detail-panel bg-surface-raised border border-rule-strong p-4 flex flex-col gap-3 u-rise"
+      className="surface-card issue-detail-panel bg-surface-raised border border-rule-strong p-4 flex flex-col gap-3 u-rise"
       style={{ borderRadius: "var(--radius)" }}
       aria-label={`Details for ${issue.publicRef}`}
     >
@@ -61,7 +61,7 @@ export function IssueDetailPanel({
             onClick={onClose}
             aria-label="Close details"
             className="text-ink-faint hover:text-ink bg-transparent border-0 cursor-pointer px-2 py-1 rounded leading-none"
-            style={{ fontSize: 19 }}
+            style={{ fontSize: 24, minWidth: 44, minHeight: 44 }}
           >
             ×
           </button>
@@ -69,6 +69,7 @@ export function IssueDetailPanel({
       </div>
 
       <StatusRule status={issue.status} overdue={overdue} audience="public" />
+      <AdministrativeClosureNotice status={issue.status} resolvedAt={issue.resolvedAt} />
 
       <Photo
         src={first?.photoUrl}
@@ -76,7 +77,7 @@ export function IssueDetailPanel({
         width={640}
         height={480}
         className="w-full h-auto"
-        style={{ borderRadius: "var(--radius-token-sm)" }}
+        style={{ borderRadius: "var(--radius-sm)" }}
       />
 
       <dl className="grid gap-0 border-t border-rule">

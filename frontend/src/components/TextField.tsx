@@ -33,7 +33,7 @@ export function TextField({ label, hint, error, className = "", ...rest }: TextF
 
   return (
     <div className="flex flex-col gap-1" style={{ maxWidth: "var(--measure-form)" }}>
-      <label htmlFor={id} className="text-meta text-ink">
+      <label htmlFor={id} className="text-dense font-medium text-ink">
         {label}
       </label>
 
@@ -51,14 +51,14 @@ export function TextField({ label, hint, error, className = "", ...rest }: TextF
         style={{
           minHeight: "var(--hit-min)",
           borderRadius: "var(--radius)",
-          borderColor: error ? "var(--st-breached)" : "var(--rule)",
+          borderColor: error ? "var(--st-breached)" : "var(--rule-strong)",
           borderWidth: error ? 2 : 1,
         }}
         {...rest}
       />
 
       {error && (
-        <p id={errorId} className="text-meta" style={{ color: "var(--st-breached)" }}>
+        <p id={errorId} role="alert" className="text-meta" style={{ color: "var(--st-breached)" }}>
           {error}
         </p>
       )}

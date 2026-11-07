@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { request } from "@/lib/api";
+import { Button } from "./Button";
 
 export function EmailPreference() {
   const { session, authed } = useAuth();
@@ -29,6 +30,7 @@ export function EmailPreference() {
           finally { setBusy(false); }
         }} /> Email me issue updates
     </label>
-    {(error || preference.isError) && <p role="alert">{error || "Could not load email preference. Reload to retry."}</p>}
+    {(error || preference.isError) && <p role="alert">{error || "Could not load email preference."}</p>}
+    {preference.isError && <span><Button type="button" variant="secondary" disabled={preference.isFetching} onClick={() => void preference.refetch()}>Retry email preference</Button></span>}
   </section>;
 }

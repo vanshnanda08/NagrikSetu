@@ -513,14 +513,17 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
     Optional<NamedCountRow> findTopBreachedDepartment(@Param("now") Instant now);
 
     /**
-     * Issues that have reached RESOLVED or CLOSED, ever.
+     * Issues currently RESOLVED or CLOSED with a real resolution timestamp.
      *
      * <p>Blueprint 3.1 makes this the landing hero's fallback when the overdue
      * query is unavailable, so it must not share a code path with it.
      */
-    @Query(value = "SELECT COUNT(*) FROM issues WHERE status IN ('RESOLVED','CLOSED')",
+    @Query(value = "SELECT COUNT(*) FROM issues WHERE status IN ('RESOLVED','CLOSED') AND resolved_at IS NOT NULL",
            nativeQuery = true)
     long countResolved();
+
+    @Query(value = "SELECT COUNT(*) FROM issues WHERE status = 'CLOSED' AND resolved_at IS NULL", nativeQuery = true)
+    long countClosedWithoutResolution();
 
     /**
      * Per department: how its claimed fixes fared with citizens (DD-006).
@@ -545,9 +548,9 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
     @Query(value = """
             SELECT d.id   AS departmentId,
                    d.name AS departmentName,
-                   COUNT(i.id) FILTER (WHERE i.status IN ('RESOLVED','CLOSED'))        AS resolved,
+                   COUNT(i.id) FILTER (WHERE i.status IN ('RESOLVED','CLOSED') AND i.resolved_at IS NOT NULL)        AS resolved,
                    COUNT(i.id) FILTER (WHERE i.status IN ('RESOLVED','CLOSED')
-                                         AND i.resolved_without_verification)          AS unverified,
+                                         AND i.resolved_at IS NOT NULL AND i.resolved_without_verification)          AS unverified,
                    COUNT(i.id) FILTER (WHERE i.verification_round > 0)                 AS fixesClaimed,
                    COUNT(i.id) FILTER (WHERE i.verification_round > 0
                                          AND i.reopen_count > 0)                       AS reopened
@@ -611,13 +614,14 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
                 ORDER BY r.created_at ASC, r.id ASC
                 LIMIT 1
             ) fr ON TRUE
-            WHERE i.status NOT IN ('CLOSED','REJECTED','RESOLVED')
+            WHERE ((:readyToCloseOnly = TRUE AND i.status = 'RESOLVED')
+                OR (:readyToCloseOnly = FALSE AND i.status NOT IN ('CLOSED','REJECTED','RESOLVED')))
               AND (CAST(:departmentId AS uuid) IS NULL OR i.department_id = CAST(:departmentId AS uuid))
               AND (CAST(:wardId AS uuid) IS NULL OR i.ward_id = CAST(:wardId AS uuid))
               AND (CAST(:assignedTo AS uuid) IS NULL OR i.assigned_to = CAST(:assignedTo AS uuid))
               AND (:unassignedOnly = FALSE OR i.assigned_to IS NULL)
               AND (:toAssignOnly = FALSE OR i.status IN ('NEW','ACKNOWLEDGED'))
-            ORDER BY i.priority_score DESC, i.due_at ASC
+            ORDER BY i.priority_score DESC, i.due_at ASC, i.id ASC
             LIMIT :limit OFFSET :offset
             """, nativeQuery = true)
     List<QueueRow> findQueueRows(@Param("departmentId") UUID departmentId,
@@ -625,6 +629,7 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
                                  @Param("assignedTo") UUID assignedTo,
                                  @Param("unassignedOnly") boolean unassignedOnly,
                                  @Param("toAssignOnly") boolean toAssignOnly,
+                                 @Param("readyToCloseOnly") boolean readyToCloseOnly,
                                  @Param("limit") int limit,
                                  @Param("offset") int offset);
 

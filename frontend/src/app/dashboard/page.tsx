@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { Activity, ChevronDown } from "lucide-react";
+import { Activity } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
+import { StaffOverview } from "@/components/work/StaffOverview";
+import { LoadingState } from "@/components/LoadingState";
+import { ComplaintTracker } from "@/components/ComplaintTracker";
 import { MetricTile } from "@/components/MetricTile";
 import { ErrorState } from "@/components/ErrorState";
-import { SkeletonTileGrid } from "@/components/Skeleton";
+import { SkeletonTile, SkeletonTileGrid } from "@/components/Skeleton";
 import { StatusRule } from "@/components/StatusRule";
 import { TicketRef } from "@/components/TicketRef";
 import { TrendChart } from "@/components/charts/TrendChart";
-import { ColumnChart } from "@/components/charts/ColumnChart";
-import { shortDay } from "@/components/charts/chartKit";
 import {
   useBreaching,
   useDashboardMetrics,
@@ -18,15 +19,23 @@ import {
   useDashboardSummary,
   useDepartmentAccountability,
   useWards,
-  type StreamState,
 } from "@/lib/queries";
-import { useState, type ReactNode } from "react";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { absoluteDateTime, humaniseMs, reporters } from "@/lib/format";
+import { useAuth } from "@/lib/auth";
 import type { ApiError } from "@/lib/api";
-import type { DashboardMetrics, DepartmentAccountability, Median } from "@/lib/types";
+import type { DashboardMetrics, DepartmentAccountability } from "@/lib/types";
+
+const DETAIL_VIEWS = [
+  "Complaint trends",
+  "Overdue complaints",
+  "Most reported complaints",
+  "Ward overview",
+] as const;
+type DetailView = typeof DETAIL_VIEWS[number];
 
 /**
- * Accountability dashboard (blueprint §3.8), complete as of phase 7.
+ * Complaint dashboard (blueprint §3.8), complete as of phase 7.
  *
  * Three requests, each failing on its own: the summary row, the aggregates
  * (/dashboard/metrics, every section of which is itself nullable), and the
@@ -35,9 +44,7 @@ import type { DashboardMetrics, DepartmentAccountability, Median } from "@/lib/t
  *
  * LIVE. The overdue tile and the breaching list subscribe to the event stream
  * and refetch when the server says they changed; everything else refetches
- * every 60 seconds (§3.8). The page says "live" only while the stream is
- * connected -- a dashboard that claims liveness through a dropped connection
- * is showing a stale number with a fresh label.
+ * every 60 seconds (§3.8).
  *
  * EMPTY. Below the minimum sample a figure is withheld and its tile says how
  * many more resolved issues it needs (§3.8: "Not zeros, not dashes"). A median
@@ -48,106 +55,104 @@ import type { DashboardMetrics, DepartmentAccountability, Median } from "@/lib/t
  * late fixes are the validated context gray; single-series columns are the
  * neutral mark. The pairs were checked with the dataviz validator, which is
  * also why "late" is not red: red against green measured ΔE 1.9 under
- * deuteranopia in dark mode -- one colour to roughly one man in twelve.
+ * deuteranopia -- one colour to roughly one man in twelve.
  */
 export default function DashboardPage() {
+  const { session, initialising } = useAuth();
+  if (initialising) return <PageShell wide className="dashboard-page"><LoadingState label="Loading your overview" /></PageShell>;
+  return session?.role === "STAFF" ? <StaffOverview /> : <CityDashboard />;
+}
+
+function CityDashboard() {
+  const { session, initialising } = useAuth();
   const summary = useDashboardSummary();
   const metrics = useDashboardMetrics();
-  const stream = useDashboardStream();
+  const [detailView, setDetailView] = useState<DetailView>(DETAIL_VIEWS[0]);
+  const needsMetrics = detailView !== "Overdue complaints" && detailView !== "Ward overview";
+  useDashboardStream();
 
   return (
-    <PageShell wide className="liquid-dashboard">
+    <PageShell wide className="dashboard-page">
       <div className="dashboard-greeting">
-        <h1 className="text-display">Accountability dashboard</h1>
-        <LiveBadge state={stream} />
+        <div>
+          <h1 className="text-display">Complaint Dashboard</h1>
+        </div>
       </div>
 
+      {!initialising && !session && <ComplaintTracker />}
+
       <div className="dashboard-layout">
-        <div className="dashboard-metrics">
-          {summary.isPending && <SkeletonTileGrid label="Loading the dashboard" />}
-
-          {summary.isError && (
-            <ErrorState
-              action="Loading the dashboard"
-              problem={(summary.error as ApiError)?.problem}
-              onRetry={() => void summary.refetch()}
-            />
-          )}
-
-          {summary.data && (
-            <div className="dashboard-metric-grid u-stagger">
-              <MetricTile
-                label="Currently overdue"
-                emphasis
-                {...(summary.data.overdueCount === null
-                  ? { pending: "This figure could not be computed just now. It will return on the next refresh." }
-                  : {
-                      value: summary.data.overdueCount.toLocaleString("en-IN"),
-                      trend: "Breached and still on the clock",
-                    })}
-              />
-              <MetricTile label="Total resolved to date" value={summary.data.totalResolved.toLocaleString("en-IN")} />
-              <MetricTile
-                label="Ward holding the most overdue work"
-                {...(summary.data.topOverdueWard
-                  ? { value: String(summary.data.topOverdueWard.count), unit: `in ${summary.data.topOverdueWard.name}` }
-                  : { pending: "Nothing is overdue in any ward." })}
-              />
-              <MetricTile
-                label="Department holding the most overdue work"
-                {...(summary.data.topOverdueDepartment
-                  ? {
-                      value: String(summary.data.topOverdueDepartment.count),
-                      unit: `in ${summary.data.topOverdueDepartment.name}`,
-                    }
-                  : { pending: "No department is holding overdue work." })}
-              />
-            </div>
-          )}
-
+        <section className="dashboard-metrics" tabIndex={0} aria-label="City metrics">
           <div className="dashboard-metric-grid u-stagger">
+            {summary.isPending && <MetricPlaceholders count={4} label="Loading summary statistics" />}
+            {summary.isError && (
+              <ErrorState action="Loading the dashboard" problem={(summary.error as ApiError)?.problem} onRetry={() => void summary.refetch()} />
+            )}
+            {summary.data && <>
+              <MetricTile label="Currently overdue" emphasis={summary.data.overdueCount !== null && summary.data.overdueCount > 0}
+                {...(summary.data.overdueCount === null
+                  ? { pending: FAILED }
+                  : { value: summary.data.overdueCount.toLocaleString("en-IN"), trend: "Breached and still on the clock" })} />
+              <MetricTile label="Resolved to date" value={summary.data.totalResolved.toLocaleString("en-IN")} trend="All resolved issues, city-wide" />
+              <MetricTile label="Most overdue ward"
+                {...(summary.data.topOverdueWard
+                  ? { value: String(summary.data.topOverdueWard.count), trend: summary.data.topOverdueWard.name }
+                  : { pending: "Nothing overdue in any ward." })} />
+              <MetricTile label="Most overdue department"
+                {...(summary.data.topOverdueDepartment
+                  ? { value: String(summary.data.topOverdueDepartment.count), trend: summary.data.topOverdueDepartment.name }
+                  : { pending: "No department has overdue work." })} />
+            </>}
+            {metrics.isPending && <MetricPlaceholders count={2} label="Loading resolution statistics" />}
+            {metrics.isError && (
+              <ErrorState action="Loading the dashboard figures" problem={(metrics.error as ApiError)?.problem} onRetry={() => void metrics.refetch()} />
+            )}
             {metrics.data && <HeadlineAggregates m={metrics.data} />}
-            <DepartmentRecord tilesOnly />
+            <DepartmentRecord />
+            {!!summary.data?.closedWithoutResolution && <p className="text-meta text-ink-muted col-span-full">{summary.data.closedWithoutResolution.toLocaleString("en-IN")} closed before resolution by an administrator; excluded from resolution and SLA figures.</p>}
           </div>
-        </div>
-        <section className="dashboard-detail glass" aria-labelledby="dashboard-detail-heading">
-          <div className="dashboard-detail-intro">
-            <span className="dashboard-detail-icon glass-thin"><Activity size={24} aria-hidden="true" /></span>
-            <div>
-              <p className="text-meta text-ink-muted">City overview</p>
-              <h2 id="dashboard-detail-heading">Every report. A clearer picture.</h2>
+        </section>
+
+        <section className="dashboard-detail surface-card" aria-labelledby="dashboard-detail-heading">
+          <div className="dashboard-detail-toolbar">
+            <h2 id="dashboard-detail-heading"><Activity size={20} aria-hidden="true" />City overview</h2>
+            <div className="dashboard-view-picker">
+              <label htmlFor="dashboard-detail-view" className="sr-only">Detail view</label>
+              <select id="dashboard-detail-view" value={detailView} onChange={(event) => setDetailView(event.target.value as DetailView)} aria-controls="dashboard-detail-content">
+                {DETAIL_VIEWS.map((view) => <option key={view} value={view}>{view}</option>)}
+              </select>
             </div>
           </div>
-          <p className="dashboard-detail-hint text-dense text-ink-muted">Choose a heading to explore its detailed figures.</p>
-          <DashboardSection title="Currently breaching">
-            <Breaching />
-          </DashboardSection>
+          <div id="dashboard-detail-content" key={detailView} className="dashboard-detail-body" tabIndex={0} role="region" aria-label={detailView}>
+            <DashboardSection title="Overdue complaints" selected={detailView}>
+              <Breaching />
+            </DashboardSection>
 
-          {metrics.isPending && <SkeletonTileGrid tiles={2} label="Loading the figures" />}
-          {metrics.isError && (
-            <ErrorState
-              action="Loading the dashboard figures"
-              problem={(metrics.error as ApiError)?.problem}
-              onRetry={() => void metrics.refetch()}
-            />
-          )}
-          {metrics.data && <Aggregates m={metrics.data} />}
+            {needsMetrics && metrics.isPending && <SkeletonTileGrid tiles={2} label="Loading the figures" />}
+            {needsMetrics && metrics.isError && (
+              <ErrorState
+                action="Loading the dashboard figures"
+                problem={(metrics.error as ApiError)?.problem}
+                onRetry={() => void metrics.refetch()}
+              />
+            )}
+            {metrics.data && <Aggregates m={metrics.data} selected={detailView} />}
 
-          <DashboardSection title="Ward pages">
-            <WardPages />
-          </DashboardSection>
+            <DashboardSection title="Ward overview" selected={detailView}>
+              <WardPages />
+            </DashboardSection>
 
-          {/* Outside the summary's block: its own request, its own failure. */}
-          <DashboardSection title="Did the fixes hold?">
-            <DepartmentRecord />
-          </DashboardSection>
+          </div>
 
           {metrics.data && (
-            <p className="mt-8 text-meta text-ink-muted">
-              Figures generated {absoluteDateTime(metrics.data.generatedAt)}. Days are calendar days in
-              local time. Resolution time runs from the first report to resolution; a fix counts as on time
-              when the department claimed it before the deadline.
-            </p>
+            <details className="dashboard-notes text-meta text-ink-muted">
+              <summary>About these figures</summary>
+              <p>
+                Figures generated {absoluteDateTime(metrics.data.generatedAt)}. Days are calendar days in
+                local time. Resolution time runs from the first report to resolution; a fix counts as on time
+                when the department claimed it before the deadline.
+              </p>
+            </details>
           )}
         </section>
       </div>
@@ -160,7 +165,7 @@ function WardPages() {
   const wards = useWards();
   if (wards.isPending) return <p className="text-dense text-ink-muted">Loading the wards…</p>;
   if (wards.isError || !wards.data) {
-    return <p className="text-dense text-ink-muted">The ward list could not be loaded just now.</p>;
+    return <ErrorState action="Loading wards" problem={(wards.error as ApiError)?.problem} onRetry={() => void wards.refetch()} />;
   }
   return (
     <>
@@ -180,36 +185,21 @@ function WardPages() {
   );
 }
 
-/** Native disclosure controls support keyboard navigation and one open section at a time. */
-function DashboardSection({ title, children }: { title: string; children: ReactNode }) {
+/** Only the selected view mounts, so charts measure the visible content area. */
+function DashboardSection({ title, selected, children }: { title: DetailView; selected: DetailView; children: ReactNode }) {
+  if (selected !== title) return null;
   return (
-    <details name="dashboard-sections" className="dashboard-section group border-b border-rule">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-ink hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-4 [&::-webkit-details-marker]:hidden">
-        <h2 className="text-heading">{title}</h2>
-        <ChevronDown aria-hidden="true" size={20} className="shrink-0 transition-transform group-open:rotate-180" />
-      </summary>
-      <div className="pb-6">{children}</div>
-    </details>
+    <section className="dashboard-view" aria-label={title}>
+      {children}
+    </section>
   );
 }
 
-function LiveBadge({ state }: { state: StreamState }) {
-  if (state === "unsupported") return null;
-  const live = state === "live";
-  return (
-    <span className={`dashboard-live glass-thin text-meta inline-flex items-center gap-2 ${live ? "is-live" : ""}`} role="status">
-      <span
-        aria-hidden="true"
-        className="inline-block rounded-full"
-        style={{ width: 8, height: 8, background: live ? "var(--ink)" : "transparent", border: "1.5px solid var(--ink-muted)" }}
-      />
-      {live
-        ? "Live: overdue figures update as they change"
-        : state === "connecting"
-          ? "Connecting to live updates"
-          : "Live updates interrupted, reconnecting. Figures refresh every minute meanwhile."}
-    </span>
-  );
+function MetricPlaceholders({ count, label }: { count: number; label: string }) {
+  return <>
+    <span className="sr-only" aria-live="polite">{label}…</span>
+    {Array.from({ length: count }, (_, index) => <SkeletonTile key={index} />)}
+  </>;
 }
 
 /**
@@ -280,12 +270,12 @@ function duration(hours: number): string {
   return hours >= 48 ? `${(hours / 24).toFixed(1)} days` : `${hours.toFixed(1)} hours`;
 }
 
-function needs(m: DashboardMetrics, have: number, what: string): string {
+function needs(m: DashboardMetrics, have: number): string {
   const more = Math.max(1, m.minimumSample - have);
-  return `Needs ${more} more resolved issue${more === 1 ? "" : "s"} before ${what} means anything (${have} so far).`;
+  return `Needs ${more} more resolved issue${more === 1 ? "" : "s"} (${have} so far).`;
 }
 
-const FAILED = "This figure could not be computed just now. It will return on the next refresh.";
+const FAILED = "Unavailable · retrying on the next refresh.";
 
 function HeadlineAggregates({ m }: { m: DashboardMetrics }) {
   const rt = m.resolutionTime;
@@ -297,11 +287,11 @@ function HeadlineAggregates({ m }: { m: DashboardMetrics }) {
           {...(!rt
             ? { pending: FAILED }
             : rt.overall.medianHours === null
-              ? { pending: needs(m, rt.overall.resolved, "a median") }
+              ? { pending: needs(m, rt.overall.resolved) }
               : {
                   value: duration(rt.overall.medianHours).split(" ")[0],
                   unit: duration(rt.overall.medianHours).split(" ")[1],
-                  trend: `Across ${rt.overall.resolved.toLocaleString("en-IN")} resolved issues, first report to resolution`,
+                  trend: `${rt.overall.resolved.toLocaleString("en-IN")} issues · first report to resolution`,
                 })}
         />
         <MetricTile
@@ -309,31 +299,39 @@ function HeadlineAggregates({ m }: { m: DashboardMetrics }) {
           {...(!sla
             ? { pending: FAILED }
             : sla.rate === null
-              ? { pending: needs(m, sla.resolved, "a compliance rate") }
+              ? { pending: needs(m, sla.resolved) }
               : {
                   value: `${Math.round(sla.rate * 100)}%`,
-                  trend: `${sla.onTime.toLocaleString("en-IN")} of ${sla.resolved.toLocaleString("en-IN")} fixes claimed before the deadline`,
+                  trend: `${sla.onTime.toLocaleString("en-IN")} of ${sla.resolved.toLocaleString("en-IN")} fixes claimed on time`,
                 })}
         />
     </>
   );
 }
 
-function Aggregates({ m }: { m: DashboardMetrics }) {
-  const rt = m.resolutionTime;
-  const sla = m.slaCompliance;
+const SHORT_DESKTOP = "(min-width: 1280px) and (min-height: 600px) and (max-height: 699px)";
+function subscribeShortDesktop(onChange: () => void) {
+  const media = window.matchMedia(SHORT_DESKTOP);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+const shortDesktopSnapshot = () => window.matchMedia(SHORT_DESKTOP).matches;
+const serverShortDesktopSnapshot = () => false;
 
+function Aggregates({ m, selected }: { m: DashboardMetrics; selected: DetailView }) {
+  const shortDesktop = useSyncExternalStore(subscribeShortDesktop, shortDesktopSnapshot, serverShortDesktopSnapshot);
+  const { session } = useAuth();
   return (
     <>
-      <DashboardSection title="Reported against resolved, last 90 days">
+      <DashboardSection title="Complaint trends" selected={selected}>
         <p className="mt-1 text-dense text-ink-muted" style={{ maxWidth: "var(--measure-prose)" }}>
-          New issues each day against issues resolved each day. Where the gray line runs above the
-          green one, the backlog is growing.
+          Daily new and resolved issues. The backlog grows when gray is above green.
         </p>
         <div className="mt-3">
           {m.reportedVsResolved ? (
             <TrendChart
               title="New issues and resolved issues per day, last 90 days"
+              height={shortDesktop && !session ? 144 : 220}
               series={[
                 { key: "reported", label: "New issues", color: "var(--chart-context)" },
                 { key: "resolved", label: "Resolved", color: "var(--st-resolved)" },
@@ -346,66 +344,7 @@ function Aggregates({ m }: { m: DashboardMetrics }) {
         </div>
       </DashboardSection>
 
-      <DashboardSection title="Open backlog by age">
-          <div className="mt-3">
-            {m.backlogAge ? (
-              <ColumnChart
-                title="Open issues by time since first report"
-                valueLabel="Open issues"
-                labelCaps
-                columns={m.backlogAge.map((b) => ({
-                  key: b.label,
-                  label: b.label,
-                  axisLabel: b.toDays === null ? `${b.fromDays}d+` : b.toDays <= 7 ? `${b.fromDays}–${b.toDays}d` : `${b.fromDays / 7}–${b.toDays === 30 ? "4" : b.toDays / 7}w`,
-                  values: [b.open],
-                }))}
-              />
-            ) : (
-              <p className="text-dense text-ink-muted">{FAILED}</p>
-            )}
-          </div>
-        </DashboardSection>
-
-      <DashboardSection title="Fixes on time, last 30 days">
-
-
-          <div className="mt-3">
-            {sla ? (
-              <ColumnChart
-                title="Issues resolved per day, split by whether the fix was claimed before the deadline"
-                valueLabel="Resolved"
-                labelEvery={7}
-                parts={[
-                  { label: "On time", color: "var(--st-resolved)" },
-                  { label: "Late", color: "var(--chart-context)" },
-                ]}
-                columns={sla.trend.map((d) => ({
-                  key: d.day,
-                  label: shortDay(d.day),
-                  values: [d.onTime, d.resolved - d.onTime],
-                  detail:
-                    d.resolved === 0
-                      ? "Nothing resolved"
-                      : `${d.onTime} of ${d.resolved} on time`,
-                }))}
-              />
-            ) : (
-              <p className="text-dense text-ink-muted">{FAILED}</p>
-            )}
-          </div>
-      </DashboardSection>
-
-      <DashboardSection title="Resolution time by department and ward">
-
-        {rt ? (
-          <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <MedianTable caption="By department" rows={rt.byDepartment} m={m} />
-            <MedianTable caption="By ward" rows={rt.byWard} m={m} />
-          </div>
-        ) : <p className="text-dense text-ink-muted">{FAILED}</p>}
-      </DashboardSection>
-
-      <DashboardSection title="Most-reported open issues">
+      <DashboardSection title="Most reported complaints" selected={selected}>
         {m.topClusters === null ? <p className="text-dense text-ink-muted">{FAILED}</p> : m.topClusters.length === 0 ? (
           <p className="text-dense text-ink-muted">No open issues yet.</p>
         ) : (
@@ -431,43 +370,6 @@ function Aggregates({ m }: { m: DashboardMetrics }) {
   );
 }
 
-function MedianTable({ caption, rows, m }: { caption: string; rows: Median[]; m: DashboardMetrics }) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-dense border-collapse">
-        <caption className="text-left text-meta text-ink-muted pb-2">{caption}</caption>
-        <thead>
-          <tr className="border-b border-rule text-meta text-ink-muted">
-            <th scope="col" className="text-left font-medium py-2 pr-4">&nbsp;</th>
-            <th scope="col" className="text-right font-medium py-2 px-4">Median</th>
-            <th scope="col" className="text-right font-medium py-2 pl-4">Resolved</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.name} className="border-b border-rule">
-              <th scope="row" className="text-left font-normal py-2 pr-4">{r.name}</th>
-              <td className="text-right py-2 px-4 tabular-nums">
-                {r.medianHours === null ? (
-                  <span className="text-ink-muted">
-                    {r.resolved === 0 ? "Nothing resolved yet" : `Needs ${m.minimumSample - r.resolved} more`}
-                  </span>
-                ) : (
-                  duration(r.medianHours)
-                )}
-              </td>
-              <td className="text-right py-2 pl-4 tabular-nums">{r.resolved}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-const UNVERIFIED_EXPLANATION =
-  "Anonymous reporters cannot vote on whether a fix worked, so those issues close on a 72-hour timeout. Publishing the rate is the mitigation, not a footnote — a dashboard that hides its own weakest metric is the thing this project argues against.";
-
 /** A share as a whole percentage. Never called with a zero denominator. */
 function pct(part: number, whole: number): string {
   return `${Math.round((part / whole) * 100)}%`;
@@ -482,14 +384,10 @@ function pct(part: number, whole: number): string {
  * with no denominator yet, and it says so in words -- "0%" would claim a
  * perfect record nobody has earned.
  */
-function DepartmentRecord({ tilesOnly = false }: { tilesOnly?: boolean }) {
+function DepartmentRecord() {
   const departments = useDepartmentAccountability();
 
-  if (departments.isPending) return (
-    <div className={tilesOnly ? "sm:col-span-2" : undefined}>
-      <SkeletonTileGrid tiles={2} label="Loading the department figures" />
-    </div>
-  );
+  if (departments.isPending) return <MetricPlaceholders count={2} label="Loading the department figures" />;
 
   if (departments.isError) {
     return (
@@ -508,21 +406,21 @@ function DepartmentRecord({ tilesOnly = false }: { tilesOnly?: boolean }) {
   const claimed = total((d) => d.fixesClaimed);
   const reopened = total((d) => d.reopened);
 
-  if (tilesOnly) return (
+  return (
     <>
         <MetricTile
           label="Reopen rate"
           {...(claimed === 0
-            ? { pending: "Will show how often citizens rejected a fix, once a department has submitted one." }
+            ? { pending: "Awaiting the first claimed fix." }
             : {
                 value: pct(reopened, claimed),
-                trend: `${reopened.toLocaleString("en-IN")} of ${claimed.toLocaleString("en-IN")} claimed fixes were reopened`,
+                trend: `${reopened.toLocaleString("en-IN")} of ${claimed.toLocaleString("en-IN")} claimed fixes reopened`,
               })}
         />
         <MetricTile
           label="Resolved without citizen verification"
           {...(resolved === 0
-            ? { pending: "Will show the share of issues that closed with nobody confirming the fix, once one has closed." }
+            ? { pending: "Awaiting the first resolved issue." }
             : {
                 value: pct(unverified, resolved),
                 trend: `${unverified.toLocaleString("en-IN")} of ${resolved.toLocaleString("en-IN")} resolved issues`,
@@ -531,49 +429,4 @@ function DepartmentRecord({ tilesOnly = false }: { tilesOnly?: boolean }) {
     </>
   );
 
-  return (
-    <div>
-      <p className="text-dense text-ink-muted" style={{ maxWidth: "var(--measure-prose)" }}>{UNVERIFIED_EXPLANATION}</p>
-
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full text-dense border-collapse">
-          <caption className="text-left text-meta text-ink-muted pb-2">By department</caption>
-          <thead>
-            <tr className="border-b border-rule text-meta text-ink-muted">
-              <th scope="col" className="text-left font-medium py-2 pr-4">Department</th>
-              <th scope="col" className="text-right font-medium py-2 px-4">Reopened</th>
-              <th scope="col" className="text-right font-medium py-2 pl-4">Resolved without verification</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((d) => (
-              <tr key={d.departmentId} className="border-b border-rule">
-                <th scope="row" className="text-left font-normal py-2 pr-4">{d.departmentName}</th>
-                <td className="text-right py-2 px-4 tabular-nums">
-                  {d.reopenRate === null ? (
-                    <span className="text-ink-muted">No fixes claimed yet</span>
-                  ) : (
-                    <>
-                      {pct(d.reopened, d.fixesClaimed)}{" "}
-                      <span className="text-ink-muted">({d.reopened} of {d.fixesClaimed})</span>
-                    </>
-                  )}
-                </td>
-                <td className="text-right py-2 pl-4 tabular-nums">
-                  {d.unverifiedRate === null ? (
-                    <span className="text-ink-muted">Nothing resolved yet</span>
-                  ) : (
-                    <>
-                      {pct(d.resolvedWithoutVerification, d.resolved)}{" "}
-                      <span className="text-ink-muted">({d.resolvedWithoutVerification} of {d.resolved})</span>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
 }

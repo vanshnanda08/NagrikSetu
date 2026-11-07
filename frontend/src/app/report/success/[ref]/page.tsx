@@ -7,9 +7,10 @@ import { TicketRef } from "@/components/TicketRef";
 import { StatusRule } from "@/components/StatusRule";
 import { CountUp } from "@/components/CountUp";
 import { LoadingState } from "@/components/LoadingState";
+import { ErrorState } from "@/components/ErrorState";
 import { useAuth } from "@/lib/auth";
 import { useComposer } from "@/lib/composer";
-import { request } from "@/lib/api";
+import { ApiError, request } from "@/lib/api";
 import { absoluteDateTime, metres } from "@/lib/format";
 import type { ClusterResult, PublicIssue } from "@/lib/types";
 
@@ -38,7 +39,7 @@ export default function ReportSuccessPage({ params }: { params: Promise<{ ref: s
   // screen legitimately knows nothing -- rendering a loading state first and
   // correcting it would be a cascading render and a visible flicker on the one
   // screen the citizen is most likely to be staring at.
-  const [result, setResult] = useState<ClusterResult | null>(() => {
+  const [result] = useState<ClusterResult | null>(() => {
     if (typeof window === "undefined") return null;
     try {
       const raw = window.sessionStorage.getItem(`ct:${ref}`);
@@ -49,6 +50,8 @@ export default function ReportSuccessPage({ params }: { params: Promise<{ ref: s
   });
   const [issue, setIssue] = useState<PublicIssue | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [lookupError, setLookupError] = useState<Error | null>(null);
+  const [lookupAttempt, setLookupAttempt] = useState(0);
 
   useEffect(() => {
     let live = true;
@@ -66,20 +69,31 @@ export default function ReportSuccessPage({ params }: { params: Promise<{ ref: s
         // effect is the cascading render the lint rule exists to prevent.
         reset();
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (!live) return;
-        setResult((current) => {
-          if (!current) setNotFound(true);
-          return current;
-        });
+        if (error instanceof ApiError && error.status === 404) {
+          if (!result) setNotFound(true);
+        } else {
+          setLookupError(error instanceof Error ? error : new Error("Could not load the report status."));
+        }
       });
 
     return () => {
       live = false;
     };
-    // Runs once per reference.
+    // Runs for the reference and explicit retries; the saved hand-over is initial state.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref]);
+  }, [ref, lookupAttempt]);
+
+  const retryStatus = () => { setLookupError(null); setLookupAttempt(attempt => attempt + 1); };
+
+  if (lookupError && !result) return (
+    <PageShell>
+      <h1 className="text-display">Report status unavailable</h1>
+      <ErrorState action="Loading the report status" problem={lookupError instanceof ApiError ? lookupError.problem : undefined} onRetry={retryStatus} />
+      <Link href="/dashboard" className="underline">Back to dashboard</Link>
+    </PageShell>
+  );
 
   if (notFound) {
     return (
@@ -113,7 +127,9 @@ export default function ReportSuccessPage({ params }: { params: Promise<{ ref: s
 
   return (
     <PageShell>
-      <p className="text-meta text-ink-muted">Your ticket number</p>
+      <h1 className="text-display">Report received</h1>
+      {lookupError && <ErrorState action="Refreshing the report status" problem={lookupError instanceof ApiError ? lookupError.problem : undefined} onRetry={retryStatus} />}
+      <p className="mt-4 text-meta text-ink-muted">Your ticket number</p>
       <div className="mt-1">
         <TicketRef publicRef={ref} issueId={issue?.id} size="large" copyable />
       </div>

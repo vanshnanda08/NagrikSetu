@@ -9,6 +9,9 @@ public enum NotificationType {
     /** An issue you reported was resolved -- by vote, or by the timeout. */
     RESOLVED,
 
+    /** An administrator closed the complaint, possibly before a repair was verified. */
+    CLOSED,
+
     /** Citizens rejected a fix, or the problem recurred. Sent to reporters and to the assignee. */
     REOPENED,
 

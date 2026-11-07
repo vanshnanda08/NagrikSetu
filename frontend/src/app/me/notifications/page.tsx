@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
-import { MeNav } from "@/components/MeNav";
 import { Button } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
@@ -12,7 +11,7 @@ import { LoadingState } from "@/components/LoadingState";
 import { useAuth } from "@/lib/auth";
 import { ApiError, request } from "@/lib/api";
 import { keys } from "@/lib/queries";
-import { absoluteDateTime, ageLabel } from "@/lib/format";
+import { absoluteDateTime, timeAgo } from "@/lib/format";
 import { useSignIn } from "@/lib/signInDialog";
 import type { AppNotification, NotificationPage } from "@/lib/types";
 
@@ -34,12 +33,12 @@ export default function NotificationsPage() {
   const { session, initialising, authed } = useAuth();
   const { openSignIn } = useSignIn();
   const qc = useQueryClient();
-  const [limit, setLimit] = useState(PAGE);
+  const [offset, setOffset] = useState(0);
 
   const list = useQuery({
-    queryKey: [...keys.myNotifications(session?.userId), limit],
+    queryKey: [...keys.myNotifications(session?.userId), offset],
     queryFn: () =>
-      authed((token) => request<NotificationPage>(`/me/notifications?limit=${limit}`, { token })),
+      authed((token) => request<NotificationPage>(`/me/notifications?limit=${PAGE}&offset=${offset}`, { token })),
     enabled: Boolean(session),
     staleTime: 30_000,
     placeholderData: keepPreviousData,
@@ -84,7 +83,6 @@ export default function NotificationsPage() {
 
   return (
     <PageShell wide>
-      <MeNav current="/me/notifications" />
       <div className="flex flex-wrap items-end gap-4">
         <h1 className="text-display">Notifications</h1>
         {data && data.unread > 0 && (
@@ -96,6 +94,7 @@ export default function NotificationsPage() {
         )}
       </div>
 
+      <p className="page-description mt-2 text-dense">Status updates, requests for information and fixes waiting for your confirmation.</p>
       {list.isPending && <LoadingState label="Loading your notifications" />}
 
       {list.isError && (
@@ -105,25 +104,26 @@ export default function NotificationsPage() {
           onRetry={() => void list.refetch()}
         />
       )}
+      {markRead.isError && <ErrorState action="Marking notifications read" problem={(markRead.error as ApiError)?.problem} onRetry={() => markRead.mutate(markRead.variables ?? null)} />}
 
-      {data && data.items.length === 0 && <EmptyState message="Nothing new." />}
+      {data && data.items.length === 0 && <EmptyState message={offset ? "No notifications on this page." : "Nothing new."} {...(offset ? { actionLabel: "Back to newest", onAction: () => setOffset(0) } : {})} />}
 
       {data && data.items.length > 0 && (
         <>
           <p className="mt-4 text-meta text-ink-muted">
             {data.unread === 0 ? "All read" : `${data.unread} unread`} · {data.total} in total
+            {` · showing ${data.offset + 1}–${Math.min(data.offset + data.items.length, data.total)}`}
           </p>
-          <ol className="mt-2 list-none p-0 border-t border-rule">
+          <ol key={data.offset} className="mt-2 list-none p-0 border-t border-rule" tabIndex={0} aria-label="Notifications list" aria-busy={list.isFetching}>
             {data.items.map((n) => (
               <Row key={n.id} n={n} onOpen={() => !n.readAt && markRead.mutate([n.id])} />
             ))}
           </ol>
-          {data.items.length < data.total && (
-            <div className="mt-4">
-              <Button variant="secondary" onClick={() => setLimit((l) => l + PAGE)} disabled={list.isFetching}>
-                Show older
-              </Button>
-            </div>
+          {data.total > PAGE && (
+            <nav aria-label="Notification pages" className="mt-4 flex items-center gap-3">
+              <Button variant="secondary" onClick={() => setOffset(value => Math.max(0, value - PAGE))} disabled={offset === 0 || list.isFetching}>Newer</Button>
+              <Button variant="secondary" onClick={() => setOffset(value => value + PAGE)} disabled={offset + PAGE >= data.total || list.isFetching}>Older</Button>
+            </nav>
           )}
         </>
       )}
@@ -145,7 +145,7 @@ function Row({ n, onOpen }: { n: AppNotification; onOpen: () => void }) {
       <div className="flex flex-wrap items-baseline gap-x-4">
         <span className={`text-body ${unread ? "font-semibold" : ""}`}>{n.title}</span>
         <span className="ml-auto text-meta text-ink-muted" title={absoluteDateTime(n.createdAt)}>
-          {ageLabel(n.createdAt)}
+          {timeAgo(n.createdAt)}
         </span>
       </div>
       {n.body && <p className="mt-1 text-dense text-ink-muted">{n.body}</p>}

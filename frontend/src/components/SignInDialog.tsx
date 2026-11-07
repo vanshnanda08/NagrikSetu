@@ -132,8 +132,9 @@ export function SignInDialog({
     >
       <form
         method="dialog"
+        aria-busy={busy}
         onSubmit={submit}
-        className="glass auth-panel bg-surface-raised border border-rule-strong p-6 flex flex-col gap-4"
+        className="surface-card auth-panel bg-surface-raised border border-rule-strong p-6 flex flex-col gap-4"
         style={{ borderRadius: "var(--radius)", width: "min(430px, 100%)" }}
       >
         <div className="flex items-start justify-between gap-4">
@@ -145,7 +146,7 @@ export function SignInDialog({
             onClick={onClose}
             aria-label="Close"
             className="text-ink-faint hover:text-ink cursor-pointer bg-transparent border-0 leading-none px-2 py-1 rounded"
-            style={{ fontSize: 20 }}
+            style={{ fontSize: 24, minWidth: 44, minHeight: 44 }}
           >
             ×
           </button>
@@ -159,6 +160,7 @@ export function SignInDialog({
         {mode === "up" && (
           <TextField
             label="Your name"
+            required
             autoComplete="name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
@@ -167,6 +169,7 @@ export function SignInDialog({
 
         <TextField
           label="Email"
+          required
           type="email"
           autoComplete="username"
           value={email}
@@ -184,6 +187,7 @@ export function SignInDialog({
         )}
         <TextField
           label="Password"
+          required
           type="password"
           autoComplete={mode === "in" ? "current-password" : "new-password"}
           value={password}

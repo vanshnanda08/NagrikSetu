@@ -184,13 +184,28 @@ public enum Guards implements Guard {
     },
 
     /**
-     * Seven quiet days after resolution before an issue closes for good.
+     * Automatic closure observes seven quiet days; an administrator may close
+     * an already-resolved complaint earlier with an audited reason.
      *
      * <p>Closing is what ends the reopen path, so the window is the citizen's
      * last opportunity to say the problem came back. Closing immediately on
      * resolution would make the reopen rate -- a published number -- structurally
      * impossible to move.
      */
+    SETTLED_OR_ADMIN_REASON {
+        @Override
+        public boolean permits(Issue issue, Actor actor, TransitionContext ctx) {
+            return actor.isAdmin()
+                    ? issue.getResolvedAt() != null && NOTE_MIN_20.permits(issue, actor, ctx)
+                    : SETTLED_7_DAYS.permits(issue, actor, ctx);
+        }
+
+        @Override
+        public String explanation() {
+            return "administrator closure requires an already-resolved complaint and a reason of at least 20 characters; automatic closure requires seven quiet days";
+        }
+    },
+
     SETTLED_7_DAYS {
         @Override
         public boolean permits(Issue issue, Actor actor, TransitionContext ctx) {

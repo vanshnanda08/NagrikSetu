@@ -41,7 +41,9 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
   const [hover, setHover] = useState<number | null>(null);
   const tableId = useId();
 
-  const plotW = Math.max(0, width - PAD.left - PAD.right);
+  const compact = width < 480;
+  const rightPad = compact ? 16 : PAD.right;
+  const plotW = Math.max(0, width - PAD.left - rightPad);
   const plotH = height - PAD.top - PAD.bottom;
   const max = Math.max(1, ...rows.flatMap((r) => series.map((s) => r[s.key])));
   const ticks = niceTicks(max);
@@ -50,7 +52,7 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
   const y = (v: number) => PAD.top + plotH - (v / top) * plotH;
 
   // Six date labels at most, evenly spaced, always including the last day.
-  const every = Math.max(1, Math.ceil(rows.length / 6));
+  const every = Math.max(1, Math.ceil(rows.length / (compact ? 3 : 6)));
   const xLabels = rows.map((r, i) => ({ i, day: r.day })).filter(({ i }) => (rows.length - 1 - i) % every === 0);
 
   // End labels only when the two ends are far enough apart to stay attached
@@ -58,7 +60,7 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
   // tooltip carry identity either way.
   const last = rows[rows.length - 1];
   const endYs = last ? series.map((s) => y(last[s.key])) : [];
-  const endLabelsFit = endYs.length < 2 || Math.abs(endYs[0] - endYs[1]) >= 14;
+  const endLabelsFit = !compact && (endYs.length < 2 || Math.abs(endYs[0] - endYs[1]) >= 14);
 
   const onMove = (clientX: number, rect: DOMRect) => {
     if (rows.length === 0 || plotW <= 0) return;
@@ -69,7 +71,7 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
   const active = hover === null ? null : rows[hover];
 
   return (
-    <figure className="m-0">
+    <figure className="chart-figure m-0">
       {/* Legend: always present for two or more series, line keys to match the marks. */}
       {series.length > 1 && (
         <ul className="flex flex-wrap gap-x-5 gap-y-1 list-none p-0 m-0 mb-2 text-meta text-ink-muted">
@@ -181,7 +183,7 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
 
       <details id={tableId} className="mt-2">
         <summary className="text-meta text-ink-muted cursor-pointer">Show as a table</summary>
-        <div className="mt-2 overflow-x-auto" style={{ maxHeight: 280 }}>
+        <div className="mt-2 overflow-x-auto" style={{ maxHeight: 280 }} tabIndex={0} role="region" aria-label={`${title} data table`}>
           <table className="w-full text-dense border-collapse">
             <caption className="sr-only">{title}</caption>
             <thead>

@@ -25,7 +25,7 @@ public class AdminConfigurationController {
     private final ObjectMapper json;
     private static final Map<String,String> COLUMNS = Map.of(
         "users", "id,full_name,email,role,department_id,ward_id,active",
-        "categories", "code,display_name,merge_radius_m,default_sla_hours,severity_weight,reopen_window_days,max_extent_multiplier,low_conf_action,is_mobile_target,department_id,active",
+        "categories", "code,display_name,merge_radius_m,default_sla_hours,severity_weight,reopen_window_days,max_extent_multiplier,low_conf_action,department_id,active",
         "departments", "id,code,name,parent_department_id,head_user_id",
         "wards", "id,ward_number,name,officer_user_id");
 
@@ -49,13 +49,13 @@ public class AdminConfigurationController {
         @Min(0) @Max(100) int severityWeight, @Min(1) @Max(365) int reopenWindowDays,
         @NotNull @DecimalMin("1.0") @DecimalMax("10.0") BigDecimal maxExtentMultiplier,
         @NotNull @Pattern(regexp="MERGE_FLAG|SPLIT_FLAG") String lowConfAction,
-        boolean mobileTarget, UUID departmentId, boolean active) {}
+        UUID departmentId, boolean active) {}
     @PutMapping("/categories/{code}") @Transactional @ResponseStatus(HttpStatus.NO_CONTENT)
     public void category(@PathVariable String code, @Valid @RequestBody Category c, @AuthenticationPrincipal Jwt jwt) {
         begin(jwt); var before = row("categories",code);
         reference("departments",c.departmentId());
-        jdbc.update("UPDATE categories SET display_name=?,merge_radius_m=?,default_sla_hours=?,severity_weight=?,reopen_window_days=?,max_extent_multiplier=?,low_conf_action=?,is_mobile_target=?,department_id=?,active=? WHERE code=?",
-            c.displayName().strip(),c.mergeRadiusM(),c.defaultSlaHours(),c.severityWeight(),c.reopenWindowDays(),c.maxExtentMultiplier(),c.lowConfAction(),c.mobileTarget(),c.departmentId(),c.active(),code);
+        jdbc.update("UPDATE categories SET display_name=?,merge_radius_m=?,default_sla_hours=?,severity_weight=?,reopen_window_days=?,max_extent_multiplier=?,low_conf_action=?,department_id=?,active=? WHERE code=?",
+            c.displayName().strip(),c.mergeRadiusM(),c.defaultSlaHours(),c.severityWeight(),c.reopenWindowDays(),c.maxExtentMultiplier(),c.lowConfAction(),c.departmentId(),c.active(),code);
         record(jwt,"categories",code,before);
     }
 

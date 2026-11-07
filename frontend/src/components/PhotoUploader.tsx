@@ -25,11 +25,14 @@ import { fileSize } from "@/lib/format";
 export interface PhotoUploaderProps {
   onChange: (image: CompressedImage | null) => void;
   error?: string;
+  /** When controlled, the parent owns the photo and its preview URL. */
+  value?: CompressedImage | null;
 }
 
-export function PhotoUploader({ onChange, error }: PhotoUploaderProps) {
+export function PhotoUploader({ onChange, error, value }: PhotoUploaderProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [image, setImage] = useState<CompressedImage | null>(null);
+  const [localImage, setImage] = useState<CompressedImage | null>(null);
+  const image = value === undefined ? localImage : value;
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -38,9 +41,9 @@ export function PhotoUploader({ onChange, error }: PhotoUploaderProps) {
   // blob per attempt.
   useEffect(() => {
     return () => {
-      if (image) URL.revokeObjectURL(image.previewUrl);
+      if (localImage) URL.revokeObjectURL(localImage.previewUrl);
     };
-  }, [image]);
+  }, [localImage]);
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
@@ -48,10 +51,7 @@ export function PhotoUploader({ onChange, error }: PhotoUploaderProps) {
     setLocalError(null);
     try {
       const compressed = await compressImage(file);
-      setImage((previous) => {
-        if (previous) URL.revokeObjectURL(previous.previewUrl);
-        return compressed;
-      });
+      if (value === undefined) setImage(compressed);
       onChange(compressed);
     } catch (e) {
       const message =

@@ -1,7 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthProvider } from "@/lib/auth";
 import { ComposerProvider } from "@/lib/composer";
 import { SignInProvider } from "@/lib/signInDialog";
@@ -16,6 +16,9 @@ import { OutboxSync } from "@/components/OutboxSync";
  * way this goes wrong.
  */
 export function Providers({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    try { localStorage.removeItem("theme"); } catch { /* Storage may be unavailable. */ }
+  }, []);
   const [client] = useState(
     () =>
       new QueryClient({

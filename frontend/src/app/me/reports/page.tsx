@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
-import { MeNav } from "@/components/MeNav";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { LoadingState } from "@/components/LoadingState";
+import { Button } from "@/components/Button";
 import { IssueRow } from "@/components/IssueRow";
 import { useAuth } from "@/lib/auth";
 import { ApiError, request } from "@/lib/api";
@@ -15,6 +16,8 @@ import { ageLabel } from "@/lib/format";
 import { keys } from "@/lib/queries";
 import type { AwaitingVerdict, MyReportsPage } from "@/lib/types";
 import { useSignIn } from "@/lib/signInDialog";
+
+const PAGE = 50;
 
 /**
  * My reports (blueprint §3.11).
@@ -32,10 +35,11 @@ import { useSignIn } from "@/lib/signInDialog";
 export default function MyReportsPageRoute() {
   const { openSignIn } = useSignIn();
   const { session, initialising, authed } = useAuth();
+  const [offset, setOffset] = useState(0);
 
   const reports = useQuery({
-    queryKey: ["me", "reports", session?.userId],
-    queryFn: () => authed((token) => request<MyReportsPage>("/me/reports?limit=50", { token })),
+    queryKey: ["me", "reports", session?.userId, offset],
+    queryFn: () => authed((token) => request<MyReportsPage>(`/me/reports?limit=${PAGE}&offset=${offset}`, { token })),
     enabled: Boolean(session),
     staleTime: 30_000,
   });
@@ -64,6 +68,7 @@ export default function MyReportsPageRoute() {
     return (
       <PageShell>
         <h1 className="text-display">Your reports</h1>
+      <p className="page-description mt-2 text-dense">Track the reports you submitted and confirm whether completed work has fixed the problem.</p>
         <EmptyState
           message="Sign in to see the problems you have reported."
           actionLabel="Sign in"
@@ -75,8 +80,8 @@ export default function MyReportsPageRoute() {
 
   return (
     <PageShell wide>
-      <MeNav current="/me/reports" />
       <h1 className="text-display">Your reports</h1>
+      <p className="page-description mt-2 text-dense">Track the reports you submitted and confirm whether completed work has fixed the problem.</p>
 
       {reports.isPending && <LoadingState label="Loading your reports" />}
 
@@ -88,11 +93,13 @@ export default function MyReportsPageRoute() {
         />
       )}
 
+      {awaiting.isError && <ErrorState action="Loading fixes awaiting your confirmation" problem={(awaiting.error as ApiError)?.problem} onRetry={() => void awaiting.refetch()} />}
+
       {reports.data && reports.data.items.length === 0 && (
         <EmptyState
-          message="You haven't reported anything yet."
-          actionLabel="Report a problem"
-          actionHref="/report"
+          message={offset ? "No reports on this page." : "You haven't reported anything yet."}
+          actionLabel={offset ? "Back to latest reports" : "Report a problem"}
+          {...(offset ? { onAction: () => setOffset(0) } : { actionHref: "/report" })}
         />
       )}
 
@@ -100,9 +107,10 @@ export default function MyReportsPageRoute() {
         <>
           <p className="mt-4 text-meta text-ink-muted">
             {reports.data.total} report{reports.data.total === 1 ? "" : "s"}
+            {` · showing ${reports.data.offset + 1}–${Math.min(reports.data.offset + reports.data.items.length, reports.data.total)}`}
           </p>
 
-          <div className="mt-2 border-t border-rule">
+          <div key={offset} className="report-list mt-2 border-t border-rule" tabIndex={0} role="region" aria-label="Your submitted reports">
             {reports.data.items.map((r) => (
               <div key={r.reportId}>
                 <IssueRow
@@ -132,12 +140,16 @@ export default function MyReportsPageRoute() {
                   // the same thing, which is the fact that matters to them.
                   <p className="text-meta text-ink-muted -mt-2 mb-3">
                     Others had already reported this, so your report joined
-                    theirs — {r.issue.distinctReporterCount} people in total.
+                    theirs — {r.issue.distinctReporterCount} {r.issue.distinctReporterCount === 1 ? "person" : "people"} in total.
                   </p>
                 )}
               </div>
             ))}
           </div>
+          {reports.data.total > PAGE && <nav aria-label="Report pages" className="mt-4 flex items-center gap-3">
+            <Button variant="secondary" disabled={offset === 0 || reports.isFetching} onClick={() => setOffset(value => Math.max(0, value - PAGE))}>Previous</Button>
+            <Button variant="secondary" disabled={offset + PAGE >= reports.data.total || reports.isFetching} onClick={() => setOffset(value => value + PAGE)}>Next</Button>
+          </nav>}
         </>
       )}
 

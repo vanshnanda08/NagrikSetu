@@ -138,7 +138,7 @@ export default function ClusterInspectorPage({ params }: { params: Promise<{ id:
         radius in force <strong>{metres(effectiveRadius)}</strong>
       </p>
 
-      <div className="mt-5 grid gap-5" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+      <div className="cluster-workspace mt-5 grid gap-5" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
         <MapCanvas
           center={{ lat: i.lat, lng: i.lng }}
           zoom={18}
@@ -151,7 +151,7 @@ export default function ClusterInspectorPage({ params }: { params: Promise<{ id:
               lat: r.lat,
               lng: r.lng,
               kind: "report" as const,
-              color: selected === r.id ? "var(--st-active)" : "#14181A",
+              color: selected === r.id ? "var(--st-active)" : "var(--ink)",
               label: `Report ${r.sequence}`,
               onClick: () => setSelected(r.id),
             })),

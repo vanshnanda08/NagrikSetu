@@ -41,7 +41,7 @@ export function DeadlineCountdown({
   if (status === "RESOLVED" || status === "CLOSED") {
     return (
       <span className="text-meta text-ink-muted">
-        {resolvedAt ? `Resolved ${absoluteDateTime(resolvedAt)}` : "Clock stopped"}
+        {resolvedAt ? `Resolved ${absoluteDateTime(resolvedAt)}` : status === "CLOSED" ? "Closed before resolution" : "Clock stopped"}
       </span>
     );
   }

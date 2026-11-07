@@ -37,7 +37,7 @@ public class ProfileService {
      * muting the request would let somebody consent to a fix by accident.
      */
     public static final Set<NotificationType> MUTABLE = EnumSet.of(
-            NotificationType.RESOLVED, NotificationType.REOPENED, NotificationType.REJECTED,
+            NotificationType.RESOLVED, NotificationType.CLOSED, NotificationType.REOPENED, NotificationType.REJECTED,
             NotificationType.INFO_REQUESTED, NotificationType.CITIZEN_REPLIED);
 
     private final UserRepository users;

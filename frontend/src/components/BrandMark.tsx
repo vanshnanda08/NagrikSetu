@@ -1,8 +1,4 @@
-/**
- * The NagrikSetu pin-and-bridge mark. The pin and bridge swap colours in dark
- * mode (the "reversed" logo) so the mark never sinks into the page; the
- * colours live in --logo-* tokens for that reason.
- */
+/** The civic pin-and-bridge mark, using shared brand tokens. */
 export function BrandMark({ size = 40 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden="true" focusable="false">
@@ -15,9 +11,9 @@ export function BrandMark({ size = 40 }: { size?: number }) {
         <path d="M10 22h28" />
         <path d="M18 22v-5.2M24 22v-7M30 22v-5.2" strokeWidth="2" />
       </g>
-      <circle cx="12" cy="22" r="2.9" fill="#e8761e" />
-      <circle cx="36" cy="22" r="2.9" fill="#e8761e" />
-      <path d="M17.5 29.5Q24 33.5 30.5 29.5" stroke="#5aa9d6" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="12" cy="22" r="2.9" fill="var(--logo-detail)" />
+      <circle cx="36" cy="22" r="2.9" fill="var(--logo-detail)" />
+      <path d="M17.5 29.5Q24 33.5 30.5 29.5" stroke="var(--logo-highlight)" strokeWidth="2.2" strokeLinecap="round" />
     </svg>
   );
 }

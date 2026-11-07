@@ -22,7 +22,7 @@
  */
 export function LoadingState({ label = "Loading" }: { label?: string }) {
   return (
-    <p className="py-8 text-dense text-ink-muted" aria-live="polite">
+    <p className="loading-state text-dense text-ink-muted" role="status" aria-live="polite">
       {label}…
     </p>
   );

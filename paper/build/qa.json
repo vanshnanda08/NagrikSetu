@@ -1,0 +1,69 @@
+{
+  "pages": 7,
+  "page_size": "A4 595.28 x 841.89 pt",
+  "abstract_words": 197,
+  "sections": 6,
+  "figures": 4,
+  "tables": 4,
+  "equations": 6,
+  "bibliography_entries": 10,
+  "unresolved_citations_or_references": 0,
+  "overfull_boxes": 0,
+  "font_substitution_warnings": 0,
+  "missing_glyph_warnings": 0,
+  "text_outside_pages": 0,
+  "all_fonts_embedded": true,
+  "text_bounds_pt": [
+    {
+      "page": 1,
+      "left": 40.6,
+      "right": 554.68,
+      "top": 52.25,
+      "bottom": 718.44
+    },
+    {
+      "page": 2,
+      "left": 40.6,
+      "right": 554.68,
+      "top": 50.94,
+      "bottom": 718.44
+    },
+    {
+      "page": 3,
+      "left": 40.6,
+      "right": 554.68,
+      "top": 54.32,
+      "bottom": 718.44
+    },
+    {
+      "page": 4,
+      "left": 40.6,
+      "right": 554.68,
+      "top": 63.91,
+      "bottom": 720.06
+    },
+    {
+      "page": 5,
+      "left": 40.6,
+      "right": 554.68,
+      "top": 50.71,
+      "bottom": 718.44
+    },
+    {
+      "page": 6,
+      "left": 40.6,
+      "right": 554.68,
+      "top": 52.5,
+      "bottom": 719.12
+    },
+    {
+      "page": 7,
+      "left": 40.6,
+      "right": 554.68,
+      "top": 59.77,
+      "bottom": 718.44
+    }
+  ],
+  "sha256_pdf": "81f3271f7ff1b529039041ba96e41ae4c225ab72178a349170100b9bd4c7e41f",
+  "remaining_log_notices": "Underfull line/page justification notices only."
+}

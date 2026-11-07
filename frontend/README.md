@@ -2,19 +2,17 @@
 
 Next.js 16 (App Router), React 19, Tailwind v4.
 
-**Status (2026-10-26).** The agreed frontend scope is implemented, including
+**Status (2026-11-07).** The agreed frontend scope is implemented, including
 public reporting, citizen verification, supervisor tools, administration,
 profile and account recovery, email preferences, persistent drafts and offline
 submission. The latest additions are authenticator MFA and session controls at
-`/me/security`, issue following, private clarification threads, an installable
-web-app manifest and browser security headers. The NagrikSetu theme supports
-light/dark modes and responsive layouts.
+`/me/settings?tab=security`, issue following, private clarification threads, an installable
+web-app manifest and browser security headers. The NagrikSetu interface restores the committed blue/orange glass design in light mode only, with responsive layouts.
 
-Latest checks: 82 tests passed, ESLint and TypeScript passed, and
-`npm run build -- --webpack` succeeded with 31 generated static pages.
-The expanded five-role browser route sweep passed 190 checks. Security and
-extended-feature journeys were exercised against a scratch API and local mail.
-See [current progress](../docs/PROGRESS.md) and [audit limitations](../FINAL_AUDIT.md).
+Latest checks: 88 unit tests, ESLint, TypeScript and the production build pass.
+The grouped-screen browser audit covers representative views in all five access
+contexts at mobile, tablet and desktop sizes. See [Screens](SCREENS.md) for current
+coverage, functionality, accessibility evidence and the limits of local testing.
 
 ## Running
 
@@ -27,14 +25,21 @@ npm run dev      # http://localhost:3000
 ```
 
 `.env.local` holds `API_BASE` (read on the server) and `NEXT_PUBLIC_API_BASE`
-(read in the browser). Cloudinary is optional: with no credentials the composer
-sends a placeholder URL and everything else works. See `.env.example`.
+(read in the browser). Without browser Cloudinary configuration the composer uses a placeholder photo.
+That is a local demo fallback, accepted only when the scratch backend disables
+evidence verification; real submissions require matching browser/backend
+Cloudinary configuration. See `.env.example`.
+
+For real uploads, start the API with `CLOUDINARY_CLOUD_NAME` set to the same
+value as the frontend's `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`. Spring does not read
+`frontend/.env.local`; configuring the browser alone causes the API to return
+“Photo storage is not configured.” Keep photo evidence verification enabled.
 
 ## Commands
 
 | | |
 |---|---|
-| `npm run test` | 82 unit tests over validation, server rules, charts, uploads and auth boundary helpers |
+| `npm run test` | 88 unit tests over validation, server rules, charts, uploads, auth boundaries and grouped navigation |
 | `npm run lint` | includes the rule confining Leaflet to one module |
 | `npm run build` | production build |
 
@@ -44,29 +49,77 @@ equivalent trap on the Maven side).
 
 ## Layout and theme
 
-- **`src/app/liquid-glass.css`** holds the whole glass theme and the layout rules
-  that make every page fit the window. The palette comes from the logo: navy
-  (`--accent-solid`), orange for the wordmark and the live badge only, and sky
-  blue. Status colours are untouched; colour still encodes status and nothing
-  else.
-- **Fit to screen.** At 1280 x 600 or larger the app is exactly the window tall.
-  The page card fills what is left; lists, timelines and the dashboard detail
-  panel scroll inside themselves, and anything unexpected makes the card scroll,
-  so content is never clipped. Below that size, and on phones, the normal
-  flowing layout applies. The rules key off class names (`report-form`,
-  `detail-grid`, `data-map-canvas`), never child positions, so adding an element
-  to a page cannot silently move something else.
-- **`/` redirects to `/dashboard`.** There is no landing page.
-- **`BrandMark.tsx`** is the logo; its colours switch to the reversed version in
-  dark mode through `--logo-*` tokens. `src/app/icon.svg` is the favicon.
-- The internal name `civictrack` is kept in cookie names, storage keys and API
-  config because the backend shares them.
+The current screen map and functionality are documented in [Screens](SCREENS.md).
+The general public dashboard, browsing and reporting review is recorded in
+[Public frontend verification](PUBLIC_VERIFICATION.md), including fixes, browser
+checks, screenshots and the limits of intercepted submission/upload tests.
+The anonymous complaint-number tracker appears only after authentication has
+settled for a signed-out visitor. Signed-in users use My reports to follow their complaints.
+Successful logout always replaces the current page with the public `/dashboard`,
+for every role and both desktop/mobile sign-out controls.
+See [Citizen verification](CITIZEN_VERIFICATION.md) for the current citizen dry run,
+paging/retry fixes, responsive evidence dialogs, screenshots and remaining limits.
+Ordinary citizen security settings show password and device management directly.
+Authenticator enrollment UI remains available to municipal accounts; already-enabled citizen
+factors and server-side authentication protections are preserved.
+Explore issues groups list/map views, Account settings groups profile/security,
+Complaints (`/work`) combines staff queues, selected-complaint work actions and
+supervisor assignment/review/performance views. Administration groups configuration/audit. Previous URLs redirect to the grouped views, preserving
+saved links and query parameters. Verification, outbox and specialist tools remain
+contextual flows rather than main-menu destinations.
 
-Checked on 2026-10-11: all pages at four window sizes in both themes, keyboard
-focus, the sign-in dialog, form validation, photo upload, filters and paging, and
-an axe scan with no findings on the pages covered. Known and existing: map marker
-touch targets are under 24px, and controls are 40px high (not 48px) on windows of
-1280px or wider.
+The light appearance is adapted from GitHub default branch `main`, commit
+`011ecb5c04192b1823065a2d4c248630c853add8`. See [restoration and verification](DESIGN_RESTORATION.md)
+for the source comparison, retained features, completed checks and limitations.
+
+- **`src/app/globals.css`** owns fixed light tokens, status colors and typography.
+  Saved `theme` preferences are removed without touching drafts or account data.
+  There is no system-theme detection, dark stylesheet, initializer or toggle.
+- **`src/app/committed-light.css`** adapts the source's blue/peach background,
+  navy/orange branding, frosted panels, pill navigation and rounded fields.
+- **`src/app/viewport-layout.css`** owns the compact desktop layout: shorter
+  chrome, three-panel complaint details, bounded media with full-size photo
+  dialogs, side-by-side profile/configuration fields and tabbed security options.
+  See [viewport verification](DENSITY_VERIFICATION.md) for screenshots and limits.
+- **`src/app/civic-interface.css`** retains corrected navigation, accessible
+  controls, tables, maps, dialogs and internal workspace scrolling.
+- **`src/app/dashboard.css`** retains the statistics/detail split and the current
+  anonymous complaint tracker. City overview uses a detail-view selector with
+  internal scrolling for long results.
+- Staff see **Department overview** at the same `/dashboard` route: personal work
+  and department/ward-scoped operational totals, priority previews and a status
+  breakdown. `/api/v1/staff/overview` derives scope from verified staff claims;
+  full counts do not depend on queue pagination. Priority rows link into the
+  existing work pane. Public/citizen city figures and supervisor-only performance
+  analytics remain separate. See [staff verification](STAFF_OVERVIEW_VERIFICATION.md).
+- The [staff dry run](STAFF_VERIFICATION.md) covers queue filters and pagination,
+  work/proof controls, account settings, notifications, map access and logout.
+  Work queues page through all results; repair upload failures retain the evidence
+  and note, and missing staff department scope fails closed.
+- At desktop sizes of at least 1280×600 the shell stays within the window;
+  long panels scroll internally. Mobile and short viewports scroll naturally.
+- `/` redirects to `/dashboard`. The brand opens `/work` for staff/supervisors
+  and `/admin` for administrators. Legacy staff/supervisor links redirect to the
+  same selected issue and queue. API paths, roles, status vocabulary and underlying
+  civictrack identifiers remain unchanged.
+- Supervisor account and mobile menus omit **Report a problem**, keeping their
+  navigation focused on managing complaints. Citizen/public reporting is retained.
+- `src/components/work/` holds the shared complaints shell, scoped queue and
+  reusable work/proof panel. Supervisor panels reuse that shell and role-aware
+  tabs. On mobile the selected detail replaces the list until Back to queue is used.
+- Team performance uses `src/app/team-performance.css`: compact department totals
+  beside Crew, Trends and Backlog tabs; long data stays in internal panels and
+  phones show full crew records as cards. Shared scope charts retain the public
+  ward view. See [performance sizing verification](TEAM_PERFORMANCE_VERIFICATION.md).
+- Ticket numbers and **View ticket details** on the assignment board open the
+  complete existing record, including report descriptions/photos, location and
+  history. **Open work actions** retains assignment/progress controls. The full
+  record returns to the same selected queue through a validated local link.
+  See [ticket detail verification](TICKET_DETAILS_VERIFICATION.md).
+- [Supervisor dry run](SUPERVISOR_VERIFICATION.md): paginated assignments and grouping
+  review, bulk/individual failure recovery, contextual moderation, profile/security,
+  notification and responsive-layout checks. Long work panels keep their own scroll
+  position; selecting another complaint starts its details at the summary.
 
 ## Things that are load-bearing
 
@@ -87,9 +140,31 @@ what to *render*, never what is permitted. It has been wrong before (DD-035);
 `tools/table.mjs` and `tools/uiwalk.mjs` in the repository root check it against
 the running server, which is the only thing that can.
 
-**`src/lib/schemas.ts` holds every validation rule**, each naming the server rule
-it mirrors. Nothing validates inline in a submit handler.
+**`src/lib/schemas.ts` holds reporting and proof validation rules**, naming the
+server rules they mirror. The sign-in dialog currently uses browser/server
+validation; its registration schema tests do not establish runtime form coverage.
 
 **Never put a token in `localStorage` or `sessionStorage`.** The access token
 lives in React state; the refresh token is in an httpOnly cookie set by the
 route handlers under `src/app/api/auth/`.
+
+## Focused cleanup
+
+The review queue keeps grouping confirmation and links to the split/merge tool
+and the canonical **Moderate issue** screen. Category changes and rejection remain
+available there with status-aware controls. The unlinked production styleguide,
+its standalone measurement script, unused starter SVGs, and unused `authedFetch`
+helper were removed. The ineffective mobile-target category control was removed;
+its existing database values are preserved. See [assessment and verification](../docs/PROJECT_ASSESSMENT.md).
+
+
+Administrator review: [features, dry run and screenshots](ADMIN_VERIFICATION.md).
+Administrators retain Configuration/Audit log and citywide complaint oversight.
+`Assignments → Ready to close` lists resolved complaints; closure requires a public
+20–2000-character reason and confirmation. Administrators may also close open
+or pending complaints from All open. This ends work/verification, is visibly
+labelled closed before resolution and is excluded from resolution/SLA figures.
+Automatic closure retains its configured quiet period.
+Admin-only navigation omits My work, My reports and Report a problem shortcuts.
+Configuration now has record search, older history pages, clearer field labels,
+pinned desktop save controls and a mobile/tablet editor with Back to records.

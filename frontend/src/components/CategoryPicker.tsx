@@ -28,6 +28,7 @@ export interface CategoryPickerProps {
   value?: string;
   onChange?: (code: string) => void;
   name?: string;
+  error?: string;
 }
 
 export function CategoryPicker({
@@ -35,9 +36,10 @@ export function CategoryPicker({
   value,
   onChange,
   name = "categoryCode",
+  error,
 }: CategoryPickerProps) {
   return (
-    <fieldset className="border-0 p-0 m-0">
+    <fieldset className="border-0 p-0 m-0" aria-invalid={Boolean(error)} aria-describedby={error ? "category-error" : undefined}>
       <legend className="text-meta text-ink mb-2">What is the problem?</legend>
 
       <div className="grid grid-cols-2 gap-2">
@@ -69,6 +71,7 @@ export function CategoryPicker({
                 name={name}
                 value={c.code}
                 checked={selected}
+                aria-describedby={error ? "category-error" : undefined}
                 onChange={() => onChange?.(c.code)}
                 className="sr-only"
               />

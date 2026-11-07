@@ -216,20 +216,23 @@ class IssueLifecycleApiIT extends IntegrationTestBase {
         mvc.perform(post("/api/v1/issues/{id}/close", issue.getId())
                         .header(HttpHeaders.AUTHORIZATION, fixtures.bearer(roadsCrew))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"note\":\"Closing this one off\"}"))
+                        .content("{\"note\":\"Closing this one off with a recorded reason\"}"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @DisplayName("an administrator cannot close an issue that has not settled for seven days")
-    void closingTooEarlyIsRefused() throws Exception {
+    @DisplayName("only administrators can close an unresolved complaint with a reason")
+    void manualCloseEndpointIsAdministratorOnly() throws Exception {
         Issue issue = pothole();
-
-        mvc.perform(post("/api/v1/issues/{id}/close", issue.getId())
-                        .header(HttpHeaders.AUTHORIZATION, fixtures.bearer(admin))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"note\":\"Tidying the queue\"}"))
-                .andExpect(status().isConflict());
+        for (AppUser actor : new AppUser[]{citizen, roadsCrew, roadsSupervisor, admin}) {
+            mvc.perform(post("/api/v1/issues/{id}/close", issue.getId())
+                            .header(HttpHeaders.AUTHORIZATION, fixtures.bearer(actor))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"note\":\"A complete recorded closure reason for this ticket.\"}"))
+                    .andExpect(actor == admin ? status().isOk() : status().isForbidden());
+        }
+        assertThat(issues.findById(issue.getId()).orElseThrow().getStatus())
+                .isEqualTo(IssueStatus.CLOSED);
     }
 
     @Test

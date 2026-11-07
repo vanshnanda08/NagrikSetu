@@ -68,7 +68,7 @@ export function IssueEngagement({ issueId }: { issueId: string }) {
           {post.isError && <ErrorState action="Sending the message" problem={(post.error as ApiError).problem} />}
         </form>
       </>}
-      {messages.isError && !denied && <ErrorState action="Loading clarification messages" problem={(messages.error as ApiError).problem} />}
+      {messages.isError && !denied && <ErrorState action="Loading clarification messages" problem={(messages.error as ApiError).problem} onRetry={() => void messages.refetch()} />}
     </section>
   );
 }

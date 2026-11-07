@@ -9,7 +9,7 @@
  */
 export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ colorScheme: "light" }}>
       <body style={{ fontFamily: "system-ui, sans-serif", margin: 0, padding: "48px 24px", background: "#eaf3fa", color: "#0b2540" }}>
         <main style={{ maxWidth: 560, margin: "0 auto" }}>
           <h1 style={{ fontSize: 32, margin: "0 0 12px" }}>Something went wrong</h1>

@@ -27,7 +27,8 @@ export function PageShell({
   const { session } = useAuth();
 
   return (
-    <div className={`liquid-app flex min-h-screen flex-col md:flex-row ${className}`}>
+    <div className={`app-shell ${className}`}>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <SiteHeader />
       {/* `min-w-0` so a wide table or a long unbroken string inside `main`
           cannot force the flex row wider than the viewport -- the default
@@ -44,14 +45,16 @@ export function PageShell({
           arriving separately reads as the page struggling.
       */}
       <main
+        id="main-content"
+        tabIndex={-1}
         key={pathname}
         className="page-main flex-1 min-w-0 w-full mx-auto px-4 py-6 md:px-8 u-rise"
         style={{ maxWidth: wide ? 1440 : 920 }}
       >
-        {session?.mfaSetupRequired && pathname !== "/me/security" && (
+        {session?.mfaSetupRequired && (
           <p role="alert" className="mb-4 border-l-4 border-st-breached pl-3 text-dense">
             Multi-factor authentication is required for municipal accounts.{" "}
-            <Link href="/me/security" className="underline text-ink">Secure this account</Link>
+            <Link href="/me/settings?tab=security" className="underline text-ink">Secure this account</Link>
             {" "}to use staff and administration tools.
           </p>
         )}

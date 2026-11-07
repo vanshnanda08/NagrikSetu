@@ -38,7 +38,7 @@ try {
   const cookie = (await context.cookies()).find(c => c.name === 'civictrack_refresh');
   assert.ok(cookie.httpOnly && cookie.secure && cookie.sameSite === 'Lax');
   await page.goto(APP + '/me/security');
-  await page.getByLabel('Current password', { exact: true }).fill(password);
+  await page.getByLabel('Current password for authenticator setup', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Set up authenticator' }).click();
   const secret = await page.locator('code').first().textContent();
   await page.getByLabel('Six-digit code').fill(totp(secret));
@@ -62,6 +62,7 @@ try {
   const otherLogin = await other.request.post(APP + '/api/auth/login', { data: { email, password, mfaCode: recovery[1] } });
   assert.equal(otherLogin.status(), 200);
   await page.goto(APP + '/me/security');
+  await page.getByRole('tab', { name: 'Devices & app', exact: true }).click();
   await page.getByRole('button', { name: 'Sign out other devices' }).click();
   await page.getByRole('status').filter({ hasText: 'Session access updated.' }).waitFor();
   assert.equal((await other.request.post(APP + '/api/auth/refresh')).status(), 401);

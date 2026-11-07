@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { use, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AdministrativeClosureNotice } from "@/components/AdministrativeClosureNotice";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { LoadingState } from "@/components/LoadingState";
-import { Photo } from "@/components/Photo";
+import { EvidencePhoto } from "@/components/EvidencePhoto";
 import { StatusRule } from "@/components/StatusRule";
 import { TextField } from "@/components/TextField";
 import { TicketRef } from "@/components/TicketRef";
@@ -150,39 +151,18 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
         <StatusRule status={result?.status ?? i.status} />
       </div>
 
+      <AdministrativeClosureNotice status={i.status} resolvedAt={i.resolvedAt} />
       <h1 className="mt-3 text-display">Is it fixed?</h1>
       <p className="mt-1 text-body text-ink-muted">
         {i.categoryName} · {i.wardName}
         {i.departmentName ? ` · ${i.departmentName}` : ""}
       </p>
 
+      <div className="workspace-scroll verification-workspace" tabIndex={0} role="region" aria-label="Photos and citizen verification">
       {/* Before and after: side by side from md, stacked below, both full width. */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <figure className="m-0">
-          <Photo
-            src={v.beforePhotoUrl}
-            alt="The problem as it was reported"
-            width={640}
-            height={480}
-            className="border border-rule object-cover"
-            style={{ borderRadius: "var(--radius)", width: "100%", height: "auto", aspectRatio: "4 / 3" }}
-          />
-          <figcaption className="mt-2 text-meta text-ink-muted">Before — as it was reported</figcaption>
-        </figure>
-        <figure className="m-0">
-          <Photo
-            src={i.resolutionPhotoUrl}
-            alt="The photo the department submitted as proof of the fix"
-            width={640}
-            height={480}
-            className="border border-rule object-cover"
-            style={{ borderRadius: "var(--radius)", width: "100%", height: "auto", aspectRatio: "4 / 3" }}
-          />
-          <figcaption className="mt-2 text-meta text-ink-muted">
-            After — the department&apos;s photo
-            {v.submittedAt ? `, submitted ${absoluteDateTime(v.submittedAt)}` : ""}
-          </figcaption>
-        </figure>
+        <EvidencePhoto src={v.beforePhotoUrl} label="Before — as it was reported" />
+        <EvidencePhoto src={i.resolutionPhotoUrl} label={`After — the department's photo${v.submittedAt ? `, submitted ${absoluteDateTime(v.submittedAt)}` : ""}`} />
       </div>
 
       {i.resolutionNote && (
@@ -256,6 +236,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
 
         {pending && <Tally view={v} result={result} />}
       </section>
+      </div>
     </PageShell>
   );
 }

@@ -8,10 +8,9 @@ package com.civictrack.user;
  * {@link #SYSTEM} is deliberately in the same enum but is <em>never</em>
  * persisted on a user row -- that CHECK constraint is what enforces it. It
  * exists because the transition table names it as an actor: the transitions
- * into RESOLVED and CLOSED are performed by the verification sweep and the
- * auto-close job, not by a person, and modelling that as "some admin account
- * the jobs log in as" would put a human role on a machine action in the audit
- * trail.
+ * into RESOLVED and automatic CLOSED are performed by the verification sweep
+ * and auto-close job. Administrators can separately close with an audited reason.
+ * Jobs retain SYSTEM as their actor rather than borrowing a human identity.
  *
  * <p>Spring Security authorities are the role name with a {@code ROLE_} prefix,
  * so {@code hasRole('SUPERVISOR')} in a {@code @PreAuthorize} matches
@@ -31,8 +30,4 @@ public enum Role {
         return "ROLE_" + name();
     }
 
-    /** True for the roles that may hold a login. */
-    public boolean isHuman() {
-        return this != SYSTEM;
-    }
 }

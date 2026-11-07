@@ -2,6 +2,7 @@ package com.civictrack.issue.api;
 
 import com.civictrack.issue.IssueLifecycleService;
 import com.civictrack.issue.dto.AssignRequest;
+import com.civictrack.issue.dto.CloseRequest;
 import com.civictrack.issue.dto.IssueDto;
 import com.civictrack.issue.dto.RejectRequest;
 import com.civictrack.issue.dto.ResolveRequest;
@@ -33,7 +34,8 @@ import java.util.UUID;
  * would let a citizen who reported an issue acknowledge it.
  *
  * <p>There is no {@code /resolve} endpoint that reaches RESOLVED, and no
- * {@code /close} for staff. The absence is the feature.
+ * staff closure endpoint. Administrators can close an already-resolved issue
+ * with a reason; settlement still belongs to verification jobs.
  */
 @RestController
 @RequestMapping("/api/v1/issues")
@@ -94,18 +96,11 @@ public class IssueController {
         return IssueDto.from(lifecycle.reject(id, actor(jwt), body.reason()));
     }
 
-    /** Force close. ADMIN only, and still subject to the seven-day guard. */
     @PostMapping("/{id}/close")
-    // SUPERVISOR as well as ADMIN, matching the transition table. The endpoint
-    // guard and the policy have to agree: a @PreAuthorize that is stricter
-    // than the table produces a 403 where the policy would have allowed it,
-    // and the client -- which mirrors the table -- would offer a button that
-    // always fails. That exact mismatch cost a phase once (DD-035).
-    @PreAuthorize("hasAnyRole('ADMIN','SUPERVISOR')")
-    public IssueDto close(@PathVariable UUID id,
-                          @Valid @RequestBody(required = false) TransitionRequest body,
+    @PreAuthorize("hasRole('ADMIN') and @issueGuard.canAct(#id, authentication)")
+    public IssueDto close(@PathVariable UUID id, @Valid @RequestBody CloseRequest body,
                           @AuthenticationPrincipal Jwt jwt) {
-        return IssueDto.from(lifecycle.close(id, actor(jwt), noteOf(body)));
+        return IssueDto.from(lifecycle.close(id, actor(jwt), body.note()));
     }
 
     private static Actor actor(Jwt jwt) {

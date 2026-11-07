@@ -129,6 +129,7 @@ export interface DashboardSummary {
   /** Null means the query failed, NOT that nothing is overdue. Zero means zero. */
   overdueCount: number | null;
   totalResolved: number;
+  closedWithoutResolution?: number;
   topOverdueWard: { name: string; count: number } | null;
   topOverdueDepartment: { name: string; count: number } | null;
   generatedAt: string;
@@ -170,6 +171,18 @@ export interface StaffIssue {
   assignedTo: string | null;
   resolvedAt: string | null;
   reopenCount: number;
+}
+
+export interface StaffOverview {
+  department: { id: string; name: string };
+  ward: { id: string; name: string } | null;
+  personal: { open: number; overdue: number; readyToStart: number; inProgress: number; awaitingVerification: number };
+  departmentWork: { open: number; overdue: number; needsAssignment: number; awaitingVerification: number };
+  stages: { status: IssueStatus; total: number; mine: number }[];
+  myPriorities: QueueRow[];
+  departmentPriorities: QueueRow[];
+  previewLimit: number;
+  generatedAt: string;
 }
 
 export interface QueueRow {
@@ -298,7 +311,7 @@ export interface AwaitingVerdict {
   silenceDeadline: string | null;
 }
 
-export type NotificationType = "VERIFY_REQUESTED" | "RESOLVED" | "REOPENED" | "REJECTED" | "INFO_REQUESTED" | "CITIZEN_REPLIED";
+export type NotificationType = "VERIFY_REQUESTED" | "RESOLVED" | "CLOSED" | "REOPENED" | "REJECTED" | "INFO_REQUESTED" | "CITIZEN_REPLIED";
 
 export interface AppNotification {
   id: number;
@@ -537,6 +550,7 @@ export interface ScopeMetrics {
   openCount: number;
   overdueCount: number;
   resolvedCount: number;
+  closedWithoutResolution?: number;
   reportedLast30Days: number;
   resolvedLast30Days: number;
   medianResolutionHours: number | null;

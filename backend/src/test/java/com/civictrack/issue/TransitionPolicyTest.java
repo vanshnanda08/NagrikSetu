@@ -71,7 +71,14 @@ class TransitionPolicyTest {
             new Edge(IssueStatus.PENDING_VERIFICATION, IssueStatus.RESOLVED, Set.of(Role.SYSTEM)),
             new Edge(IssueStatus.PENDING_VERIFICATION, IssueStatus.REOPENED, Set.of(Role.SYSTEM)),
             new Edge(IssueStatus.RESOLVED, IssueStatus.REOPENED, Set.of(Role.SYSTEM)),
-            new Edge(IssueStatus.RESOLVED, IssueStatus.CLOSED, Set.of(Role.SYSTEM, Role.ADMIN, Role.SUPERVISOR)),
+            new Edge(IssueStatus.RESOLVED, IssueStatus.CLOSED, Set.of(Role.SYSTEM, Role.ADMIN)),
+            new Edge(IssueStatus.NEW, IssueStatus.CLOSED, Set.of(Role.ADMIN)),
+            new Edge(IssueStatus.ACKNOWLEDGED, IssueStatus.CLOSED, Set.of(Role.ADMIN)),
+            new Edge(IssueStatus.ASSIGNED, IssueStatus.CLOSED, Set.of(Role.ADMIN)),
+            new Edge(IssueStatus.IN_PROGRESS, IssueStatus.CLOSED, Set.of(Role.ADMIN)),
+            new Edge(IssueStatus.PENDING_VERIFICATION, IssueStatus.CLOSED, Set.of(Role.ADMIN)),
+            new Edge(IssueStatus.REOPENED, IssueStatus.CLOSED, Set.of(Role.ADMIN)),
+
             new Edge(IssueStatus.NEW, IssueStatus.REJECTED, Set.of(Role.SUPERVISOR, Role.ADMIN)),
             new Edge(IssueStatus.ACKNOWLEDGED, IssueStatus.REJECTED, Set.of(Role.SUPERVISOR, Role.ADMIN)),
             new Edge(IssueStatus.ASSIGNED, IssueStatus.REJECTED, Set.of(Role.SUPERVISOR, Role.ADMIN)),
@@ -236,15 +243,37 @@ class TransitionPolicyTest {
         Issue issue = issueAt(IssueStatus.RESOLVED);
         issue.setResolvedAt(NOW.minus(Duration.ofDays(3)));
 
-        assertThatThrownBy(() -> policy.check(issue, IssueStatus.CLOSED, admin(),
+        assertThatThrownBy(() -> policy.check(issue, IssueStatus.CLOSED, Actor.system(),
                 fullyPermissiveContext()))
                 .isInstanceOf(TransitionGuardException.class)
                 .extracting(e -> ((TransitionGuardException) e).getGuard())
-                .isEqualTo(Guards.SETTLED_7_DAYS.key());
+                .isEqualTo(Guards.SETTLED_OR_ADMIN_REASON.key());
 
         issue.setResolvedAt(NOW.minus(Duration.ofDays(8)));
-        assertThatCode(() -> policy.check(issue, IssueStatus.CLOSED, admin(),
+        assertThatCode(() -> policy.check(issue, IssueStatus.CLOSED, Actor.system(),
                 fullyPermissiveContext())).doesNotThrowAnyException();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Role.class, names = {"SYSTEM", "ADMIN"}, mode = EnumSource.Mode.EXCLUDE)
+    @DisplayName("staff, supervisors and citizens cannot close complaints")
+    void humansCannotCloseSettledIssues(Role role) {
+        Issue issue = issueAt(IssueStatus.RESOLVED);
+        issue.setResolvedAt(NOW.minus(Duration.ofDays(8)));
+        Actor actor = new Actor(ASSIGNEE, role, DEPARTMENT, WARD);
+        assertThatThrownBy(() -> policy.check(issue, IssueStatus.CLOSED, actor,
+                fullyPermissiveContext())).isInstanceOf(ForbiddenTransitionException.class);
+    }
+
+    @Test
+    void administratorCanCloseResolvedEarlyOnlyWithAReason() {
+        Issue issue = issueAt(IssueStatus.RESOLVED);
+        issue.setResolvedAt(NOW.minusSeconds(60));
+        assertThatCode(() -> policy.check(issue, IssueStatus.CLOSED, admin(), fullyPermissiveContext()))
+                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> policy.check(issue, IssueStatus.CLOSED, admin(),
+                TransitionContext.at(NOW).note("done").build()))
+                .isInstanceOf(TransitionGuardException.class);
     }
 
     // ------------------------------------------------------------------

@@ -33,11 +33,16 @@ export function humaniseMs(ms: number): string {
   return m === 1 ? "1 minute" : `${m} minutes`;
 }
 
+/** Relative event time, without a report-specific prefix. */
+export function timeAgo(isoInstant: string | null | undefined, now: Date = new Date()): string {
+  const t = isoInstant ? Date.parse(isoInstant) : NaN;
+  if (Number.isNaN(t)) return "at an unknown time";
+  return `${humaniseMs(now.getTime() - t)} ago`;
+}
+
 /** "Reported 6 days ago". */
 export function ageLabel(isoInstant: string | null | undefined, now: Date = new Date()): string {
-  const t = isoInstant ? Date.parse(isoInstant) : NaN;
-  if (Number.isNaN(t)) return "Reported at an unknown time";
-  return `Reported ${humaniseMs(now.getTime() - t)} ago`;
+  return `Reported ${timeAgo(isoInstant, now)}`;
 }
 
 /**
