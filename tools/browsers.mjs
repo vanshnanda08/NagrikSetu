@@ -1,11 +1,21 @@
 // Local cross-engine smoke checks; not a substitute for physical-device testing.
 import { firefox, webkit } from 'playwright';
+import { expect } from 'playwright/test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { APP } from './http.mjs';
+
+const app = process.env.BROWSERS_APP ?? APP;
+const routes = [
+  ['/dashboard', 'Complaint Dashboard'],
+  ['/issues', 'Explore issues'],
+  ['/report', 'Report a problem'],
+  ['/forgot-password', 'Reset your password'],
+  ['/report/outbox', 'Report outbox'],
+];
 
 for (const [name, engine] of Object.entries({ firefox, webkit })) {
   let browser;
@@ -28,15 +38,22 @@ for (const [name, engine] of Object.entries({ firefox, webkit })) {
     let checks = 0;
     for (const width of [320, 1280]) {
       await page.setViewportSize({ width, height: 900 });
-      for (const route of ['/dashboard', '/issues', '/report', '/forgot-password', '/report/outbox']) {
-        await page.goto(APP + route);
-        await page.locator('h1').waitFor();
+      for (const [route, title] of routes) {
+        await page.goto(app + route);
+        // Streaming/hydration can temporarily retain hidden copies of a page.
+        // Assert one visible title, rather than selecting the first DOM match
+        // or accepting two visible copies of the interface.
+        const heading = page.locator('main h1:visible');
+        const caseLabel = `${name} ${width}px ${route}`;
+        await expect(heading, caseLabel).toHaveCount(1, { timeout: 15_000 });
+        await expect(heading, caseLabel).toHaveText(title);
         await page.waitForTimeout(500);
+        await expect(heading, caseLabel).toHaveCount(1);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, `${name} ${width} ${route}`);
         checks++;
       }
     }
-    await page.goto(APP + '/login');
+    await page.goto(app + '/login');
     const dialog = page.locator('dialog[open]');
     await dialog.getByLabel('Email', { exact: true }).fill('keyboard@example.test');
     await page.keyboard.press('Tab');

@@ -41,7 +41,7 @@ Restart the frontend after building so it serves matching chunks.
 | `restore-design-audit.mjs` | Compares the isolated `main@011ecb5` source frontend on port 3002 with the restored production frontend on port 3003 (override `RESTORED_APP` if needed). Checks five access contexts, desktop/mobile screenshots, matching light tokens, OS/saved-theme invariance, native fields before hydration, accessibility and scroll containment. Uses a browser-only CORS bridge for secondary local ports; civic records are read-only. |
 | `theme-audit.mjs` | All current routes across five access contexts at 390×844, 768×1024, 1280×600, 1366×768, 1440×900 and 1920×1080; fixed-appearance comparison, keyboard/scroll containment, axe scans and screenshots. Creates isolated citizen accounts but does not mutate existing issue data. |
 | `theme-states.mjs` | Focused loading/empty/error/validation/success states, narrow/short layouts, menu focus return, internal scrolling, split/merge section geometry, chart/keyboard interactions, map equivalents and fixture-only sensitive write previews. |
-| `browsers.mjs` | Firefox and WebKit public routes at 320/1280px, keyboard dialog navigation, Escape and runtime errors; attempts both engines and exits nonzero if either fails. |
+| `browsers.mjs` | Firefox and WebKit public routes at 320/1280px, exactly one visible main heading with the expected route title, keyboard dialog navigation, Escape and runtime errors; attempts both engines and exits nonzero if either fails. `BROWSERS_APP` optionally selects an isolated frontend; the default remains localhost:3000. |
 
 Current committed-light restoration checks are recorded in
 [design restoration](../frontend/DESIGN_RESTORATION.md).
@@ -49,6 +49,12 @@ The newer grouped-screen structure and its checks are recorded in
 [Screens](../frontend/SCREENS.md). Earlier menu-specific theme harnesses describe
 the previous navigation; use `screen-consolidation.mjs` for the current grouped
 screen and navigation assertions.
+
+The cross-engine smoke waits for one **visible** main heading and checks its
+expected text. Raw `h1` selectors can match hidden streaming/hydration content
+as well as the displayed page. Selecting `.first()` would hide a genuine
+duplicate-title defect; two visible headings still fail this check. Secondary
+frontend origins must have matching API/CORS configuration when running locally.
 
 Fresh cleanup checks and their limitations are recorded in the
 [2026-11-06 project assessment](../docs/PROJECT_ASSESSMENT.md).
