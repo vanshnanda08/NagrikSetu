@@ -1,31 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "./Button";
-
-interface InstallPromptEvent extends Event {
-  prompt(): Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
+import { usePwaInstall } from "@/lib/pwaInstall";
 
 /** Optional install affordance; browsers without the event keep normal web access. */
 export function PwaInstall() {
-  const [prompt, setPrompt] = useState<InstallPromptEvent | null>(null);
-  const [installed, setInstalled] = useState(false);
-
-  useEffect(() => {
-    const ready = (event: Event) => {
-      event.preventDefault();
-      setPrompt(event as InstallPromptEvent);
-    };
-    const done = () => { setInstalled(true); setPrompt(null); };
-    window.addEventListener("beforeinstallprompt", ready);
-    window.addEventListener("appinstalled", done);
-    return () => {
-      window.removeEventListener("beforeinstallprompt", ready);
-      window.removeEventListener("appinstalled", done);
-    };
-  }, []);
+  const { prompt, installed, clearPrompt } = usePwaInstall();
+  const [error, setError] = useState<string | null>(null);
+  const [opening, setOpening] = useState(false);
 
   return (
     <section className="flex flex-col gap-3">
@@ -36,10 +19,18 @@ export function PwaInstall() {
       {installed ? (
         <p role="status" className="text-dense">Installed.</p>
       ) : prompt ? (
-        <span><Button type="button" variant="secondary" onClick={async () => { await prompt.prompt(); await prompt.userChoice; setPrompt(null); }}>Install app</Button></span>
+        <span><Button type="button" variant="secondary" disabled={opening} onClick={async () => {
+          if (opening) return;
+          setOpening(true);
+          setError(null);
+          try { await prompt.prompt(); await prompt.userChoice; }
+          catch { setError("The install prompt could not open. Try your browser’s install command instead."); }
+          finally { clearPrompt(); setOpening(false); }
+        }}>{opening ? "Opening installation…" : "Install app"}</Button></span>
       ) : (
         <p className="text-meta text-ink-muted">Use your browser’s “Add to Home Screen” or “Install app” command when available.</p>
       )}
+      {error && <p role="alert" className="text-dense">{error}</p>}
     </section>
   );
 }

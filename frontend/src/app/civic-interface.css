@@ -66,8 +66,6 @@
 .feedback-panel[role="alert"] { border-left: 4px solid var(--st-breached); }
 .loading-state { display: flex; align-items: center; gap: 12px; padding: 24px 16px; margin-block: 16px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-sm); }
 .loading-state::before { content: ""; width: 18px; height: 18px; border: 2px solid var(--rule-strong); border-top-color: var(--brand-primary); border-radius: 50%; flex-shrink: 0; }
-.category-option { background: var(--surface-raised); border-radius: var(--radius-sm) !important; }
-.category-option:has(input:checked) { background: var(--surface-sunk); border-color: var(--brand-primary); }
 .issue-detail-panel { padding: 24px; }
 .segmented-control { width: fit-content; max-width: 100%; padding: 4px; gap: 4px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
 .segmented-control button { min-height: 44px; padding: 10px 18px; border: 0 !important; margin: 0 !important; border-radius: 7px; }
@@ -118,7 +116,6 @@
   .page-main table { font-size: var(--size-dense); }
   .page-main :is(th, td) { padding: 12px 8px; }
   .page-main .max-h-\[60vh\] { max-height: none; }
-  .category-option { padding-inline: 10px; gap: 8px; }
   .ct-dialog .auth-panel { padding: 24px 20px; }
 }
 /* Desktop workspaces keep their headings and filters visible. Each long
@@ -143,8 +140,6 @@
 /* Keep the submit action in the reading flow so it cannot cover map or form
    fields on short mobile viewports and when the keyboard is open. */
 .report-submit { position: static; border-radius: var(--radius); }
-.category-option > span:last-child { flex: 1; min-width: 0; }
-.category-option input.sr-only { width: 1px; height: 1px; }
 .chart-figure { max-width: 100%; min-width: 0; }
 .chart-figure > .relative { overflow: visible; }
 .chart-figure svg { max-width: 100%; }

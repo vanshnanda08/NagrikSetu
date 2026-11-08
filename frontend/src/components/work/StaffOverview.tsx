@@ -87,7 +87,7 @@ export function StaffOverview() {
         </div>
         <div id="staff-overview-content" className="dashboard-detail-body" tabIndex={0} role="region" aria-label={view === "mine" ? "My priorities" : view === "department" ? "Department priorities" : "Workload by status"}>
           {view === "workload" ? <>
-            <p className="text-dense text-ink-muted mb-3">Open complaints in your department{data.ward ? " and assigned ward" : ""}. Verification clocks are paused while citizens check a fix.</p>
+            <p className="text-dense text-ink-muted mb-3">Open complaints in your department{data.ward ? " and assigned ward" : ""}. Your assignments also include complaints handed to you through escalation. Verification clocks are paused while citizens check a fix.</p>
             <table className="staff-workload-table">
               <caption className="sr-only">Open complaints by status, department total and assigned to you</caption>
               <thead><tr><th scope="col">Status</th><th scope="col">Department</th><th scope="col">Yours</th></tr></thead>
@@ -108,7 +108,7 @@ export function StaffOverview() {
           </>}
         </div>
         <div className="staff-overview-footer">
-          <Link href={queueHref} className="text-dense underline inline-flex items-center gap-1">{view === "mine" ? "Open my work queue" : "Open department queue"}<ArrowUpRight size={16} aria-hidden="true" /></Link>
+          <Link href={queueHref} className="text-dense underline inline-flex items-center gap-1">{view === "mine" ? "Open my work queue" : "Open work queue"}<ArrowUpRight size={16} aria-hidden="true" /></Link>
           <p className="text-meta text-ink-muted">Updated {absoluteDateTime(data.generatedAt)} · refreshes every minute</p>
         </div>
       </section>

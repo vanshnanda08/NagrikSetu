@@ -1,5 +1,25 @@
 # NagrikSetu — implementation and production-readiness audit
 
+**Scope update — 7 November 2026:** email notifications and email-based password
+recovery are deferred to a future update. Provider setup and live delivery/reset
+checks are excluded from current completion requirements. Existing code and the
+historical verification results below are retained. In-app notifications and
+signed-in password changes remain in scope.
+
+**Local quality follow-up — 7–8 November 2026:** see
+[quality verification](frontend/QUALITY_VERIFICATION.md) for 332 passing backend
+tests (two optional evaluations skipped), 115 frontend tests, lint/type/build,
+real Cloudinary evidence checks and offline recovery. Desktop keyboard and basic
+user-assisted VoiceOver checks passed; Chrome showed an install prompt but native
+installation did not complete. Physical-phone checks and the deliberately final
+role-by-role journey were pending at that point. The subsequent
+[end-to-end audit](docs/END_TO_END_TEST_REPORT.md) completed that journey;
+[audit follow-up fixes](docs/AUDIT_FIXES.md) address its five confirmed findings.
+The combined follow-up passed 377 backend tests (2 optional skips),
+115 frontend tests, lint, TypeScript and build. Device/browser boundaries remain.
+These results do not replace the dated release or
+constitute a new deployment/production sign-off.
+
 Audit date: 2026-10-26; closeout updated 2026-10-27. This is a source/build/test
 and public-health audit, not a claim that every possible interaction has been
 exhaustively tested.

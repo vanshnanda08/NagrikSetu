@@ -1,5 +1,11 @@
 # Administrator review — 7 November 2026
 
+**Scope update — 7 November 2026:** email notifications and email-based password
+recovery are deferred to a future update. Provider setup and live delivery/reset
+checks are excluded from current completion requirements. Existing code and the
+historical verification results below are retained. In-app notifications and
+signed-in password changes remain in scope.
+
 The live administrator session on localhost:3000 was inspected without saving
 configuration, changing accounts or submitting civic-work actions. Writes used
 an isolated frontend/API and real integration tests on a separate PostGIS test

@@ -34,7 +34,7 @@ import java.util.UUID;
  * would let a citizen who reported an issue acknowledge it.
  *
  * <p>There is no {@code /resolve} endpoint that reaches RESOLVED, and no
- * staff closure endpoint. Administrators can close an already-resolved issue
+ * staff closure endpoint. Administrators can close a nonterminal issue
  * with a reason; settlement still belongs to verification jobs.
  */
 @RestController

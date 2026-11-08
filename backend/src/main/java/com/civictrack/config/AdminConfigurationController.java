@@ -52,10 +52,10 @@ public class AdminConfigurationController {
         UUID departmentId, boolean active) {}
     @PutMapping("/categories/{code}") @Transactional @ResponseStatus(HttpStatus.NO_CONTENT)
     public void category(@PathVariable String code, @Valid @RequestBody Category c, @AuthenticationPrincipal Jwt jwt) {
-        begin(jwt); var before = row("categories",code);
+        begin(jwt); String name = configurationName(c.displayName(), "Category name"); var before = row("categories",code);
         reference("departments",c.departmentId());
         jdbc.update("UPDATE categories SET display_name=?,merge_radius_m=?,default_sla_hours=?,severity_weight=?,reopen_window_days=?,max_extent_multiplier=?,low_conf_action=?,department_id=?,active=? WHERE code=?",
-            c.displayName().strip(),c.mergeRadiusM(),c.defaultSlaHours(),c.severityWeight(),c.reopenWindowDays(),c.maxExtentMultiplier(),c.lowConfAction(),c.departmentId(),c.active(),code);
+            name,c.mergeRadiusM(),c.defaultSlaHours(),c.severityWeight(),c.reopenWindowDays(),c.maxExtentMultiplier(),c.lowConfAction(),c.departmentId(),c.active(),code);
         record(jwt,"categories",code,before);
     }
 
@@ -64,8 +64,10 @@ public class AdminConfigurationController {
         UUID departmentId, UUID wardId, boolean active) {}
     @PutMapping("/users/{id}") @Transactional @ResponseStatus(HttpStatus.NO_CONTENT)
     public void user(@PathVariable UUID id, @Valid @RequestBody User u, @AuthenticationPrincipal Jwt jwt) {
-        begin(jwt); var before = row("users",id);
+        begin(jwt); String name = configurationName(u.fullName(), "Full name"); var before = row("users",id);
         reference("departments",u.departmentId()); reference("wards",u.wardId());
+        if (u.role().equals("STAFF") && u.departmentId()==null)
+            refuse("Staff accounts need an assigned department. A ward may further restrict their work.");
         if ((u.role().equals("STAFF") || u.role().equals("SUPERVISOR")) && u.departmentId()==null && u.wardId()==null)
             refuse("Staff and supervisors need a department or ward scope.");
         if ("ADMIN".equals(before.get("role")) && Boolean.TRUE.equals(before.get("active")) && (!u.active() || !u.role().equals("ADMIN"))
@@ -75,7 +77,7 @@ public class AdminConfigurationController {
             if (jdbc.queryForObject("SELECT (SELECT count(*) FROM departments WHERE head_user_id=?) + (SELECT count(*) FROM wards WHERE officer_user_id=?)",Integer.class,id,id)>0)
                 refuse("Reassign this user's department-head or ward-officer duties first.");
         }
-        jdbc.update("UPDATE users SET full_name=?,role=?,department_id=?,ward_id=?,active=? WHERE id=?",u.fullName().strip(),u.role(),u.departmentId(),u.wardId(),u.active(),id);
+        jdbc.update("UPDATE users SET full_name=?,role=?,department_id=?,ward_id=?,active=? WHERE id=?",name,u.role(),u.departmentId(),u.wardId(),u.active(),id);
         jdbc.update("UPDATE refresh_sessions SET revoked=true WHERE user_id=?",id);
         record(jwt,"users",id,before);
     }
@@ -83,18 +85,29 @@ public class AdminConfigurationController {
     public record Department(@NotBlank @Size(max=160) String name, UUID parentDepartmentId, UUID headUserId) {}
     @PutMapping("/departments/{id}") @Transactional @ResponseStatus(HttpStatus.NO_CONTENT)
     public void department(@PathVariable UUID id,@Valid @RequestBody Department d,@AuthenticationPrincipal Jwt jwt) {
-        begin(jwt); var before=row("departments",id); reference("departments",d.parentDepartmentId()); officer(d.headUserId());
+        begin(jwt); String name = configurationName(d.name(), "Department name"); var before=row("departments",id); reference("departments",d.parentDepartmentId()); officer(d.headUserId());
         if (d.parentDepartmentId()!=null && jdbc.queryForObject("WITH RECURSIVE ancestors AS (SELECT id,parent_department_id FROM departments WHERE id=? UNION SELECT d.id,d.parent_department_id FROM departments d JOIN ancestors a ON d.id=a.parent_department_id) SELECT EXISTS(SELECT 1 FROM ancestors WHERE id=?)",Boolean.class,d.parentDepartmentId(),id)) refuse("Department hierarchy cannot contain a cycle.");
-        jdbc.update("UPDATE departments SET name=?,parent_department_id=?,head_user_id=? WHERE id=?",d.name().strip(),d.parentDepartmentId(),d.headUserId(),id);
+        jdbc.update("UPDATE departments SET name=?,parent_department_id=?,head_user_id=? WHERE id=?",name,d.parentDepartmentId(),d.headUserId(),id);
         record(jwt,"departments",id,before);
     }
 
     public record Ward(@NotBlank @Size(max=160) String name, UUID officerUserId) {}
     @PutMapping("/wards/{id}") @Transactional @ResponseStatus(HttpStatus.NO_CONTENT)
     public void ward(@PathVariable UUID id,@Valid @RequestBody Ward w,@AuthenticationPrincipal Jwt jwt) {
-        begin(jwt); var before=row("wards",id); officer(w.officerUserId());
-        jdbc.update("UPDATE wards SET name=?,officer_user_id=? WHERE id=?",w.name().strip(),w.officerUserId(),id);
+        begin(jwt); String name = configurationName(w.name(), "Ward name"); var before=row("wards",id); officer(w.officerUserId());
+        jdbc.update("UPDATE wards SET name=?,officer_user_id=? WHERE id=?",name,w.officerUserId(),id);
         record(jwt,"wards",id,before);
+    }
+
+    /** Unicode spaces and BOMs must not turn a configured label into an empty UI control. */
+    private static String configurationName(String raw, String label) {
+        String name = raw == null ? "" : raw.replaceAll("(?U)^[\\s\\uFEFF]+|[\\s\\uFEFF]+$", "");
+        boolean visible = name.codePoints().anyMatch(cp -> !Character.isWhitespace(cp)
+                && !Character.isSpaceChar(cp) && !Character.isISOControl(cp)
+                && Character.getType(cp) != Character.FORMAT);
+        if (!visible) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                label + " must contain at least one visible character.");
+        return name;
     }
 
     private void begin(Jwt jwt) {

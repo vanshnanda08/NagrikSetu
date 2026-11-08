@@ -4,12 +4,25 @@ Next.js 16 (App Router), React 19, Tailwind v4.
 
 **Status (2026-11-07).** The agreed frontend scope is implemented, including
 public reporting, citizen verification, supervisor tools, administration,
-profile and account recovery, email preferences, persistent drafts and offline
-submission. The latest additions are authenticator MFA and session controls at
+profile, persistent drafts and offline submission. Email notifications and
+email-based password recovery are deferred to a future update; their existing
+screens/code and historical checks are retained, with no current requirement for
+provider activation or live delivery/reset testing. In-app notifications and
+password changes while signed in remain in scope. The latest additions are authenticator MFA and session controls at
 `/me/settings?tab=security`, issue following, private clarification threads, an installable
 web-app manifest and browser security headers. The NagrikSetu interface restores the committed blue/orange glass design in light mode only, with responsive layouts.
 
-Latest checks: 88 unit tests, ESLint, TypeScript and the production build pass.
+Latest code checks, recorded 7–8 November 2026: 115 tests across 16 files, ESLint,
+TypeScript and the production build passed. See [quality verification](QUALITY_VERIFICATION.md)
+for real photo evidence, offline recovery, keyboard/VoiceOver and responsive checks.
+Chrome's install prompt now appears; native installation remains unverified after
+the user's unsuccessful attempt. Physical-phone tests were unavailable. The full
+role-by-role journey subsequently completed in the
+[end-to-end audit](../docs/END_TO_END_TEST_REPORT.md). Its five confirmed defects
+are addressed in [audit follow-up fixes](../docs/AUDIT_FIXES.md), including the
+verification/profile wording. The follow-up frontend115 tests, lint, TypeScript
+and production build passed; remaining browser/device cases are not inferred
+to pass from these code checks.
 The grouped-screen browser audit covers representative views in all five access
 contexts at mobile, tablet and desktop sizes. See [Screens](SCREENS.md) for current
 coverage, functionality, accessibility evidence and the limits of local testing.
@@ -39,7 +52,7 @@ value as the frontend's `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`. Spring does not rea
 
 | | |
 |---|---|
-| `npm run test` | 88 unit tests over validation, server rules, charts, uploads, auth boundaries and grouped navigation |
+| `npm run test` | 115 unit tests over validation, server rules, charts, uploads, auth boundaries and grouped navigation |
 | `npm run lint` | includes the rule confining Leaflet to one module |
 | `npm run build` | production build |
 
@@ -168,3 +181,11 @@ Automatic closure retains its configured quiet period.
 Admin-only navigation omits My work, My reports and Report a problem shortcuts.
 Configuration now has record search, older history pages, clearer field labels,
 pinned desktop save controls and a mobile/tablet editor with Back to records.
+
+
+Online report submission now uses the shared authenticated request path with one
+401 refresh/retry. The draft retains its original account and idempotency key;
+a failed renewal or account mismatch leaves its photo/details available and
+provides in-place sign-in. Anonymous submissions remain supported. Assignment
+pickers request eligible members for the selected complaint, including its ward.
+See [workflow verification](../docs/WORKFLOW_FIXES.md) for current tests and limits.

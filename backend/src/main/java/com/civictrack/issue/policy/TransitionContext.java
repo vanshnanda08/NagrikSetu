@@ -1,5 +1,7 @@
 package com.civictrack.issue.policy;
 
+import com.civictrack.user.Role;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
@@ -22,6 +24,9 @@ public record TransitionContext(
         String proofPhotoHash,
         UUID assigneeId,
         UUID assigneeDepartmentId,
+        UUID assigneeWardId,
+        Role assigneeRole,
+        boolean assigneeActive,
         boolean recurrenceWithinWindow,
         VerificationTally tally,
         Duration autoCloseAfter) {
@@ -37,6 +42,9 @@ public record TransitionContext(
         private String proofPhotoHash;
         private UUID assigneeId;
         private UUID assigneeDepartmentId;
+        private UUID assigneeWardId;
+        private Role assigneeRole;
+        private boolean assigneeActive;
         private boolean recurrenceWithinWindow;
         private VerificationTally tally = VerificationTally.none(0);
         private Duration autoCloseAfter = Duration.ofDays(7);
@@ -61,9 +69,12 @@ public record TransitionContext(
             return this;
         }
 
-        public Builder assignee(UUID id, UUID departmentId) {
+        public Builder assignee(UUID id, UUID departmentId, UUID wardId, Role role, boolean active) {
             this.assigneeId = id;
             this.assigneeDepartmentId = departmentId;
+            this.assigneeWardId = wardId;
+            this.assigneeRole = role;
+            this.assigneeActive = active;
             return this;
         }
 
@@ -84,7 +95,7 @@ public record TransitionContext(
 
         public TransitionContext build() {
             return new TransitionContext(now, note, proofPhotoUrl, proofPhotoHash, assigneeId,
-                    assigneeDepartmentId, recurrenceWithinWindow, tally, autoCloseAfter);
+                    assigneeDepartmentId, assigneeWardId, assigneeRole, assigneeActive, recurrenceWithinWindow, tally, autoCloseAfter);
         }
     }
 }

@@ -21,7 +21,9 @@ import { useGeolocation } from "@/lib/useGeolocation";
 import { deviceId } from "@/lib/deviceId";
 import { useOnline } from "@/lib/useOnline";
 import { uploadPhoto, CLOUDINARY_CONFIGURED } from "@/lib/uploadPhoto";
-import { ApiError, apiBase } from "@/lib/api";
+import { ApiError } from "@/lib/api";
+import { submitReport } from "@/lib/submitReport";
+import { useSignIn } from "@/lib/signInDialog";
 import { fileSize, metres } from "@/lib/format";
 import {
   composerSchema,
@@ -30,7 +32,6 @@ import {
   MAX_ACCURACY_M,
   type ComposerValues,
 } from "@/lib/schemas";
-import type { ClusterResult } from "@/lib/types";
 
 /**
  * Report composer (blueprint §3.2).
@@ -57,14 +58,16 @@ import type { ClusterResult } from "@/lib/types";
  */
 export default function ReportComposerPage() {
   const { hydrated } = useComposer();
-  return hydrated ? <ReportComposerForm /> : <PageShell className="report-page"><LoadingState label="Restoring your draft" /></PageShell>;
+  const { initialising } = useAuth();
+  return hydrated && !initialising ? <ReportComposerForm /> : <PageShell className="report-page"><LoadingState label="Restoring your draft" /></PageShell>;
 }
 
 function ReportComposerForm() {
   const router = useRouter();
   const categories = useCategories();
   const { report, patch, reset, storageError } = useComposer();
-  const { session } = useAuth();
+  const { session, authed } = useAuth();
+  const { openSignIn } = useSignIn();
   const { state: geo, locate } = useGeolocation();
 
   const [uploadFraction, setUploadFraction] = useState<number | null>(null);
@@ -155,7 +158,8 @@ function ReportComposerForm() {
     setFailed(null);
     const id = submissionId.current ?? crypto.randomUUID();
     submissionId.current = id;
-    patch({ submissionId: id, ownerId: session?.userId ?? report.ownerId ?? null });
+    const ownerId = report.ownerId === undefined ? session?.userId ?? null : report.ownerId;
+    patch({ submissionId: id, ownerId });
     const queuedBody: Record<string, unknown> = {
       categoryCode: values.categoryCode, lat: values.lat, lng: values.lng,
       accuracyM: values.accuracyM, manualPin: values.manualPin,
@@ -164,7 +168,7 @@ function ReportComposerForm() {
       photoCapturedAt: report.photo?.capturedAt ?? null, deviceId: deviceId(),
     };
     const saveForBackgroundDelivery = () => queueReport({
-      id, userId: session?.userId ?? report.ownerId ?? null, body: queuedBody,
+      id, userId: ownerId, body: queuedBody,
       blob: report.photo?.blob ?? null,
       cloud: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "",
       preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? "",
@@ -208,20 +212,8 @@ function ReportComposerForm() {
         deviceId: deviceId(),
       });
 
-      const res = await fetch(`${apiBase()}/reports`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Idempotency-Key": id,
-          // Attached when present, never demanded (DD-017).
-          ...(session ? { Authorization: `Bearer ${session.accessToken}` } : {}),
-        },
-        body: JSON.stringify(body),
-      });
+      const result = await submitReport(body, id, ownerId, authed);
 
-      if (!res.ok) throw new ApiError(res.status, await res.json().catch(() => null));
-
-      const result = (await res.json()) as ClusterResult;
       try {
         window.sessionStorage.setItem(`ct:${result.publicRef}`, JSON.stringify(result));
       } catch {
@@ -456,13 +448,14 @@ function ReportComposerForm() {
               </Button>
 
               {/* The one place report §12.6's limitation is surfaced to a citizen. */}
-              {!session && (
+              {report.ownerId && report.ownerId !== session?.userId && <p className="text-meta text-ink-muted">This draft belongs to its original account. <button type="button" className="underline text-ink" onClick={() => openSignIn()}>Sign in to that account</button> before retrying. Your photo and details stay here.</p>}
+              {!session && !report.ownerId && (
                 <p className="text-meta text-ink-muted">
                   You are reporting anonymously. An anonymous report cannot be used to
                   confirm the fix later.{" "}
-                  <a href="/login" className="underline text-ink">
+                  <button type="button" className="underline text-ink" onClick={() => openSignIn()}>
                     Sign in first
-                  </a>{" "}
+                  </button>{" "}
                   if you want to be asked.
                 </p>
               )}

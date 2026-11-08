@@ -5,10 +5,10 @@ import java.util.List;
 /**
  * RFC 4180 CSV for the audit log.
  *
- * <p>Two things beyond quoting. Fields starting with {@code = + - @} are
- * prefixed with an apostrophe, because a spreadsheet would otherwise execute a
- * note that begins that way as a formula, and the notes here include free text
- * a supervisor or a citizen typed. And lines end with CRLF, as the RFC asks.
+ * <p>Two things beyond quoting. Formula prefixes {@code = + - @}, including
+ * those hidden behind whitespace or control characters, are prefixed with an
+ * apostrophe. Spreadsheet importers may ignore those leading characters. This
+ * changes only the export, never the recorded note. Lines end with CRLF.
  */
 final class AuditCsv {
 
@@ -41,12 +41,25 @@ final class AuditCsv {
             return "";
         }
         String v = value;
-        if (!v.isEmpty() && "=+-@".indexOf(v.charAt(0)) >= 0) {
+        if (startsFormula(v)) {
             v = "'" + v;
         }
         if (v.contains(",") || v.contains("\"") || v.contains("\n") || v.contains("\r")) {
             return "\"" + v.replace("\"", "\"\"") + "\"";
         }
         return v;
+    }
+
+    private static boolean startsFormula(String value) {
+        int offset = 0;
+        while (offset < value.length()) {
+            int codePoint = value.codePointAt(offset);
+            if (!Character.isWhitespace(codePoint) && !Character.isSpaceChar(codePoint)
+                    && !Character.isISOControl(codePoint) && Character.getType(codePoint) != Character.FORMAT) {
+                return "=+-@".indexOf(codePoint) >= 0;
+            }
+            offset += Character.charCount(codePoint);
+        }
+        return false;
     }
 }

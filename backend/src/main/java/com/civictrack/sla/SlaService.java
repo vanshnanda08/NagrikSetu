@@ -63,7 +63,8 @@ public class SlaService {
 
     /**
      * Applies a recomputed priority, moving the deadline earlier if the new
-     * band warrants it and never later.
+     * band warrants it and never later. Once escalated, keep the ladder's
+     * existing grant; ingest and moderation must not undo a rearmed clock.
      *
      * <p>A ticket's clock can only get tighter. If a priority downgrade could
      * extend a deadline, a department could buy time by arguing an issue down a
@@ -74,7 +75,8 @@ public class SlaService {
      */
     public void applyPriority(Issue issue, Category category, Priority newPriority) {
         Instant candidate = deadlineFor(issue, category, newPriority);
-        if (issue.getDueAt() == null || candidate.isBefore(issue.getDueAt())) {
+        if (issue.getDueAt() == null || (issue.getLastEscalatedAt() == null
+                && issue.getEscalationLevel() == 0 && candidate.isBefore(issue.getDueAt()))) {
             issue.setDueAt(candidate);
         }
         issue.setPriority(newPriority);

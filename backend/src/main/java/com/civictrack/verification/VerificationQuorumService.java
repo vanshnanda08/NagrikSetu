@@ -39,8 +39,8 @@ public class VerificationQuorumService {
     }
 
     /**
-     * The moment after which silence counts as consent, or null when the issue
-     * is not waiting on citizens. The verify screen states it, and the tally
+     * The verification deadline after which the timeout rule may resolve an issue
+     * without citizen confirmation, or null when it is not waiting on citizens. The verify screen states it, and the tally
      * above is judged against it, so the two cannot disagree about when that
      * is.
      */

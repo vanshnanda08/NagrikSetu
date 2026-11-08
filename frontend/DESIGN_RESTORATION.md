@@ -66,7 +66,8 @@ source would remove functionality or fixes:
 - The mobile preference checkboxes remain beside their wrapping descriptions.
 
 These adaptations mean the result is not pixel-identical to an older feature
-set. Source and restored screenshots are retained side by side for review.
+set. Source and restored screenshots were retained side by side for review and
+were subsequently moved to the local recovery archive during cleanup (see below).
 
 ## Checks actually completed
 
@@ -106,7 +107,12 @@ Screenshots were visually compared for the dashboard, reporting, profile,
 staff queue, assignment board and configuration. Public issues/map/details,
 login, notifications/security, review, analytics, cluster tools and audit were
 also rendered in the source/restored comparison. Evidence, measurements and
-paired screenshots are in `artifacts/restored-design/` (local and gitignored).
+result JSON remains in `artifacts/restored-design/` (local and gitignored).
+Superseded source/restored PNGs were moved out of the checkout on 8 November
+2026 to `~/.codex/archives/nagriksetu-cleanup-20261108T100006Z/artifacts/restored-design/`.
+The archive manifest retains original paths and hashes. Latest role/workflow
+screenshots remain in `artifacts/e2e/QA-20261108T001350/`; the historical
+comparison counts above are unchanged.
 
 The comparison builds ran at localhost ports 3002 (isolated source) and 3003
 (restored production). The harness uses a browser-only CORS bridge for these

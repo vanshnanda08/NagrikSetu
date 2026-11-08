@@ -103,10 +103,20 @@ class ProfileIT extends IntegrationTestBase {
         update(citizen, "  ", null, List.of()).andExpect(status().isBadRequest());
         update(citizen, "Name", "not-a-phone", List.of()).andExpect(status().isBadRequest());
 
-        // A verification request cannot be muted: silence counts as agreement.
+        // A mandatory request must not describe timeout as citizen confirmation.
+        String savedPhone = "8" + String.format("%012d",
+                Math.floorMod(citizen.getId().getMostSignificantBits(), 1_000_000_000_000L));
+        update(citizen, "Saved Name", savedPhone, List.of("RESOLVED"))
+                .andExpect(status().isOk());
         update(citizen, "Name", null, List.of("VERIFY_REQUESTED"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.type").value("https://civictrack.example/problems/profile-refused"));
+                .andExpect(jsonPath("$.type").value("https://civictrack.example/problems/profile-refused"))
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("without citizen verification")))
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("confirmed"))));
+        AppUser unchanged = users.findById(citizen.getId()).orElseThrow();
+        assertThat(unchanged.getFullName()).isEqualTo("Saved Name");
+        assertThat(unchanged.getPhone()).isEqualTo(savedPhone);
+        assertThat(ProfileService.mutedOf(unchanged)).containsExactly(com.civictrack.notification.NotificationType.RESOLVED);
 
         // A phone number belongs to one account.
         AppUser other = fixtures.user(Role.CITIZEN, null, null);

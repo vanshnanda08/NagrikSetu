@@ -2,6 +2,15 @@
 
 > Navigation update (2026-11-07): staff/supervisor work now shares `/work`, with role-based views and a queue/detail layout. Legacy frontend URLs below redirect to the corresponding view. Backend paths and this backend assessment remain unchanged. See [current screens](../frontend/SCREENS.md).
 
+> Quality follow-up (2026-11-08): [fresh verification](../frontend/QUALITY_VERIFICATION.md)
+> now covers real photo upload/server hashing, offline queue recovery, desktop
+> keyboard/basic VoiceOver and responsive layouts. Native installation did not
+> complete and physical-phone tests were unavailable. The later
+> [end-to-end audit](END_TO_END_TEST_REPORT.md) completed the principal role
+> journey. Its five confirmed defects are corrected and regression-tested in
+> [audit follow-up fixes](AUDIT_FIXES.md); untested/device boundaries remain.
+> Earlier “not freshly tested” statements below are historical.
+
 Reviewed 2026-11-06. This assessment separates source inspection, fresh local
 verification, and proposals. The lead coordinated bounded read-only reviews of
 the backend, frontend, and evaluation/tooling; only the lead edited cleanup code.
@@ -128,7 +137,7 @@ specified separately below. It does not imply every integration was tested live.
 | Notifications, following, private clarification | **Keep as secondary** | Transactional notifications, follow/unfollow independent of report count, and reporter/scoped-staff private threads are connected. No evidence they are unused. Removing affects engagement and unresolved-information workflows. |
 | Recovery, MFA and sessions | **Keep** | Shared dialog, refresh rotation/reuse detection, recovery, municipal MFA and session controls protect privileged access. Demo MFA exemption is not production behavior. Access tokens can survive revocation until expiry; do not promise universal immediate sign-out. Removing for demo simplicity weakens real access security. |
 | Drafts/offline outbox/PWA | **Keep / qualify** | IndexedDB, account-bound queued submissions and server idempotency are connected. Worker retries submissions but does not cache the entire application for reliable offline reload. Removing could strand existing local drafts/jobs; installed-device behavior was not freshly tested. |
-| Email | **Improve integration evidence** | SMTP/Brevo code and transactional outbox exist; production delivery is documented as deferred. Retain implementation and honest setup instructions, leave outside core demo. Removal affects preferences/recovery/delivery dependencies; no basis to call it dead. |
+| Email and email-based password recovery | **Deferred to future update — user decision, 7 November** | SMTP/Brevo, recovery and transactional outbox code are retained. Provider activation and live delivery/reset-link checks are outside current completion requirements and the demo. In-app notifications and signed-in password changes remain in scope. |
 | Abuse/photo checks/orphan cleanup | **Keep** | Quotas/idempotency/photo screening protect anonymous intake; photo verification runs before spatial transaction. Browser-first upload can orphan assets, so bounded dry-run cleanup is relevant. No destructive sweep enabled; real CDN/upload behavior not freshly tested. |
 | Styleguide, starter assets, dead helpers | **Remove — done** | Unlinked production showcase used fictitious ticket IDs/inert controls; only abandoned `frontend/measure.mjs` targeted it. Five default SVGs had no callers. Removed these and unreferenced `authedFetch`, `Role.isHuman`, `IssueStatusService.now`, unused controller injection/imports. No runtime dependency was proven unused, so package dependencies stay. |
 | Registration/login validation schemas | **Improve / merge proposal** | `registerSchema` is exercised only by schema tests; the live shared sign-in dialog uses browser/server validation. Tests do not prove the real registration form uses those rules. Keep the existing contract tests for now; connect or remove the duplicate schema and its tests together in a later focused change, rather than delete one shared base in isolation. |
@@ -222,9 +231,9 @@ No fresh production mail/CDN/upload, installed-PWA, physical-device/screen-reade
 remote backup restore, deployment scheduling or performance-capacity claim is
 made. Local test JDK was 26; the Maven source target and CI are Java 21.
 
-## Remaining proposals, in priority order
+## Assessment proposals and current status
 
-1. **Correct SLA rearm preservation and parent-owner permissions.** Ingest and
+1. **Completed locally, 7 November — SLA rearm preservation and owner permissions.** The original finding below is superseded by [workflow fixes](WORKFLOW_FIXES.md). Ingest and
    moderation `rescore` call `SlaService.applyPriority`, which can replace a newly
    rearmed deadline with `firstReportedAt + allowance`; the scheduled
    `PriorityRecomputer` deliberately preserves it after escalation. Separately,
@@ -234,11 +243,11 @@ made. Local test JDK was 26; the Maven source target and CI are Java 21.
    escalation, add focused regression coverage, agree consistent ownership
    semantics and fix all writers. Removing the ladder would discard valuable
    accountability instead of repairing its integration.
-2. **Align queue scope and assignment validity.** Supervisor guards allow
+2. **Completed locally, 7 November — queue scope and assignment validity.** The original finding below is superseded by [workflow fixes](WORKFLOW_FIXES.md). Supervisor guards allow
    department OR ward while queue predicates intersect them. Direct assignment
    guards check department equality but do not establish active municipal role as
    strictly as the UI picker. Test dual-scope and disabled/citizen-assignee cases.
-3. **Finish list/auth workflow reliability.** My reports stops at 50, crew queue
+3. **Completed locally, 7 November — list/auth workflow reliability.** Pagination was added during the role reviews; expired-session report submission is now covered by [workflow fixes](WORKFLOW_FIXES.md). The following describes the earlier finding. My reports stops at 50, crew queue
    at 100 and assignment board at 200 without full pagination. Report submission
    uses the current raw access token instead of the refresh wrapper. Paginate or
    disclose limits, and preserve identity on expired-session submission. These
@@ -260,11 +269,13 @@ made. Local test JDK was 26; the Maven source target and CI are Java 21.
    uninformative rather than presenting F1=1 as demonstrated grouping accuracy.
    Existing retained aggregate scores (precision 1.000 / recall 0.790 / F1 0.883)
    agree with raw artifacts; they were inspected, not freshly rebenchmarked.
-7. **Finish operational checks before municipal claims.** Verify real delivery,
+7. **Finish operational checks before municipal claims.** Verify
    photo integration, accessible physical-device/installed-PWA behavior, privacy
    of publicly exposed photos/locations, restore and unattended jobs. Retain
    dry-run deletion until reviewed. Any schema/data deletion stays a separate
    migration proposal with retention review; none is needed for this cleanup.
+   Email delivery and email-based password recovery are explicitly deferred to a
+   future update; exclude their activation/live checks from this current list.
 
 The focused product/demo remains: citizen report and public tracking → explained
 clustering → supervisor assignment → crew proof → original citizen verification

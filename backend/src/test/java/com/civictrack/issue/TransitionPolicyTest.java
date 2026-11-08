@@ -299,7 +299,7 @@ class TransitionPolicyTest {
         return TransitionContext.at(NOW)
                 .note("A note that is comfortably longer than twenty characters")
                 .proofPhotoUrl("https://example.test/after.jpg")
-                .assignee(ASSIGNEE, DEPARTMENT)
+                .assignee(ASSIGNEE, DEPARTMENT, null, Role.STAFF, true)
                 .recurrenceWithinWindow(true)
                 .tally(new VerificationTally(3, 3, 0, true))
                 .build();

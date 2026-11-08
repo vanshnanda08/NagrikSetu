@@ -140,6 +140,9 @@ class VerificationLoopIT extends IntegrationTestBase {
                 .andExpect(jsonPath("$.required").value(2));
 
         vote(bob, issue, "FIXED").andExpect(jsonPath("$.status").value("RESOLVED"));
+        assertThat(jdbc.queryForList("SELECT body FROM notifications WHERE issue_id=? AND type='RESOLVED'",String.class,issue.getId()))
+                .allSatisfy(body -> assertThat(body).contains("Confirmed fixed by 2", "required confirmations: 2")
+                        .doesNotContain("timeout", "closed"));
     }
 
     @Test

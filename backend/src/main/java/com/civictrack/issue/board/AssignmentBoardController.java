@@ -1,6 +1,8 @@
 package com.civictrack.issue.board;
 
 import com.civictrack.issue.QueueTab;
+import com.civictrack.issue.IssueRepository;
+import com.civictrack.issue.IssueScope;
 import com.civictrack.user.Actor;
 import com.civictrack.user.auth.Actors;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class AssignmentBoardController {
     private static final int MAX_PAGE = 200;
 
     private final AssignmentBoardService board;
+    private final IssueRepository issues;
 
     @GetMapping("/queue")
     @PreAuthorize("hasAnyRole('SUPERVISOR','ADMIN')")
@@ -49,12 +52,19 @@ public class AssignmentBoardController {
 
     @GetMapping("/departments/{departmentId}/members")
     @PreAuthorize("hasAnyRole('SUPERVISOR','ADMIN')")
-    public List<MemberDto> members(@PathVariable UUID departmentId, @AuthenticationPrincipal Jwt jwt) {
+    public List<MemberDto> members(@PathVariable UUID departmentId, @RequestParam(required = false) UUID issueId, @AuthenticationPrincipal Jwt jwt) {
         Actor actor = Actors.from(jwt);
+        if (issueId != null) {
+            var issue = issues.findById(issueId).orElseThrow(() -> new AccessDeniedException("Complaint unavailable"));
+            if (!departmentId.equals(issue.getDepartmentId()) || !IssueScope.permits(actor, issue)) {
+                throw new AccessDeniedException("Not your complaint scope");
+            }
+            return board.members(departmentId, issue.getWardId());
+        }
         boolean wardOfficer = actor.departmentId() == null && actor.wardId() != null;
         if (!actor.isAdmin() && !wardOfficer && !departmentId.equals(actor.departmentId())) {
             throw new AccessDeniedException("Not your department");
         }
-        return board.members(departmentId);
+        return board.members(departmentId, null);
     }
 }

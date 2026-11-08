@@ -49,7 +49,9 @@ public class IssueLifecycleService {
         // supervisor probe for which user ids exist.
         return statusService.transition(issue, IssueStatus.ASSIGNED, actor,
                 context()
-                        .assignee(assigneeId, assignee == null ? null : assignee.getDepartmentId())
+                        .assignee(assigneeId, assignee == null ? null : assignee.getDepartmentId(),
+                                assignee == null ? null : assignee.getWardId(),
+                                assignee == null ? null : assignee.getRole(), assignee != null && assignee.isActive())
                         .note(note)
                         .build());
     }
@@ -109,13 +111,7 @@ public class IssueLifecycleService {
      */
     @Transactional(readOnly = true)
     public List<IssueRepository.QueueRow> queue(Actor actor, QueueTab tab, int limit, int offset) {
-        // A missing department must not turn staff scope into the SQL wildcard.
-        // Ward officers are supervisors explicitly scoped to a ward across departments.
-        if (!actor.isAdmin() && actor.departmentId() == null
-                && (actor.role() != com.civictrack.user.Role.SUPERVISOR || actor.wardId() == null)) {
-            throw new org.springframework.security.access.AccessDeniedException(
-                    "A department assignment is required to access this work queue.");
-        }
+        IssueScope.requireQueueScope(actor);
         // Administrators see the whole city; everybody else sees their own
         // scope, applied in SQL rather than by filtering afterwards so that
         // paging returns a full page of things the caller may actually act on.
@@ -128,7 +124,7 @@ public class IssueLifecycleService {
         if (readyToCloseOnly && !actor.isAdmin()) {
             throw new org.springframework.security.access.AccessDeniedException("Only administrators can access the closure queue.");
         }
-        return issues.findQueueRows(departmentId, wardId, assignedTo, unassignedOnly,
+        return issues.findQueueRows(departmentId, wardId, actor.isAdmin(), actor.role() == com.civictrack.user.Role.SUPERVISOR, actor.id(), assignedTo, unassignedOnly,
                                     toAssignOnly, readyToCloseOnly, limit, offset);
     }
 

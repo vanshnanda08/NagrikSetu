@@ -44,6 +44,7 @@ class WardAndDepartmentDashboardIT extends IntegrationTestBase {
     private AppUser crewA;
     private AppUser crewB;
     private AppUser roadsHead;
+    private java.util.List<String> expectedCrew;
 
     @BeforeEach
     void setUp() {
@@ -55,6 +56,9 @@ class WardAndDepartmentDashboardIT extends IntegrationTestBase {
         crewA = fixtures.user(Role.STAFF, roads, null);
         crewB = fixtures.user(Role.STAFF, roads, null);
 
+        // Other integration classes legitimately leave user accounts behind.
+        // Assert all current crew identities rather than assuming the seed is alone.
+        expectedCrew = jdbc.queryForList("SELECT CAST(id AS text) FROM users WHERE department_id=? AND role='STAFF' AND active", String.class, roads);
         Instant first = Instant.now().minusSeconds(5 * 86_400L);
         for (int i = 0; i < 5; i++) {
             Issue resolved = fixtures.issue("POTHOLE", first, first.plusSeconds(12 * 3600));
@@ -142,8 +146,8 @@ class WardAndDepartmentDashboardIT extends IntegrationTestBase {
                 .andExpect(jsonPath("$.department.name").value(org.hamcrest.Matchers.containsString("Roads")))
                 .andExpect(jsonPath("$.metrics.resolvedCount").value(5))
                 .andExpect(jsonPath("$.metrics.openCount").value(2))
-                // The two crew created here plus the roads crew account seeded by V4.
-                .andExpect(jsonPath("$.staff.length()").value(3))
+                // Every active crew member, including both fixtures and existing accounts.
+                .andExpect(jsonPath("$.staff[*].id").value(org.hamcrest.Matchers.containsInAnyOrder(expectedCrew.toArray())))
                 .andExpect(jsonPath("$.staff[0].id").value(crewA.getId().toString()))
                 .andExpect(jsonPath("$.staff[0].fixesClaimed").value(5))
                 .andExpect(jsonPath("$.staff[0].resolved").value(5))

@@ -154,8 +154,11 @@ public class VerificationService {
                       + " hours with no citizen response (resolved without verification)"
                     : tally.confirmations() >= tally.required()
                             ? "Confirmed fixed by " + tally.confirmations() + " of the people who reported it"
+                              + " (required confirmations: " + tally.required() + ")"
                             : "Resolved at the end of the verification window, "
-                              + tally.confirmations() + " fixed to " + tally.rejections() + " not fixed";
+                              + tally.confirmations() + " fixed to " + tally.rejections() + " not fixed"
+                              + ". The required " + tally.required() + " confirmations were not reached; "
+                              + "this complaint was marked resolved under the timeout rule.";
             statusService.systemTransition(issue, IssueStatus.RESOLVED,
                     TransitionContext.at(now).tally(tally).note(note).build());
             log.info("Issue {} resolved ({} fixed, {} not fixed, timeout {})", issue.getId(),

@@ -7,6 +7,8 @@ import com.civictrack.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,9 +60,10 @@ public class IssueEngagementService {
     @Transactional
     public Message post(UUID issueId, Actor actor, boolean staffInScope, String rawBody) {
         Issue issue = requireParticipant(issueId, actor, staffInScope);
-        String body = rawBody == null ? "" : rawBody.strip();
+        String body = rawBody == null ? "" : rawBody.replaceAll("(?U)^[\\s\\uFEFF]+|[\\s\\uFEFF]+$", "");
         if (body.length() < 3 || body.length() > 2000) {
-            throw new IllegalArgumentException("A message must be between 3 and 2,000 characters.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "A message must contain 3 to 2,000 characters after removing surrounding whitespace.");
         }
         boolean citizen = actor.role() == Role.CITIZEN;
         String kind = citizen ? "CITIZEN_REPLY" : "REQUEST_INFO";

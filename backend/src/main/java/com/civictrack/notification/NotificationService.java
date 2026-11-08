@@ -55,17 +55,19 @@ public class NotificationService {
                     "Is it fixed? " + what + " " + ref,
                     "The department says this is fixed and has posted a photo. You reported it, "
                     + "so you decide. If nobody objects within " + verificationProps.timeoutHours()
-                    + " hours, it counts as fixed.");
+                    + " hours, it can be marked resolved under the timeout rule. A timeout is not citizen confirmation.");
 
             case RESOLVED -> send(
                     transitionAudience(issue.getId()), issue,
                     NotificationType.RESOLVED,
                     "Resolved: " + what + " " + ref,
-                    issue.isResolvedWithoutVerification()
-                            ? "Nobody answered within " + verificationProps.timeoutHours()
-                              + " hours, so this closed without a citizen confirming it. If the "
-                              + "problem is still there, report it again."
-                            : "The people who reported this confirmed the fix.");
+                    // The settlement writer already records the exact quorum/timeout
+                    // outcome in history. Reuse it rather than inventing a second rule.
+                    event.note() != null && !event.note().isBlank() ? event.note()
+                            : issue.isResolvedWithoutVerification()
+                                ? "Resolved after " + verificationProps.timeoutHours()
+                                  + " hours without a citizen response. This was a timeout settlement without citizen confirmation."
+                                : "Marked resolved. See the complaint history for the recorded verification outcome.");
 
             case REOPENED -> {
                 Set<UUID> recipients = new LinkedHashSet<>(

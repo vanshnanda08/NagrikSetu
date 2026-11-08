@@ -147,6 +147,17 @@ public class GlobalExceptionHandler {
         return pd;
     }
 
+    /** Another permitted writer committed first; stale input is not a server failure. */
+    @ExceptionHandler({org.springframework.dao.OptimisticLockingFailureException.class,
+            jakarta.persistence.OptimisticLockException.class})
+    ProblemDetail onConcurrentUpdate(Exception ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+                "This complaint changed while you were working. Reload it, review the latest details, and try again.");
+        pd.setType(URI.create(BASE + "concurrent-update"));
+        pd.setTitle("Complaint changed");
+        return pd;
+    }
+
     // ------------------------------------------------------------------
     // phase 6: verification
     // ------------------------------------------------------------------

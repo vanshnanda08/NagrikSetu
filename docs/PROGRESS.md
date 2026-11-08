@@ -1,9 +1,42 @@
 # NagrikSetu — current progress
 
-Updated 2026-10-27. The agreed application scope is implemented and deployed.
-Production transactional email delivery is intentionally deferred.
-This record supersedes older progress counts and original scope exclusions;
-historical milestone reports retain their original dated results.
+Release record: 2026-10-27. Scope decision updated: 2026-11-07.
+Email notifications and email-based password recovery are deferred to a future
+update at the user's request. Provider activation and live delivery/reset testing
+are excluded from current completion requirements; existing code is retained.
+In-app notifications and signed-in password changes remain in scope.
+
+The implementation and verification below describe the earlier deployed release.
+Latest local workflow fixes and test counts are in [WORKFLOW_FIXES.md](WORKFLOW_FIXES.md).
+Historical milestone reports retain their dated results.
+
+Local follow-up, 7–8 November: [quality verification](../frontend/QUALITY_VERIFICATION.md)
+records corrected short-message validation and verification wording, a real
+photo upload/server hash check, durable outbox recovery, desktop keyboard and
+user-confirmed VoiceOver announcements, and twelve responsive checks. Full code
+checks passed: 332 backend tests (two optional evaluations skipped), 115 frontend
+tests, lint, TypeScript and build. Chrome offered installation but native install
+did not complete. Physical-phone tests were unavailable. The later
+[end-to-end audit](END_TO_END_TEST_REPORT.md) completed the cross-role browser
+journey and real service-outage recovery. All five confirmed defects were then
+corrected in [audit follow-up fixes](AUDIT_FIXES.md), with
+377 passing backend tests (2 optional skips), 115 frontend tests,
+lint, TypeScript and build. No deployment followed these checks.
+
+## Repository cleanup — 8 November 2026
+
+Removed the unimported `CategoryPicker` component and its unused selectors/pop
+animation. The active report form retains its existing labelled select and
+validation. Moved 132 superseded dashboard, theme-comparison and report-sizing
+screenshots out of the repository into a local recovery archive; retained current
+end-to-end/quality evidence and historical result JSON. Original source briefs,
+academic deliverables, tests, configuration/secrets, backups, dependencies and
+active build output were preserved. The archive manifest records paths/hashes.
+Validation in an isolated frontend copy passed: 115 tests, ESLint, TypeScript
+and the production build. Source/archive hashes and existing dirty-file checks
+passed; the running backend health remained UP. No backend files changed, so
+backend tests were not rerun for this cleanup. No commit, push or deployment
+was performed.
 
 ## Implemented scope
 
@@ -13,7 +46,8 @@ historical milestone reports retain their original dated results.
 | Phase 5 | Deployment, CI, live health checks and encrypted backup recovery verified; destructive media cleanup remains opt-in pending dry-run review |
 | Phases 6–7 | Citizen verification, notifications, supervisor assignment/moderation, analytics and live dashboard implemented |
 | Phases 8–9 | Evaluation artifacts, abuse controls, privacy redaction, remaining screens, final report and demo runbook implemented |
-| Previously excluded features | Password reset, refresh-token rotation/reuse detection, opt-in email outbox, audited admin configuration and background offline submission implemented |
+| Extended scope | Refresh-token rotation/reuse detection, audited admin configuration and background offline submission implemented |
+| Future update | Email notifications and email-based password recovery deferred; existing reset/outbox code and prior tests retained |
 | Security additions | TOTP MFA, recovery codes, refresh-session listing/revocation and browser security headers implemented |
 | Engagement additions | Issue following without priority inflation and private reporter/municipal clarification threads implemented |
 | Installable web client | Manifest, app icons and install prompt implemented alongside existing offline submission support |
@@ -24,7 +58,7 @@ administrators. The explicit demo profile bypasses mandatory enrolment for
 seeded automation. Revoking refresh sessions prevents future refreshes; issued
 access tokens retain their bounded lifetime of up to 15 minutes.
 
-## Latest recorded verification
+## Historical release verification — 27 October 2026
 
 | Check | Result |
 |---|---|
@@ -61,14 +95,22 @@ Render health endpoint returned `UP` and the Vercel dashboard returned HTTP 200.
 The scheduled backup rerun passed restore verification and encrypted upload; the
 downloaded artifact subsequently decrypted with GPG exit code 0.
 
-- Complete physical-device/screen-reader and actual PWA installation checks;
-  automated browser coverage does not certify full accessibility or OS-level sync.
+- Follow up native PWA installation and physical-phone checks. Desktop keyboard,
+  basic VoiceOver and API-outage recovery are recorded above; they do not certify
+  full accessibility, cold offline navigation or closed-browser background sync.
+- Complete the explicitly blocked/untested cases in the end-to-end report;
+  its principal role-by-role journey and confirmed-defect fixes are complete.
 - Review the final audit's dependency applicability, key-rotation and rate-limit
   operating conditions before production sign-off.
-- Production transactional mail delivery is deferred until work resumes on that
-  external integration; the outbox, retry path and local SMTP flow remain tested.
 - Verify Cloudinary management credentials and inspect the orphan-cleanup dry run.
 - Record the final demonstration if required for submission.
+
+## Deferred future update
+
+Email notifications and email-based password recovery will resume in a future
+update. Their existing outbox/retry/recovery implementation and historical local
+SMTP results remain; no claim of real provider delivery is made. This work is
+not a blocker for the current milestone or demo.
 
 Push notifications, passkeys, Open311/municipal ERP integration, multilingual
 UI and native mobile apps are not part of the implemented additions. They are

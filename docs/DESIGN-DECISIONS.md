@@ -2769,3 +2769,38 @@ making public descriptions a channel for personal information.
 - CLOSED without `resolved_at` is disclosed as **Closed before resolution** on work/public/verification records. City and scoped dashboards publish its count separately. Resolution, unverified-resolution and SLA calculations require a real resolution timestamp; staff performance uses the same definition.
 - A dedicated CLOSED notification tells reporters and followers what happened and includes the reason, subject to their notification preferences. Automatic quiet-period closure does not generate this administrator notification.
 - The action stays in Assignments; Ready to close is a resolved shortlist and All open exposes early closure. No additional screen, status, migration, reset, deployment or generic status editor was introduced.
+
+## DD-075 — Preserve escalation grants and bind work/report actions to their scope
+
+**Date:** 7 November 2026. **Status:** Implemented for the three requested workflow fixes.
+
+Escalation grants survive rescoring in ingest, moderation and the scheduler. The
+ladder changes the deadline only after an actual breach. Work scope is one shared
+policy: supervisor department OR ward, staff department AND optional ward, plus
+current explicit escalation ownership for valid municipal accounts. Ownership
+moves revoke the extra grant; parent hierarchy does not grant general access.
+Queues, review counts and pagination apply this policy before selecting rows.
+
+Manual assignees must be active staff/supervisors in the owning department and
+permitted staff ward. Contextual member queries use the selected issue and API
+checks enforce eligibility again at assignment time. Invalid legacy escalation
+references remain visible as unstaffed rungs instead of receiving work.
+
+Online report retries renew once on 401 and retain the original account, body and
+submission key. Failed renewal or an account switch preserves the draft for
+sign-in/retry. Anonymous submission and owner-bound offline delivery remain.
+See [verification and limits](WORKFLOW_FIXES.md); no production integration or
+deployment claim follows from these local checks.
+
+
+## DD-076 — Defer email and email-based password recovery
+
+**Date:** 7 November 2026. **Status:** Explicit user scope decision.
+
+Email notifications and email-based password recovery are reserved for a future
+update. Provider configuration/activation, real email/reset-link delivery and
+associated live integration checks are excluded from current completion
+requirements and the demo. Existing code, routes, configuration guidance and
+historical tests are retained; this documentation change does not remove or
+disable application behavior. In-app notifications, authentication/session
+renewal and password changes while signed in remain in the current scope.

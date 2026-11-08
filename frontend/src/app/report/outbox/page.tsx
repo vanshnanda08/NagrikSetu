@@ -6,10 +6,10 @@ import { Button } from "@/components/Button";
 import { offlineStore, wakeOutbox, type OfflineJob } from "@/lib/offlineStore";
 
 export default function OutboxPage() {
-  const [jobs, setJobs] = useState<OfflineJob[]>([]);
+  const [jobs, setJobs] = useState<OfflineJob[] | null>(null);
   const [error, setError] = useState("");
   async function reload() {
-    try { setJobs(await offlineStore<OfflineJob[]>("outbox", "all")); }
+    try { setJobs(await offlineStore<OfflineJob[]>("outbox", "all")); setError(""); }
     catch { setError("Browser storage is unavailable."); }
   }
   useEffect(() => {
@@ -23,8 +23,9 @@ export default function OutboxPage() {
     <p className="mt-3 text-body">Queued reports and photos stay on this device until sent or removed. Background delivery depends on browser support; otherwise reopen this app when online. Signed-in reports require their original account.</p>
     <Link href="/report" className="underline block mt-4">Back to reporting</Link>
     {error && <p role="alert">{error}</p>}
-    {!jobs.length && <p className="mt-4">No queued reports on this device.</p>}
-    <ul className="mt-4 grid gap-4">{jobs.map(job => <li key={job.id} className="surface-card p-5">
+    {jobs === null && !error && <p role="status" className="mt-4">Loading queued reports…</p>}
+    {jobs?.length === 0 && <p className="mt-4">No queued reports on this device.</p>}
+    <ul className="mt-4 grid gap-4" aria-live="polite">{jobs?.map(job => <li key={job.id} className="surface-card p-5">
       <h2 className="text-heading">{job.state === "sent" ? "Sent" : job.state === "failed" ? "Needs attention" : "Waiting to send"}</h2>
       <p>{new Date(job.createdAt).toLocaleString()} — {job.message ?? "Saved safely on this device."}</p>
       {job.publicRef && <Link className="underline" href={`/report/success/${job.publicRef}`}>{job.publicRef}</Link>}

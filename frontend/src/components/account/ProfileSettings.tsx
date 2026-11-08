@@ -18,9 +18,9 @@ import type { NotificationType, Profile } from "@/lib/types";
 const TYPE_COPY: Record<NotificationType, { title: string; detail: string }> = {
   VERIFY_REQUESTED: {
     title: "A fix needs your answer",
-    detail: "Always on. If nobody answers, the fix counts as confirmed after the deadline, so this cannot be switched off.",
+    detail: "Always on. If nobody answers, the complaint can be marked resolved without citizen verification after the deadline. This request cannot be switched off.",
   },
-  RESOLVED: { title: "A report of yours was resolved", detail: "When a fix is confirmed, or closes after the answer period." },
+  RESOLVED: { title: "A report of yours was resolved", detail: "When citizens confirm a fix or the complaint is marked resolved under the timeout rule. Resolution is separate from later closure." },
   CLOSED: { title: "An administrator closed a complaint", detail: "Includes the closure reason. Early closure does not mean the repair was verified." },
   REOPENED: { title: "A fix did not hold", detail: "When a report of yours is reopened because the problem came back." },
   REJECTED: {

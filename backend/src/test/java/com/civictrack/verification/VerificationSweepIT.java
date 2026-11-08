@@ -80,6 +80,8 @@ class VerificationSweepIT extends IntegrationTestBase {
         assertThat(after.getStatus()).isEqualTo(IssueStatus.RESOLVED);
         assertThat(after.isResolvedWithoutVerification()).isTrue();
         assertThat(notificationTypes()).contains("RESOLVED");
+        assertThat(resolutionMessage(issue)).contains("Resolved after 72 hours", "no citizen response")
+                .doesNotContain("closed", "confirmed the fix");
     }
 
     @Test
@@ -115,6 +117,8 @@ class VerificationSweepIT extends IntegrationTestBase {
 
         Issue after = reload(issue);
         assertThat(after.getStatus()).isEqualTo(IssueStatus.RESOLVED);
+        assertThat(resolutionMessage(issue)).contains("2 fixed to 1 not fixed", "required 3 confirmations were not reached", "timeout rule")
+                .doesNotContain("The people who reported this confirmed the fix", "closed");
         assertThat(after.isResolvedWithoutVerification())
                 .as("three citizens voted; this was verified, just not unanimously")
                 .isFalse();
@@ -191,6 +195,10 @@ class VerificationSweepIT extends IntegrationTestBase {
     }
 
     // ------------------------------------------------------------------
+
+    private String resolutionMessage(Issue issue) {
+        return jdbc.queryForList("SELECT body FROM notifications WHERE issue_id=? AND type='RESOLVED' ORDER BY id",String.class,issue.getId()).get(0);
+    }
 
     private Issue pending(AppUser... reporters) {
         Issue issue = fixtures.issue("POTHOLE", clock.instant(), clock.instant().plusSeconds(3 * 86_400));

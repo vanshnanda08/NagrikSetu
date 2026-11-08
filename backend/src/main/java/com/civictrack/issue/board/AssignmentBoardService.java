@@ -94,7 +94,7 @@ public class AssignmentBoardService {
      * issues, so the picker cannot offer a choice the transition would refuse.
      */
     @Transactional(readOnly = true)
-    public List<MemberDto> members(UUID departmentId) {
+    public List<MemberDto> members(UUID departmentId, UUID issueWardId) {
         return jdbc.query("""
                 SELECT u.id, u.full_name, u.role, w.name AS ward_name,
                        (SELECT COUNT(*) FROM issues i
@@ -102,8 +102,10 @@ public class AssignmentBoardService {
                 FROM users u
                 LEFT JOIN wards w ON w.id = u.ward_id
                 WHERE u.department_id = :d AND u.active AND u.role IN ('STAFF','SUPERVISOR')
+                  AND (CAST(:ward AS uuid) IS NULL OR u.role = 'SUPERVISOR'
+                       OR u.ward_id IS NULL OR u.ward_id = CAST(:ward AS uuid))
                 ORDER BY u.role DESC, u.full_name
-                """.formatted(HELD), new MapSqlParameterSource("d", departmentId),
+                """.formatted(HELD), new MapSqlParameterSource("d", departmentId).addValue("ward", issueWardId),
                 (rs, n) -> new MemberDto(rs.getObject("id", UUID.class), rs.getString("full_name"),
                         rs.getString("role"), rs.getString("ward_name"), rs.getInt("open_assigned")));
     }

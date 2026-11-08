@@ -25,6 +25,8 @@ import static com.civictrack.dashboard.DashboardQueries.OPEN;
 @RequiredArgsConstructor
 public class StaffOverviewService {
     private static final int PREVIEW = 6;
+    private static final String DEPARTMENT_SCOPE = "(i.department_id = :department AND (CAST(:ward AS uuid) IS NULL OR i.ward_id = CAST(:ward AS uuid)))";
+    private static final String VISIBLE_SCOPE = "(" + DEPARTMENT_SCOPE + " OR (i.assigned_to = :member AND i.escalation_level > 0 AND i.last_escalated_at IS NOT NULL))";
     private final NamedParameterJdbcTemplate jdbc;
     private final IssueRepository issues;
     private final Clock clock;
@@ -52,11 +54,11 @@ public class StaffOverviewService {
         // Aggregate the complete scope, not the capped queue preview. The SLA
         // definitions are shared with the public and supervisor dashboards.
         var totals = jdbc.queryForObject("""
-                SELECT COUNT(*) AS department_open,
-                       COUNT(*) FILTER (WHERE i.status IN %s AND CAST(:now AS timestamptz) >
+                SELECT COUNT(*) FILTER (WHERE %s) AS department_open,
+                       COUNT(*) FILTER (WHERE %s AND i.status IN %s AND CAST(:now AS timestamptz) >
                            i.due_at + make_interval(secs => i.paused_seconds)) AS department_overdue,
-                       COUNT(*) FILTER (WHERE i.status IN ('NEW','ACKNOWLEDGED')) AS needs_assignment,
-                       COUNT(*) FILTER (WHERE i.status = 'PENDING_VERIFICATION') AS department_waiting,
+                       COUNT(*) FILTER (WHERE %s AND i.status IN ('NEW','ACKNOWLEDGED')) AS needs_assignment,
+                       COUNT(*) FILTER (WHERE %s AND i.status = 'PENDING_VERIFICATION') AS department_waiting,
                        COUNT(*) FILTER (WHERE i.assigned_to = :member) AS mine_open,
                        COUNT(*) FILTER (WHERE i.assigned_to = :member AND i.status IN %s AND
                            CAST(:now AS timestamptz) > i.due_at + make_interval(secs => i.paused_seconds)) AS mine_overdue,
@@ -64,31 +66,29 @@ public class StaffOverviewService {
                        COUNT(*) FILTER (WHERE i.assigned_to = :member AND i.status = 'IN_PROGRESS') AS mine_progress,
                        COUNT(*) FILTER (WHERE i.assigned_to = :member AND i.status = 'PENDING_VERIFICATION') AS mine_waiting
                 FROM issues i
-                WHERE %s AND i.merged_into_id IS NULL AND i.department_id = :department
-                  AND (CAST(:ward AS uuid) IS NULL OR i.ward_id = CAST(:ward AS uuid))
-                """.formatted(CLOCK_RUNNING, CLOCK_RUNNING, OPEN), params,
+                WHERE %s AND i.merged_into_id IS NULL AND %s
+                """.formatted(DEPARTMENT_SCOPE, DEPARTMENT_SCOPE, CLOCK_RUNNING, DEPARTMENT_SCOPE, DEPARTMENT_SCOPE, CLOCK_RUNNING, OPEN, VISIBLE_SCOPE), params,
                 (rs, row) -> new Totals(
                         new StaffOverviewDto.Personal(rs.getLong("mine_open"), rs.getLong("mine_overdue"),
                                 rs.getLong("mine_ready"), rs.getLong("mine_progress"), rs.getLong("mine_waiting")),
                         new StaffOverviewDto.DepartmentWork(rs.getLong("department_open"), rs.getLong("department_overdue"),
                                 rs.getLong("needs_assignment"), rs.getLong("department_waiting"))));
         var stageRows = jdbc.query("""
-                SELECT i.status, COUNT(*) AS total,
+                SELECT i.status, COUNT(*) FILTER (WHERE %s) AS total,
                        COUNT(*) FILTER (WHERE i.assigned_to = :member) AS mine
                 FROM issues i
-                WHERE %s AND i.merged_into_id IS NULL AND i.department_id = :department
-                  AND (CAST(:ward AS uuid) IS NULL OR i.ward_id = CAST(:ward AS uuid))
+                WHERE %s AND i.merged_into_id IS NULL AND %s
                 GROUP BY i.status
-                """.formatted(OPEN), params,
+                """.formatted(DEPARTMENT_SCOPE, OPEN, VISIBLE_SCOPE), params,
                 (rs, row) -> new StaffOverviewDto.Stage(rs.getString("status"), rs.getLong("total"), rs.getLong("mine")));
         var stages = List.of(IssueStatus.NEW, IssueStatus.REOPENED, IssueStatus.ACKNOWLEDGED,
                 IssueStatus.ASSIGNED, IssueStatus.IN_PROGRESS, IssueStatus.PENDING_VERIFICATION).stream()
                 .map(status -> stageRows.stream().filter(s -> s.status().equals(status.name())).findFirst()
                         .orElse(new StaffOverviewDto.Stage(status.name(), 0, 0))).toList();
         return new StaffOverviewDto(department, ward, totals.personal(), totals.department(), stages,
-                issues.findQueueRows(actor.departmentId(), actor.wardId(), actor.id(), false, false, false, PREVIEW, 0)
+                issues.findQueueRows(actor.departmentId(), actor.wardId(), false, false, actor.id(), actor.id(), false, false, false, PREVIEW, 0)
                         .stream().map(QueueRowDto::from).toList(),
-                issues.findQueueRows(actor.departmentId(), actor.wardId(), null, false, false, false, PREVIEW, 0)
+                issues.findQueueRows(actor.departmentId(), actor.wardId(), false, false, null, null, false, false, false, PREVIEW, 0)
                         .stream().map(QueueRowDto::from).toList(), PREVIEW, now);
     }
 

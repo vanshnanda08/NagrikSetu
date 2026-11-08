@@ -616,8 +616,7 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
             ) fr ON TRUE
             WHERE ((:readyToCloseOnly = TRUE AND i.status = 'RESOLVED')
                 OR (:readyToCloseOnly = FALSE AND i.status NOT IN ('CLOSED','REJECTED','RESOLVED')))
-              AND (CAST(:departmentId AS uuid) IS NULL OR i.department_id = CAST(:departmentId AS uuid))
-              AND (CAST(:wardId AS uuid) IS NULL OR i.ward_id = CAST(:wardId AS uuid))
+            """ + " AND " + IssueScope.SQL + """
               AND (CAST(:assignedTo AS uuid) IS NULL OR i.assigned_to = CAST(:assignedTo AS uuid))
               AND (:unassignedOnly = FALSE OR i.assigned_to IS NULL)
               AND (:toAssignOnly = FALSE OR i.status IN ('NEW','ACKNOWLEDGED'))
@@ -626,6 +625,9 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
             """, nativeQuery = true)
     List<QueueRow> findQueueRows(@Param("departmentId") UUID departmentId,
                                  @Param("wardId") UUID wardId,
+                                 @Param("scopeAdmin") boolean scopeAdmin,
+                                 @Param("scopeSupervisor") boolean scopeSupervisor,
+                                 @Param("scopeActorId") UUID scopeActorId,
                                  @Param("assignedTo") UUID assignedTo,
                                  @Param("unassignedOnly") boolean unassignedOnly,
                                  @Param("toAssignOnly") boolean toAssignOnly,
@@ -674,13 +676,15 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
             JOIN wards w      ON w.id   = i.ward_id
             WHERE i.needs_review
               AND i.status NOT IN ('CLOSED','REJECTED')
-              AND (CAST(:departmentId AS uuid) IS NULL OR i.department_id = CAST(:departmentId AS uuid))
-              AND (CAST(:wardId AS uuid) IS NULL OR i.ward_id = CAST(:wardId AS uuid))
+            """ + " AND " + IssueScope.SQL + """
             ORDER BY i.created_at ASC, i.id ASC
             LIMIT :limit OFFSET :offset
             """, nativeQuery = true)
     List<ReviewRow> findReviewRows(@Param("departmentId") UUID departmentId,
                                    @Param("wardId") UUID wardId,
+                                 @Param("scopeAdmin") boolean scopeAdmin,
+                                 @Param("scopeSupervisor") boolean scopeSupervisor,
+                                 @Param("scopeActorId") UUID scopeActorId,
                                    @Param("limit") int limit,
                                    @Param("offset") int offset);
 
@@ -688,10 +692,11 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
             SELECT COUNT(*) FROM issues i
             WHERE i.needs_review
               AND i.status NOT IN ('CLOSED','REJECTED')
-              AND (CAST(:departmentId AS uuid) IS NULL OR i.department_id = CAST(:departmentId AS uuid))
-              AND (CAST(:wardId AS uuid) IS NULL OR i.ward_id = CAST(:wardId AS uuid))
+            """ + " AND " + IssueScope.SQL + """
             """, nativeQuery = true)
-    long countReviewRows(@Param("departmentId") UUID departmentId, @Param("wardId") UUID wardId);
+    long countReviewRows(@Param("departmentId") UUID departmentId, @Param("wardId") UUID wardId,
+                         @Param("scopeAdmin") boolean scopeAdmin, @Param("scopeSupervisor") boolean scopeSupervisor,
+                         @Param("scopeActorId") UUID scopeActorId);
 
     interface ReviewRow {
         UUID getId();

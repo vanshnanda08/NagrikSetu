@@ -18,8 +18,8 @@ export function AssigneePicker({ issueId, departmentId }: { issueId: string; dep
   const [note, setNote] = useState("");
 
   const members = useQuery({
-    queryKey: ["supervisor", "members", departmentId, session?.userId],
-    queryFn: () => authed((token) => request<Member[]>(`/supervisor/departments/${departmentId}/members`, { token })),
+    queryKey: ["supervisor", "members", departmentId, issueId, session?.userId],
+    queryFn: () => authed((token) => request<Member[]>(`/supervisor/departments/${departmentId}/members?issueId=${issueId}`, { token })),
     staleTime: 30_000,
   });
 
@@ -40,7 +40,7 @@ export function AssigneePicker({ issueId, departmentId }: { issueId: string; dep
   return (
     <div className="assignee-picker mt-4" style={{ maxWidth: 560 }}>
       {members.isPending && <LoadingState label="Loading the department" />}
-      {members.isError && <ErrorState action="Loading the department" problem={(members.error as ApiError)?.problem} />}
+      {members.isError && <ErrorState action="Loading the department" problem={(members.error as ApiError)?.problem} onRetry={() => void members.refetch()} />}
       {members.data && members.data.length === 0 && (
         <p className="text-dense">Nobody in this department can be assigned work yet.</p>
       )}
@@ -73,7 +73,7 @@ export function AssigneePicker({ issueId, departmentId }: { issueId: string; dep
         <TextField label="Note (optional)" value={note} maxLength={2000} onChange={(e) => setNote(e.target.value)} />
       </div>
       <div className="work-action-footer mt-3">
-        <Button disabled={!assignee || assign.isPending} onClick={() => assign.mutate()}>
+        <Button disabled={!members.data?.some(member => member.id === assignee) || members.isFetching || assign.isPending} onClick={() => assign.mutate()}>
           {assign.isPending ? "Assigning…" : "Assign"}
         </Button>
       </div>

@@ -1,6 +1,7 @@
 package com.civictrack.moderation;
 
 import com.civictrack.issue.IssueRepository;
+import com.civictrack.issue.IssueScope;
 import com.civictrack.moderation.dto.ReviewItemDto;
 import com.civictrack.moderation.dto.ReviewPageDto;
 import com.civictrack.report.Report;
@@ -25,12 +26,13 @@ public class ReviewQueueService {
 
     @Transactional(readOnly = true)
     public ReviewPageDto page(Actor actor, int limit, int offset) {
+        IssueScope.requireQueueScope(actor);
         // Scope from the token, as the staff queue does: an administrator sees
         // the city, everybody else their department or ward.
         UUID departmentId = actor.isAdmin() ? null : actor.departmentId();
         UUID wardId = actor.isAdmin() ? null : actor.wardId();
 
-        List<IssueRepository.ReviewRow> rows = issues.findReviewRows(departmentId, wardId, limit, offset);
+        List<IssueRepository.ReviewRow> rows = issues.findReviewRows(departmentId, wardId, actor.isAdmin(), actor.role() == com.civictrack.user.Role.SUPERVISOR, actor.id(), limit, offset);
         // One query for every thumbnail on the page, not one per row.
         Map<UUID, List<Report>> members = rows.isEmpty() ? Map.of()
                 : reports.findByIssueIdInOrderByCreatedAtAsc(rows.stream().map(IssueRepository.ReviewRow::getId).toList())
@@ -48,6 +50,6 @@ public class ReviewQueueService {
                         .toList()))
                 .toList();
 
-        return new ReviewPageDto(items, issues.countReviewRows(departmentId, wardId), limit, offset);
+        return new ReviewPageDto(items, issues.countReviewRows(departmentId, wardId, actor.isAdmin(), actor.role() == com.civictrack.user.Role.SUPERVISOR, actor.id()), limit, offset);
     }
 }

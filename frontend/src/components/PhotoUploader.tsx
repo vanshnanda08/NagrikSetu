@@ -77,6 +77,8 @@ export function PhotoUploader({ onChange, error, value }: PhotoUploaderProps) {
         ref={inputRef}
         id="photo"
         type="file"
+        tabIndex={-1}
+        aria-hidden="true"
         accept="image/*"
         capture="environment"
         className="sr-only"

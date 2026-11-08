@@ -56,11 +56,16 @@ credential.
 
 Optional extended feature pass: reload a half-written report to show draft
 recovery, submit once while offline and watch `/report/outbox` deliver it after
-reconnection, request a password reset into local Mailpit, opt into email from
-the profile, follow an issue, show its private clarification thread, inspect
+reconnection, follow an issue, show its private clarification thread, inspect
 sessions at `/me/settings?tab=security`, and show one audited category/SLA edit at
 `/admin` (Configuration tab). The demo profile bypasses mandatory municipal MFA so
 seeded scripted logins remain usable; demonstrate MFA under the normal profile.
+
+Email notifications and email-based password recovery are deferred to a future
+update by user decision on 7 November 2026. Omit provider setup, mail delivery and
+password-reset demonstrations from the current demo. Existing implementation and
+historical test evidence remain available; in-app notifications and signed-in
+password changes stay in scope.
 
 ## Recording checklist
 

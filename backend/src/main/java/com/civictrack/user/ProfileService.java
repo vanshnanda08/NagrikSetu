@@ -33,8 +33,8 @@ public class ProfileService {
 
     /**
      * The types a person may switch off. VERIFY_REQUESTED is absent on purpose:
-     * silence on a verification round counts as agreement after the timeout, so
-     * muting the request would let somebody consent to a fix by accident.
+     * an unanswered verification round can resolve without citizen verification
+     * after the timeout, so reporters must still receive the request to inspect it.
      */
     public static final Set<NotificationType> MUTABLE = EnumSet.of(
             NotificationType.RESOLVED, NotificationType.CLOSED, NotificationType.REOPENED, NotificationType.REJECTED,
@@ -76,7 +76,7 @@ public class ProfileService {
         for (NotificationType t : muted) {
             if (!MUTABLE.contains(t)) {
                 throw new ProfileRefusedException(
-                        "Requests to verify a fix cannot be switched off: if nobody answers, the fix counts as confirmed.");
+                        "Requests to verify a fix cannot be switched off: if nobody answers, the complaint can be marked resolved under the timeout rule, without citizen verification.");
             }
         }
         user.setMutedNotificationTypes(muted.stream().distinct().map(Enum::name).collect(Collectors.joining(",")));

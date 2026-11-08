@@ -7,6 +7,9 @@ import com.civictrack.user.AppUser;
 import com.civictrack.user.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +47,31 @@ class IssueEngagementIT extends IntegrationTestBase {
         outsider = fixtures.user(Role.CITIZEN, null, null);
         supervisor = fixtures.user(Role.SUPERVISOR, issue.getDepartmentId(), null);
         fixtures.report(issue.getId(), reporter.getId());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings={"   ","  a  "," ab ","\tq\t","\u2003A\u2003","\u00a0x\u00a0","\uFEFFz\uFEFF","x"})
+    void shortOrWhitespaceOnlyMessagesAreBadRequestsWithoutWrites(String body) throws Exception {
+        mvc.perform(post("/api/v1/issues/{id}/messages",issue.getId())
+                        .header(HttpHeaders.AUTHORIZATION,fixtures.bearer(reporter))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(java.util.Map.of("body",body))))
+                .andExpect(status().isBadRequest());
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM issue_messages WHERE issue_id=?",Integer.class,issue.getId())).isZero();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM notifications WHERE issue_id=?",Integer.class,issue.getId())).isZero();
+    }
+
+    @Test void validMessageRetainsInteriorSpacingAndTheRawLengthLimit() throws Exception {
+        mvc.perform(post("/api/v1/issues/{id}/messages",issue.getId())
+                        .header(HttpHeaders.AUTHORIZATION,fixtures.bearer(reporter))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"body\":\"  a b  \"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.body").value("a b"));
+        mvc.perform(post("/api/v1/issues/{id}/messages",issue.getId())
+                        .header(HttpHeaders.AUTHORIZATION,fixtures.bearer(reporter))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(java.util.Map.of("body","x".repeat(2001)))))
+                .andExpect(status().isBadRequest());
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM issue_messages WHERE issue_id=?",Integer.class,issue.getId())).isEqualTo(1);
     }
 
     @Test

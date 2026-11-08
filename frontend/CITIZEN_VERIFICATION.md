@@ -1,5 +1,11 @@
 # Citizen review — 7 November 2026
 
+**Scope update — 7 November 2026:** email notifications and email-based password
+recovery are deferred to a future update. Provider setup and live delivery/reset
+checks are excluded from current completion requirements. Existing code and the
+historical verification results below are retained. In-app notifications and
+signed-in password changes remain in scope.
+
 The citizen frontend was reviewed against the running localhost application and
 an isolated UI fixture service. The existing light appearance and shared public
 screens remain. The original dry run left the real citizen account signed in on

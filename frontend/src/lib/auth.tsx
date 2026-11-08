@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError } from "./api";
+import { runAuthenticated, type AuthenticatedRequest } from "./authenticatedRequest";
 import { useQueryClient } from "@tanstack/react-query";
 
 /**
@@ -37,7 +38,7 @@ interface AuthValue {
   register: (input: RegisterInput) => Promise<void>;
   signOut: () => Promise<void>;
   /** Runs a request with the access token, refreshing once on a 401. */
-  authed: <T>(run: (token: string) => Promise<T>) => Promise<T>;
+  authed: AuthenticatedRequest;
 }
 
 export interface RegisterInput {
@@ -137,23 +138,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [queryClient]);
 
   const authed = useCallback(
-    async <T,>(run: (token: string) => Promise<T>): Promise<T> => {
-      const current = session ?? (await refresh());
-      if (!current) throw new ApiError(401, { detail: "Sign in to see this." });
-
-      try {
-        return await run(current.accessToken);
-      } catch (e) {
-        // Exactly one retry. A second 401 after a fresh token is not a stale
-        // token, it is a real refusal, and retrying again would loop.
-        if (e instanceof ApiError && e.status === 401) {
-          const renewed = await refresh();
-          if (!renewed) throw e;
-          return run(renewed.accessToken);
-        }
-        throw e;
-      }
-    },
+    <T,>(run: (token: string) => Promise<T>, expectedUserId?: string): Promise<T> =>
+      runAuthenticated(session, refresh, run, expectedUserId),
     [session, refresh],
   );
 

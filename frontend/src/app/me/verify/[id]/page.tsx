@@ -288,7 +288,7 @@ function Recorded({
   );
 }
 
-/** The tally in plain words, and when silence starts to count (blueprint §3.12). */
+/** Distinguish citizen confirmation, timeout resolution and later closure. */
 function Tally({ view, result }: { view: VerificationView; result: VoteResult | null }) {
   // The vote response is newer than the view until the refetch lands.
   const confirmations = result?.confirmations ?? view.confirmations;
@@ -301,12 +301,14 @@ function Tally({ view, result }: { view: VerificationView; result: VoteResult | 
       <p>
         So far {people(confirmations)} {confirmations === 1 ? "has" : "have"} said fixed and{" "}
         {people(rejections)} not fixed. {required} confirmation{required === 1 ? "" : "s"}{" "}
-        {required === 1 ? "is" : "are"} needed to close it; if as many say not fixed as say fixed,
-        it reopens.
+        {required === 1 ? "is" : "are"} needed to mark it resolved. A tie with at least one
+        not-fixed vote, or a not-fixed majority, reopens it.
       </p>
       {view.silenceDeadline && (
         <p className="mt-2">
-          If nobody says it is not fixed by {absoluteDateTime(view.silenceDeadline)}, it counts as fixed.
+          If nobody answers by {absoluteDateTime(view.silenceDeadline)}, it is marked resolved
+          without citizen verification. A fixed majority can also resolve it at that deadline
+          below the required count. This does not close the issue; closure follows a separate quiet period.
         </p>
       )}
     </div>

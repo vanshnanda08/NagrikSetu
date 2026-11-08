@@ -30,7 +30,8 @@ public class AuditQueries {
                 SELECT 'STATUS' AS kind, h.created_at AS at, h.issue_id AS issue_id,
                        COALESCE(h.from_status, 'NEW report') || ' → ' || h.to_status AS action,
                        h.from_status AS from_status, h.to_status AS to_status, NULL::int AS level,
-                       h.actor_role AS actor_role, h.actor_id AS actor_id, h.note AS note
+                       h.actor_role AS actor_role, h.actor_id AS actor_id, h.note AS note,
+                       h.id AS event_id
                 FROM issue_status_history h
               UNION ALL
                 SELECT 'ESCALATION', e.created_at, e.issue_id,
@@ -38,12 +39,12 @@ public class AuditQueries {
                        NULL, NULL, e.level, 'SYSTEM', NULL,
                        e.reason
                          || COALESCE(' · handed to ' || tu.full_name, '')
-                         || COALESCE(' · ' || (e.breached_by_seconds / 3600) || ' h overdue', '')
+                         || COALESCE(' · ' || (e.breached_by_seconds / 3600) || ' h overdue', ''), e.id
                 FROM escalation_events e
                 LEFT JOIN users tu ON tu.id = e.to_user_id
               UNION ALL
                 SELECT 'MODERATION', m.created_at, m.issue_id, m.action,
-                       NULL, NULL, NULL, m.actor_role, m.actor_id, m.note
+                       NULL, NULL, NULL, m.actor_role, m.actor_id, m.note, m.id
                 FROM moderation_actions m
             )
             """;
@@ -55,6 +56,10 @@ public class AuditQueries {
             LEFT JOIN users u ON u.id = ev.actor_id
             """;
 
+    // A timestamp/kind/issue tie can span pages. Source ids are unique within
+    // each kind, so every stable dataset has one complete page/export order.
+    private static final String ORDER = " ORDER BY ev.at DESC, ev.kind, ev.issue_id, ev.event_id DESC";
+
     private final NamedParameterJdbcTemplate jdbc;
     private final DashboardProperties dashboardProps;
 
@@ -65,7 +70,7 @@ public class AuditQueries {
         Long total = jdbc.queryForObject(EVENTS + "SELECT COUNT(*) " + JOINS + where, params, Long.class);
         params.addValue("limit", limit).addValue("offset", offset);
         List<AuditEntryDto> items = jdbc.query(EVENTS + select() + JOINS + where
-                + " ORDER BY ev.at DESC, ev.kind, ev.issue_id LIMIT :limit OFFSET :offset", params, (rs, n) -> row(rs));
+                + ORDER + " LIMIT :limit OFFSET :offset", params, (rs, n) -> row(rs));
         return new AuditPageDto(items, total == null ? 0 : total, limit, offset);
     }
 
@@ -74,7 +79,7 @@ public class AuditQueries {
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("limit", max).addValue("offset", 0);
         String where = where(filter, params);
         return jdbc.query(EVENTS + select() + JOINS + where
-                + " ORDER BY ev.at DESC, ev.kind, ev.issue_id LIMIT :limit OFFSET :offset", params, (rs, n) -> row(rs));
+                + ORDER + " LIMIT :limit OFFSET :offset", params, (rs, n) -> row(rs));
     }
 
     private static String select() {

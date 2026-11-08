@@ -1,13 +1,40 @@
 # NagrikSetu — Complete Project Documentation
 
-**Last reviewed:** 2026-11-07 (Asia/Kolkata).  
+**Last reviewed:** 2026-11-08 (Asia/Kolkata).<br>
 **Repository:** `complaint-system`.  
-**Git baseline inspected:** `011ecb5` — “Record final cross-browser CI verification”, dated 2026-10-27.  
+**Original guide baseline:** `011ecb5` — “Record final cross-browser CI verification”, dated 2026-10-27.<br>
+**Audit-fix baseline:** `74c76ec155a2ad8b354ae35b27540c8e58030b9d`, plus current uncommitted changes, verified 2026-11-08.<br>
 **Review scope:** the current working tree, including uncommitted and untracked application files, configuration, migrations, tests, tools, evaluation results and project notes.
 
-This guide describes the repository at the time of review. The working tree contains substantial changes beyond the last commit. A feature present here may therefore differ from the deployed application. This review used source inspection and local documentation checks; it did not rerun the application, test suites, benchmarks, cloud integrations or deployment. Earlier test and deployment results are identified as recorded evidence, not fresh results.
+This guide describes the repository at the time of review. The working tree contains substantial changes beyond the last commit. A feature present here may therefore differ from the deployed application. The original guide used source inspection and local documentation checks. Subsequent local runtime tests and audit-fix validation are linked below with their dates and limits; they do not establish a new deployment or repeat the earlier benchmarks.
 
 “Confirmed” below means supported by the inspected code or explicitly attributed repository evidence. **Not confirmed** marks something that cannot be established from those sources. Recommendations are suggestions, not promises or approved project plans. No private environment files or secret values are reproduced.
+
+**Local implementation follow-up, 7 November:** escalation deadline/owner scope,
+queue/assignment eligibility and expired-session reporting have since been fixed
+and verified. See [workflow checks](docs/WORKFLOW_FIXES.md). Administrator closure
+is also implemented, including reasoned early closure; see
+[administrator verification](frontend/ADMIN_VERIFICATION.md). These are local
+changes, not a new deployment or cloud-integration claim.
+
+**Quality follow-up, 7–8 November:** [fresh local verification](frontend/QUALITY_VERIFICATION.md)
+records short-message/verification wording fixes, real Cloudinary upload and
+strict server evidence checks, service-worker outbox recovery, keyboard and basic
+VoiceOver checks, and desktop/mobile layouts. The full backend suite passed 332
+tests with two optional evaluations skipped; 115 frontend tests, lint, TypeScript
+and build passed. Chrome's native installation did not complete, and no phone was
+available for physical-device checks. The subsequent full role journey completed
+in [the end-to-end audit](docs/END_TO_END_TEST_REPORT.md). Its five confirmed
+defect categories are corrected in [audit follow-up fixes](docs/AUDIT_FIXES.md),
+verified with 377 passing backend tests (2 optional skips), 115 frontend
+tests, lint, TypeScript and build. Remaining browser/device test boundaries
+are still explicit; no deployment or production sign-off is implied.
+
+**Scope decision, 7 November 2026:** email notifications and email-based password
+recovery are deferred to a future update at the user's request. Provider setup,
+real email/reset-link delivery and associated live checks are excluded from the
+current milestone. Existing code/routes and historical tests remain; in-app
+notifications and signed-in password changes stay in scope.
 
 ## Contents
 
@@ -343,7 +370,7 @@ The current layout uses one light appearance. `globals.css` and the additional `
 
 `lib/queries.ts` normally keeps list data fresh for 30 seconds, treats category/ward reference data as indefinitely fresh and treats issue detail as immediately stale. Dashboard polling uses 60 seconds. SSE change events invalidate summary and breaching data; they do not replace the API response with a second independently defined metric.
 
-Authenticated reads/mutations commonly use `authed()`, which refreshes and retries once on 401. Sign-in/out clears cached user data, and personal query keys include the user ID. The online report composer currently uses a raw access token instead of this refresh wrapper; section 15 explains the resulting limitation.
+Authenticated reads/mutations commonly use `authed()`, which refreshes and retries once on 401. Sign-in/out clears cached user data, and personal query keys include the user ID. Online report submission also uses this wrapper and binds retries to the draft's original account and submission key. Failed renewal or a changed account leaves the draft intact for in-place sign-in and retry.
 
 ### Offline reporting boundaries
 
@@ -603,7 +630,7 @@ Database transactions and locks protect multi-record changes. Issue entities als
 | Acknowledgement, assignment and work | Records who accepted and performed a repair | `WorkIssuePanel.tsx`, `AssignmentPanel.tsx`, `IssueController.java`, `TransitionPolicy.java` | Completed; remaining assignment/scope gaps in section 15 |
 | Repair proof | Requires an uploaded image and at least 20 characters explaining the work | `lib/repairProof.ts`, work panel, `ResolveRequest.java`, `IssueStatusService.java` | Completed; current UI refuses placeholder proof and preserves failed-upload inputs |
 | SLA and priority ageing | Makes neglected or widely reported work more urgent | `PriorityCalculator.java`, `SlaService.java`, `PriorityRecomputer.java`, sweeps | Partially completed end-to-end consistency; rearm gap remains |
-| Automatic escalation | Moves overdue responsibility through the organization | `sla/escalation/`, unique issue/level records and scheduler locking | Partially completed end-to-end consistency; parent-owner scope gap remains |
+| Automatic escalation | Moves overdue responsibility through the organization | `sla/escalation/`, unique issue/level records and scheduler locking | Local deadline/owner-scope regressions passed; operational scheduler checks remain separate |
 | Citizen repair verification | Lets original citizen reporters challenge a claimed fix | Verification page, `VerificationService.java`, `VerificationTally.java`, V5 | Completed rules; anonymous participation and timeout limitations |
 | Automatic closure and recurrence | Settles quiet resolved work and reopens eligible recurrence | `VerificationSweepService.java`, `ClusteringService.java`, system transitions | Completed; human-close API removed |
 | Notifications and preferences | Keeps signed-in reporters/followers informed | Notifications page, `NotificationService.java`, profile/preferences components | Completed; mandatory verification-request behavior is separately enforced |
@@ -616,7 +643,7 @@ Database transactions and locks protect multi-record changes. Issue entities als
 | Team performance | Gives supervisors scoped crew/trend/backlog views | `AnalyticsPanel.tsx`, `DepartmentAnalyticsService.java`, `StaffAnalyticsQueries.java` | Completed; restricted separately from public department data |
 | Profile and password maintenance | Lets users update their own details/preferences and change passwords | `components/account/`, `ProfileService.java`, password policy | Completed |
 | Rotating sessions and MFA | Protects municipal access and lets users revoke sessions | `auth.tsx`, auth proxy routes, `AuthService.java`, `TotpService.java`, security controller | Completed; issued access-token revocation is not immediate |
-| Password recovery and opt-in email | Recovers accounts and optionally delivers updates outside the app | `PasswordRecoveryService.java`, `MailDelivery.java`, `mail_outbox` | Partially completed operationally; production mail deferred |
+| Password recovery and opt-in email | Existing recovery/outbox code retained for a later release | `PasswordRecoveryService.java`, `MailDelivery.java`, `mail_outbox` | Deferred to a future update by user decision; not a current completion requirement |
 | Administrator configuration | Edits existing category policy, user access and organization responsibility | `ConfigurationPanel.tsx`, `AdminConfigurationController.java`, audit table | Completed for existing records; new-record provisioning Not implemented |
 | Event audit and CSV | Supports accountability/review across transitions, escalations and moderation | `AuditPanel.tsx`, `AuditQueries.java`, `AuditCsv.java` | Completed; bounded export |
 | Persistent drafts/outbox | Preserves work on weak connections and retries explicit offline submission | `composer.tsx`, `offlineStore.ts`, worker and Next offline route | Completed implementation; full offline navigation Not implemented |
@@ -689,12 +716,13 @@ The extent-cap experiment shows a trade-off: removing the cap raised seeded F1 t
 
 | Category | Current assessment |
 |---|---|
-| Partially completed | SLA rearm consistency, escalation-owner permissions, complete workflow-scope alignment, operational email readiness and installed-app evidence |
-| Not implemented | New municipal record provisioning through admin configuration; full service-worker app caching; anonymous verification identity; public arbitrary role registration; human manual close in current API |
-| Planned | Resume production transactional email; review orphan dry runs before deletion; complete physical-device/screen-reader/PWA checks; record a final demo if required |
+| Partially completed | Installed-app/device evidence; deadline, owner-scope and assignment fixes are verified locally |
+| Deferred to future update | Email notifications and email-based password recovery, including provider activation and live delivery/reset checks; code retained |
+| Not implemented | New municipal record provisioning through admin configuration; full service-worker app caching; anonymous verification identity; public arbitrary role registration |
+| Planned for current checks | Review orphan dry runs before deletion; complete physical-device/screen-reader/PWA checks; record a final demo if required |
 | Unknown | Today's live hosting/mail/photo status, field usage/adoption, actual municipal repair quality, current backup schedule execution and production load capacity |
 
-Absence is not always a missing requirement: anonymous verification and unrestricted role selection have security/product trade-offs, and manual closure was intentionally removed. No source TODO/FIXME/HACK markers were found in the searched backend/frontend source at review; concrete remaining work is recorded mainly in assessment and verification notes.
+Absence is not always a missing requirement: anonymous verification and unrestricted role selection have security/product trade-offs, and administrator closure now requires a reason and confirmation while preserving public history and role restrictions. No source TODO/FIXME/HACK markers were found in the searched backend/frontend source at review; concrete remaining work is recorded mainly in assessment and verification notes.
 
 ## 11. What We Are Currently Working On
 
@@ -712,16 +740,22 @@ There are no newer committed entries in the inspected history. Current work is b
 
 These are observed areas of activity. **Not confirmed:** the team's exact active assignment, owner, deadline or approved immediate priority. A Git diff proves files changed, not what a developer is currently doing.
 
-The November 6 assessment lists SLA rearm preservation and parent-owner permissions first among its proposals. Some later source changes supersede its list-size concerns: My reports, My work, assignment board and review now have page controls. The online composer still sends the current raw token. Keep those findings separate rather than repeating the older assessment as an unchanged backlog.
+The November 6 assessment lists SLA rearm preservation and parent-owner permissions first among its proposals. Some later source changes supersede its list-size concerns: My reports, My work, assignment board and review now have page controls. The online composer now refreshes on expiry and preserves its original submission identity, verified in the workflow follow-up. Keep those findings separate rather than repeating the older assessment as an unchanged backlog.
 
 ## 12. Future Roadmap
 
-### Confirmed follow-ups in repository notes
+### Deferred future update
 
-1. Complete production transactional email when the integration resumes. Recovery and optional email notifications depend on working delivery.
-2. Review Cloudinary dry-run logs before enabling destructive orphan cleanup. Keep the age/deletion bounds.
-3. Complete physical-device, screen-reader and installed-PWA checks where required.
-4. Record the final demo using `docs/DEMO-RUNBOOK.md` if a submission video is required.
+Email notifications and email-based password recovery are explicitly deferred.
+Retain their source implementation and setup notes; provider configuration, real
+delivery/reset-link checks and any further integration work resume in a future
+update, not as a condition of current completion.
+
+### Current operator follow-ups
+
+1. Review Cloudinary dry-run logs before enabling destructive orphan cleanup. Keep the age/deletion bounds.
+2. Complete physical-device, screen-reader and installed-PWA checks where required.
+3. Record the final demo using `docs/DEMO-RUNBOOK.md` if a submission video is required.
 
 The assessment also records proposed engineering improvements. These are documented proposals, not evidence of scheduled implementation.
 
@@ -729,11 +763,11 @@ The assessment also records proposed engineering improvements. These are documen
 
 | Order | Recommended work | Dependency and useful completion evidence |
 |---|---|---|
-| 1 | Preserve rearmed deadlines across ingest/moderation rescoring | First define one policy for all writers; focused regression should ingest/moderate after escalation and assert the intended deadline |
-| 2 | Align escalation ownership, issue guards, queue scope and assignee validity | Agree whether parent owners gain action rights; test parent heads, dual-scope supervisors, inactive users and citizen assignees |
-| 3 | Add reliable authenticated online report submission after token expiry | Refresh without losing photo/draft/submission identity; test expired token, changed account and response-loss retry |
+| 1 — completed locally | Preserve rearmed deadlines across ingest/moderation rescoring | Real ingest, recategorisation, split and scheduled-priority regressions passed; see workflow checks |
+| 2 — completed locally | Align escalation ownership, guards, queue scope and assignee validity | Current valid municipal escalation owners gain access only to their assigned complaint; dual-scope, role, active-status and ward regressions passed |
+| 3 — completed locally | Renew authenticated online report submission after token expiry | 401 retry and failed-renewal/sign-in browser flows passed with the same body/key; changed-account and anonymous-fallback regressions passed |
 | 4 | Keep verification wording and counters consistent | Retain clear fixed-vote, partial-vote and zero-vote distinctions; decide any quorum policy change before changing data semantics |
-| 5 | Finish live mail/photo/device/restore checks | Depends on actual configured services and isolated test records; record date, environment and limits |
+| 5 | Finish live photo/device/restore checks | Email and password-recovery delivery are deferred; use configured photo services and isolated records, and record date/environment/limits |
 | 6 | Improve evaluation gates and output provenance | Separate Python/Java/HTTP plot names, fail incorrect concurrency/HTTP runs, record hardware/config and broaden datasets |
 | 7 | Improve operator onboarding and policy language | Decide provisioning requirements before adding new create flows; explain technical settings in municipal terms |
 | 8 | Reconcile documentation and release the reviewed working tree | Repair missing references, rerun relevant gates on the exact release snapshot, then deploy the reviewed version |
@@ -929,7 +963,7 @@ The repository describes Vercel for `frontend/`, Render for the backend Docker i
 4. For real reporting, match frontend/backend Cloudinary clouds and configure the unsigned upload preset appropriately. Keep backend evidence verification on.
 5. If using `deploy` bootstrap, supply its password property securely. Keep privileged MFA enabled and use realistic timings.
 6. GitHub CI tests backend, frontend and running-app/browser journeys. The Render deploy job depends on those gates and uses secret `RENDER_DEPLOY_HOOK_URL` on pushes to `main`. Vercel uses its separate Git integration; the backend gate does not by itself prove synchronized frontend release timing.
-7. Configure mail only when ready: SMTP or Brevo, sender/public URL and appropriate health setting. Source implementation does not establish actual provider delivery.
+7. Mail setup is reserved for the future email/password-recovery update: SMTP or Brevo, sender/public URL and appropriate health setting. It is not required for the current milestone. Source implementation does not establish actual provider delivery.
 
 `.github/workflows/keep-alive.yml` pings the recorded API every ten minutes. Its comments explicitly say scheduled runs can be delayed or disabled after inactivity; this is not a cold-start guarantee.
 
@@ -981,11 +1015,11 @@ The weekly workflow reads `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP
 
 | Finding | Evidence and practical effect | Confidence |
 |---|---|---|
-| Escalation rearm can be tightened back to the original report deadline | Ingest/moderation rescoring calls `SlaService.applyPriority`, which compares against first-report allowance. Scheduled `PriorityRecomputer` treats escalated deadlines differently. November assessment records scratch reproduction | Confirmed source inconsistency plus recorded reproduction; not reproduced again here |
-| Parent-department escalation owner can lack action permission | Ladder can assign a parent head while `IssueAccessGuard`/`Guards.SAME_DEPARTMENT` still check issue department/ward rather than parent hierarchy | Confirmed source mismatch plus recorded reproduction |
-| Supervisor queue scope can be narrower than action scope | Guard admits same department OR ward; queue filters combine supplied department and ward constraints | Confirmed source mismatch; effect depends on account scope |
-| Assignment does not fully validate target eligibility | `IssueLifecycleService.assign` loads a user and passes ID/department; `ASSIGNEE_IN_SAME_DEPARTMENT` checks department equality but not active status or municipal role | Confirmed validation gap; crew picker filtering is not API enforcement |
-| Online composer lacks automatic token renewal | `app/report/page.tsx` directly sends `session.accessToken`; it does not use `authed()` | Confirmed source gap; expiry can refuse submission while draft/evidence remain |
+| Escalation deadlines — fixed locally, 7 November | Ingest/moderation and the scheduler preserve the existing escalation grant while updating priority | Full backend suite; four new deadline regressions |
+| Parent-owner access — fixed locally, 7 November | Shared IssueScope admits the current escalation owner to that complaint; ownership changes revoke the extra grant | Real escalation, private-read, queue and work-action regressions |
+| Queue/action scope — fixed locally, 7 November | Supervisor department OR ward; staff department AND optional ward; explicit current escalation ownership; same SQL used before pagination/counting | Dual-scope, review totals, paging and staff boundary regressions |
+| Assignee eligibility — fixed locally, 7 November | API and contextual picker require active staff/supervisor, owning department and permitted staff ward; invalid legacy escalation references are skipped | Inactive/citizen/cross-ward/cross-department and member-lookup regressions |
+| Online session renewal — fixed locally, 7 November | One refresh/retry with original owner, body and submission key; failed renewal/account mismatch preserves the draft | 115 frontend tests and isolated browser expiry/sign-in retries |
 | Trimmed message length has a broad error path | The controller validates the original string, but `IssueEngagementService.post` trims it and throws `IllegalArgumentException` if it is then shorter than three characters. A value such as a single letter padded with spaces can pass the original length check and reach the generic 500 handler | Source-supported edge case; no fresh invalid-message request run |
 
 Do not continue to describe My reports as fixed at 50 total or the work queue/assignment board as inaccessible beyond a single page. Current source contains pagination. Page-size caps still exist intentionally, and offset paging can shift when records change concurrently.
@@ -1006,7 +1040,7 @@ Do not continue to describe My reports as fixed at 50 total or the work queue/as
 
 The base configuration contains a development signing-key fallback; deployment must supply a separate secret. Token minimum length is a startup validation, not evidence that the actual hosted value was reviewed. Refresh revocation prevents renewal but does not invalidate every already issued access token before its short expiry. Some login/registration/security throttles are process-local, so replicas/restarts do not share those buckets; report-history quotas are separately durable.
 
-Cloudinary deletion is intentionally dry-run until reviewed. A configured real photo pipeline and mail provider were not exercised during this review. Mail retry code can stop after eight failures and has no demonstrated operator resend workflow here. The outbox decouples civic writes from delivery but does not prove reliable receipt or eliminate duplicate external sends.
+Cloudinary deletion is intentionally dry-run until reviewed. A configured real photo pipeline and mail provider were not exercised during this review. Email notifications and email-based password recovery are now explicitly deferred to a future update, so their activation/live checks are not current completion gates. Mail retry code can stop after eight failures and has no demonstrated operator resend workflow here. The outbox decouples civic writes from delivery but does not prove reliable receipt or eliminate duplicate external sends.
 
 Backups protect database records, not automatically browser drafts or the full Cloudinary asset library. Current remote backup execution, restore freshness, credentials, privacy retention and unattended-job behavior are **Not confirmed**. Free-tier sleep and scheduler delay remain deployment concerns documented by the repository.
 
@@ -1098,16 +1132,25 @@ The current tree is not a clean committed release. Preserve existing work and ve
 
 ### Current progress
 
-The core system, security features, public/account/work/admin screens, spatial database, tests, evaluation scripts and deployment/backup tooling exist. Current local interface changes go beyond the latest committed release. Existing reports contain substantial passing checks, but no new runtime verification was performed for this guide. Production email, reviewed destructive media cleanup and several device/operational checks remain follow-ups; present cloud state is Unknown.
+The core system, security features, public/account/work/admin screens, spatial database, tests, evaluation scripts and deployment/backup tooling exist. Current local interface changes go beyond the latest committed release. Existing reports contain substantial passing checks, but no new runtime verification was performed for this guide. Email delivery and email-based password recovery are deferred to a future update. Reviewed media cleanup and device/operational checks remain current follow-ups; present cloud state is Unknown.
 
 ### Most important remaining tasks
 
-- Correct deadline rearm and escalation-owner/scope inconsistencies.
-- Enforce complete assignee eligibility and consistent queue/action scope.
-- Refresh expired credentials safely during online report submission.
-- Complete real mail/photo/device/restore evidence and repair stale documentation references.
+The deadline, owner/queue scope, assignee eligibility and online renewal tasks above are now completed locally. Remaining work includes:
+
+- Complete the remaining physical-device/browser and operational restore checks;
+  real photo upload and the principal cross-role journey now have end-to-end evidence.
 - Strengthen experiment provenance and fail-on-error evaluation gates.
 
-**Suggested next development step:** add a focused regression that escalates an issue, submits another nearby report and checks that rescoring preserves the intended rearmed deadline; then fix every writer that violates the agreed rule.
+**Next verification work:** complete the blocked/untested browser and physical-device
+checks in [the end-to-end report](docs/END_TO_END_TEST_REPORT.md). Its five confirmed
+defects are addressed in [AUDIT_FIXES.md](docs/AUDIT_FIXES.md). Email/password-recovery work is deferred. The previously proposed escalation/assignment/report-renewal fixes are recorded in [WORKFLOW_FIXES.md](docs/WORKFLOW_FIXES.md).
+
+Repository cleanup on 8 November 2026 removed the unused `CategoryPicker` and
+its obsolete CSS, while retaining the active report category select. 132
+superseded screenshot files were moved to a local recovery archive outside the
+checkout; current end-to-end/quality screenshots and historical result JSON are
+retained. Runtime routes, tests, academic documents, supplied briefs, credentials,
+database backups, dependencies and active builds were preserved.
 
 To keep this guide useful, update the review date, Git baseline, route/feature tables, unresolved findings and evidence table whenever behavior changes. Record the exact checks actually run and preserve the distinction between source implementation, recorded verification and proposed work.

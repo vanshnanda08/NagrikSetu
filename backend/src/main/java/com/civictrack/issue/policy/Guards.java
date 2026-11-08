@@ -1,6 +1,7 @@
 package com.civictrack.issue.policy;
 
 import com.civictrack.issue.Issue;
+import com.civictrack.issue.IssueScope;
 import com.civictrack.user.Actor;
 import com.civictrack.user.Role;
 
@@ -29,21 +30,12 @@ public enum Guards implements Guard {
     SAME_DEPARTMENT {
         @Override
         public boolean permits(Issue issue, Actor actor, TransitionContext ctx) {
-            if (actor.isAdmin() || actor.isSystem()) {
-                return true;
-            }
-            if (actor.departmentId() != null
-                    && actor.departmentId().equals(issue.getDepartmentId())) {
-                return true;
-            }
-            return actor.role() == Role.SUPERVISOR
-                    && actor.wardId() != null
-                    && actor.wardId().equals(issue.getWardId());
+            return IssueScope.permits(actor, issue);
         }
 
         @Override
         public String explanation() {
-            return "the issue belongs to another department or ward";
+            return "the issue is outside your department, ward or current escalation ownership";
         }
     },
 
@@ -76,13 +68,17 @@ public enum Guards implements Guard {
     ASSIGNEE_IN_SAME_DEPARTMENT {
         @Override
         public boolean permits(Issue issue, Actor actor, TransitionContext ctx) {
-            return ctx.assigneeId() != null
-                    && Objects.equals(ctx.assigneeDepartmentId(), issue.getDepartmentId());
+            return ctx.assigneeId() != null && ctx.assigneeActive()
+                    && (ctx.assigneeRole() == Role.STAFF || ctx.assigneeRole() == Role.SUPERVISOR)
+                    && issue.getDepartmentId() != null
+                    && Objects.equals(ctx.assigneeDepartmentId(), issue.getDepartmentId())
+                    && (ctx.assigneeRole() == Role.SUPERVISOR || ctx.assigneeWardId() == null
+                        || Objects.equals(ctx.assigneeWardId(), issue.getWardId()));
         }
 
         @Override
         public String explanation() {
-            return "the assignee must belong to the department that owns this issue";
+            return "choose an active staff member or supervisor in the owning department who can work in this ward";
         }
     },
 

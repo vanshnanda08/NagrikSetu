@@ -6,6 +6,7 @@ import { AuthProvider } from "@/lib/auth";
 import { ComposerProvider } from "@/lib/composer";
 import { SignInProvider } from "@/lib/signInDialog";
 import { OutboxSync } from "@/components/OutboxSync";
+import { PwaInstallProvider } from "@/lib/pwaInstall";
 
 /**
  * Client-side providers.
@@ -38,9 +39,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <OutboxSync />
         {/* Inside AuthProvider, because the dialog calls signIn. */}
-        <SignInProvider>
-          <ComposerProvider>{children}</ComposerProvider>
-        </SignInProvider>
+        <PwaInstallProvider>
+          <SignInProvider>
+            <ComposerProvider>{children}</ComposerProvider>
+          </SignInProvider>
+        </PwaInstallProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

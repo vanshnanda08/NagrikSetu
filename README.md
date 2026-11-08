@@ -79,13 +79,41 @@ public history remain. Citizen verification and the automatic settlement/closure
 jobs remain for the normal repair workflow. Review-queue category/rejection
 edits use the existing moderation screen; no migrations or complaint history were removed.
 
+The [workflow fixes](docs/WORKFLOW_FIXES.md) complete escalation deadline/owner
+consistency, queue and assignment scope, and identity-preserving report retries
+when a login expires. That earlier workflow-fix run had **332 passing tests and
+2 opt-in evaluation tests skipped**; all **115 frontend tests**, lint, TypeScript
+and the production build passed. Browser writes used an isolated fixture.
+
+The subsequent [full end-to-end audit](docs/END_TO_END_TEST_REPORT.md) completed
+the real cross-role complaint journey and service-outage recovery. Its five
+confirmed findings are now corrected in [audit follow-up fixes](docs/AUDIT_FIXES.md):
+CSV protection, stable audit pagination, concurrent-update conflicts, Unicode
+configuration names and verification wording. The fresh combined suite passed
+**377 backend tests (2 optional skips)** and **115 frontend tests**,
+plus lint, TypeScript and production build. These local checks do not replace
+the audit’s blocked/untested browser and physical-device checks.
+
+The [7–8 November quality checks](frontend/QUALITY_VERIFICATION.md) cover message
+validation, truthful verification notifications, a real Cloudinary upload with
+strict server evidence checks, offline queue recovery, keyboard/VoiceOver checks
+and twelve desktop/mobile layout inspections. Chrome now offers installation,
+but native installation did not complete on the available laptop. Physical-phone
+checks were unavailable. The later full role-by-role journey is recorded in
+[the end-to-end report](docs/END_TO_END_TEST_REPORT.md); native installation
+and the remaining device/browser boundaries are still open.
+
 ## Project status
 
-**Phases 0–9 implemented and deployed; production mail delivery is deferred.**
+**Phases 0–9 implemented; email delivery and email-based password recovery are deferred to a future update.**
 The application, evaluation, hardening, demo profile, and final write-up are
 built and tested. CI, the live frontend/API, and encrypted backup recovery have
 been verified. Cloudinary deletion remains deliberately disabled until its dry
-run is reviewed; real transactional email delivery will be completed later.
+run is reviewed. Email notifications and email-based password recovery are outside
+the current milestone, including provider setup and live delivery/reset testing.
+Existing code/routes are retained for that future update. In-app notifications
+and password changes while signed in remain in scope. Deployment evidence below
+refers to the earlier release; the latest working-tree changes remain local.
 See [the audit](FINAL_AUDIT.md) for security fixes, fresh verification and the
 remaining operational/accessibility checks.
 
@@ -122,16 +150,26 @@ appearance and uses the consolidated screen structure described above.
 | 7 | Supervisor tools (assignment board, review queue, split/merge with full recomputation and a permanent log, recategorise), full dashboard aggregates behind expandable headings, SSE live updates | ✅ done |
 | 8 | Evaluation: labelled clustering quality, radius sweep, latency at 1k/10k/50k issues, extent-cap ablation, and live concurrency cohorts | ✅ done; reproducible scripts and CSV/PDF results are in `evaluation/` and `artifacts/evaluation/` |
 | 9 | Rate limiting, anti-abuse screening, privacy redaction, demo scenario, remaining blueprint screens, and final report | ✅ done |
-| Extended scope | Password reset, refresh-token rotation and reuse detection, opt-in email delivery, audited admin configuration, persistent drafts, and background offline submission | ✅ done |
+| Extended scope | Refresh-token rotation and reuse detection, audited admin configuration, persistent drafts, and background offline submission | ✅ done |
+| Future update | Email notifications and email-based password recovery; existing implementation retained | Deferred by user decision; excluded from current completion requirements |
 | Production essentials | Authenticator MFA and recovery codes for municipal roles, active-session revocation, issue following, private clarification threads, installable PWA manifest, and security headers | ✅ done |
 | UI | Frontend refresh (not a numbered phase): NagrikSetu branding and logo, glass theme with a navy / orange / sky palette, one-screen desktop layout for every page, root redirect to the dashboard, accessibility fixes | ✅ done, verified locally 2026-10-11 |
 
 ### Remaining operator checks
 
-- Complete production transactional email delivery when that integration resumes.
 - Review Cloudinary orphan-sweep dry-run output before enabling deletion.
-- Complete physical-device/screen-reader and installed-PWA checks where required.
+- Follow up native PWA installation and physical-phone checks where required;
+  desktop keyboard, basic VoiceOver and queued-report recovery checks are recorded
+  in [quality verification](frontend/QUALITY_VERIFICATION.md).
+- Complete the final role-by-role browser journey after the other checks.
 - Record the final demo using `docs/DEMO-RUNBOOK.md` if a submission video is required.
+
+### Deferred to a future update
+
+Email delivery and email-based password recovery will resume in a future update.
+Provider setup, real reset-link delivery, notification delivery and related live
+checks are not current blockers. Existing implementation and historical test
+evidence are retained; no application code was removed or disabled by this decision.
 
 ## Features
 
@@ -154,15 +192,16 @@ appearance and uses the consolidated screen structure described above.
   sweeps.
 - **Anonymous reporting.** No account needed to report; a signed-in reporter's
   identity is taken from the verified token, never from the request body.
-- **Recoverable accounts.** Refresh cookies rotate through reuse-detecting
-  token families. One-use password-reset links expire after 30 minutes, and
-  password/access changes revoke refresh sessions.
+- **Account sessions and password management.** Refresh cookies rotate through
+  reuse-detecting token families, and password/access changes revoke refresh
+  sessions. Email-based password recovery is deferred; its existing one-use
+  reset-link implementation is retained for the future update.
 - **Protected municipal access.** Staff, supervisor and administrator roles
   require time-based authenticator MFA in production, with one-use recovery
   codes and replay protection. Every user can inspect and revoke refresh-token
   session families from the security screen.
-- **Email without coupling civic work to SMTP.** Email updates are opt-in and
-  use a transactional outbox with bounded retries. In-app notifications and
+- **Email delivery — future update.** The retained email implementation is opt-in and
+  uses a transactional outbox with bounded retries. In-app notifications and
   issue transitions still succeed when the mail service is down.
 - **Persistent offline reporting.** Draft text, coordinates and compressed
   photos survive reloads in IndexedDB. Explicitly submitted offline reports
@@ -303,7 +342,10 @@ normal profile.
 `verify-evidence=false` is only for the local placeholder-photo demo. Production
 must leave verification enabled and set the same Cloudinary cloud in
 `CLOUDINARY_CLOUD_NAME` and `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`; the API then
-downloads and hashes the actual uploaded pixels. To exercise email locally,
+downloads and hashes the actual uploaded pixels.
+
+The following mail setup is retained for the future email/password-recovery
+update; it is not required for the current milestone. To exercise email locally,
 run Mailpit on ports 1025/8025 and set `MAIL_ENABLED=true`. Production mail also
 needs `SMTP_HOST`, `SMTP_PORT`, optional SMTP credentials/TLS, `MAIL_FROM`, and
 `PUBLIC_APP_URL`. With mail disabled, messages remain in the outbox and issue work

@@ -50,7 +50,7 @@ public class IssueAccessGuard {
             // ids exist. The 404 is still produced for callers who pass this.
             return false;
         }
-        return inScope(actor, issue);
+        return IssueScope.permits(actor, issue);
     }
 
     /**
@@ -62,19 +62,6 @@ public class IssueAccessGuard {
      * ward set are confined to it; crew with none serve the whole city, which
      * is how a small municipal department with two plumbers actually works.
      */
-    private boolean inScope(Actor actor, Issue issue) {
-        boolean sameDepartment = actor.departmentId() != null
-                && actor.departmentId().equals(issue.getDepartmentId());
-        boolean sameWard = actor.wardId() != null && actor.wardId().equals(issue.getWardId());
-
-        return switch (actor.role()) {
-            case SUPERVISOR -> sameDepartment || sameWard;
-            case STAFF -> sameDepartment && (actor.wardId() == null || sameWard);
-            case ADMIN -> true;
-            case CITIZEN, SYSTEM -> false;
-        };
-    }
-
     /** A citizen may verify only an issue they themselves reported. */
     @Transactional(readOnly = true)
     public boolean canVerify(UUID issueId, Authentication authentication) {

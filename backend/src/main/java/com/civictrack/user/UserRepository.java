@@ -42,7 +42,7 @@ public interface UserRepository extends JpaRepository<AppUser, UUID> {
             """, nativeQuery = true)
     List<UUID> findIdsMuting(@Param("ids") java.util.Collection<UUID> ids, @Param("type") String type);
 
-    @Query(value = "SELECT head_user_id FROM departments WHERE id = :id", nativeQuery = true)
+    @Query(value = "SELECT d.head_user_id FROM departments d JOIN users u ON u.id = d.head_user_id WHERE d.id = :id AND u.active AND (u.role = 'ADMIN' OR (u.role = 'STAFF' AND u.department_id IS NOT NULL) OR (u.role = 'SUPERVISOR' AND (u.department_id IS NOT NULL OR u.ward_id IS NOT NULL)))", nativeQuery = true)
     Optional<UUID> findDepartmentHead(@Param("id") UUID departmentId);
 
     /**
@@ -54,10 +54,11 @@ public interface UserRepository extends JpaRepository<AppUser, UUID> {
             SELECT parent.head_user_id
             FROM departments child
             JOIN departments parent ON parent.id = child.parent_department_id
+            JOIN users u ON u.id = parent.head_user_id AND u.active AND (u.role = 'ADMIN' OR (u.role = 'STAFF' AND u.department_id IS NOT NULL) OR (u.role = 'SUPERVISOR' AND (u.department_id IS NOT NULL OR u.ward_id IS NOT NULL)))
             WHERE child.id = :id
             """, nativeQuery = true)
     Optional<UUID> findParentDepartmentHead(@Param("id") UUID departmentId);
 
-    @Query(value = "SELECT officer_user_id FROM wards WHERE id = :id", nativeQuery = true)
+    @Query(value = "SELECT w.officer_user_id FROM wards w JOIN users u ON u.id = w.officer_user_id WHERE w.id = :id AND u.active AND (u.role = 'ADMIN' OR (u.role = 'STAFF' AND u.department_id IS NOT NULL) OR (u.role = 'SUPERVISOR' AND (u.department_id IS NOT NULL OR u.ward_id IS NOT NULL)))", nativeQuery = true)
     Optional<UUID> findWardOfficer(@Param("id") UUID wardId);
 }

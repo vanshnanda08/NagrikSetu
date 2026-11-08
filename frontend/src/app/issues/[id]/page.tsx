@@ -115,7 +115,7 @@ export default function IssueDetailPage({ params, searchParams }: { params: Prom
             {reports.isPending && <LoadingState label="Loading report photos" />}
             {reports.isError && <ErrorState action="Loading report photos" problem={(reports.error as ApiError)?.problem} onRetry={() => void reports.refetch()} />}
             {reports.data?.length === 0 && <p className="text-dense text-ink-muted">No report photos available.</p>}
-            <div className="issue-photo-strip" tabIndex={reports.data && reports.data.length > 2 ? 0 : undefined} aria-label="Report photos">
+            <div className="issue-photo-strip" role="group" tabIndex={reports.data && reports.data.length > 2 ? 0 : undefined} aria-label="Report photos">
               {reports.data?.map(r => <EvidencePhoto key={r.id} src={r.photoUrl} label={`Report ${r.sequence}${r.landmark ? `, ${r.landmark}` : ""}`} />)}
               {i.resolutionPhotoUrl && <EvidencePhoto src={i.resolutionPhotoUrl} label="Repair proof" />}
             </div>

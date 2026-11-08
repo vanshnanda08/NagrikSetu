@@ -53,8 +53,6 @@
 .issue-row { margin: 8px 0 !important; padding: 18px; border: 1px solid var(--glass-edge); border-radius: 20px; background: var(--glass-fill); }
 .issue-row:hover { background: var(--glass-thin-fill); box-shadow: var(--glass-shadow); }
 .loading-state { background: var(--glass-fill); border-color: var(--glass-edge); border-radius: 22px; }
-.category-option { background: var(--glass-thin-fill); border-radius: 20px !important; }
-.category-option:has(input:checked) { background: var(--glass-solid); box-shadow: var(--glass-shadow); }
 .segmented-control { background: var(--glass-thin-fill); border-color: var(--glass-edge); border-radius: 999px; }
 .segmented-control button, .account-nav :is(a, span) { border-radius: 999px; }
 .page-main table thead th { background: var(--glass-solid); }

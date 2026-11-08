@@ -43,7 +43,7 @@
 .issue-report-details { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--rule); }
 .issue-report-note { padding: 10px 0; border-bottom: 1px solid var(--rule); }
 .issue-report-note p { margin-top: 4px; }
-.evidence-dialog { width: min(1000px, 94vw); max-height: 92dvh; padding: 16px; border: 1px solid var(--rule); border-radius: 20px; background: var(--glass-solid); color: var(--ink); }
+.evidence-dialog { margin: auto; width: min(1000px, 94vw); max-height: 92dvh; padding: 16px; border: 1px solid var(--rule); border-radius: 20px; background: var(--glass-solid); color: var(--ink); }
 .evidence-dialog::backdrop { background: var(--overlay); }
 .evidence-dialog-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
 .evidence-dialog-heading button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--rule-strong); border-radius: var(--radius-pill); }

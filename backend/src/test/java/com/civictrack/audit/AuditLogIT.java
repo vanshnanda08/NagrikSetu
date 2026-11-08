@@ -6,6 +6,7 @@ import com.civictrack.support.Fixtures;
 import com.civictrack.support.MutableClock;
 import com.civictrack.user.AppUser;
 import com.civictrack.user.Role;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +42,8 @@ class AuditLogIT extends IntegrationTestBase {
     @Autowired private Fixtures fixtures;
     @Autowired private MutableClock clock;
     @Autowired private JdbcTemplate jdbc;
+    @Autowired private AuditQueries audit;
+    @Autowired private ObjectMapper json;
 
     private AppUser admin;
     private AppUser roadsHead;
@@ -142,6 +147,63 @@ class AuditLogIT extends IntegrationTestBase {
     }
 
     @Test
+    @DisplayName("CSV neutralizes hidden formula prefixes without rewriting the actual transition note")
+    void csvHiddenFormulaPrefix() throws Exception {
+        Issue other = fixtures.issue("POTHOLE", Instant.now(), Instant.now().plusSeconds(86_400));
+        String note = "\t=SUM(1,1)";
+        mvc.perform(post("/api/v1/issues/{id}/acknowledge", other.getId())
+                        .header(HttpHeaders.AUTHORIZATION, fixtures.bearer(roadsHead))
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(java.util.Map.of("note", note))))
+                .andExpect(status().isOk());
+
+        assertThat(jdbc.queryForObject("SELECT note FROM issue_status_history WHERE issue_id=?",
+                String.class, other.getId())).isEqualTo(note);
+        String csv = mvc.perform(get("/api/v1/admin/audit.csv").param("issueRef", other.getPublicRef())
+                        .header(HttpHeaders.AUTHORIZATION, fixtures.bearer(admin)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(csv).contains("\"'\t=SUM(1,1)\"");
+    }
+
+    @Test
+    @DisplayName("tied audit events remain reachable exactly once across pages and in export order")
+    void pagingTimestampTies() throws Exception {
+        Issue other = fixtures.issue("POTHOLE", Instant.now(), Instant.now().plusSeconds(86_400));
+        Timestamp at = Timestamp.from(Instant.parse("2026-10-01T12:00:00Z"));
+        for (int n = 0; n < 125; n++) {
+            jdbc.update("INSERT INTO issue_status_history(issue_id,from_status,to_status,actor_id,actor_role,note,created_at)"
+                            + " VALUES (?,'NEW','ACKNOWLEDGED',?,'SUPERVISOR',?,?)",
+                    other.getId(), roadsHead.getId(), "status-" + n, at);
+            jdbc.update("INSERT INTO moderation_actions(action,issue_id,actor_id,actor_role,detail,note,created_at)"
+                            + " VALUES ('CONFIRM',?,?,'SUPERVISOR','{}'::jsonb,?,?)",
+                    other.getId(), roadsHead.getId(), "moderation-" + n, at);
+        }
+        for (int level = 1; level <= 4; level++) {
+            jdbc.update("INSERT INTO escalation_events(issue_id,level,reason,created_at) VALUES (?,?,?,?)",
+                    other.getId(), level, "escalation-" + level, at);
+        }
+        List<String> expected = new ArrayList<>();
+        for (int level = 4; level >= 1; level--) expected.add("escalation-" + level);
+        for (int n = 124; n >= 0; n--) expected.add("moderation-" + n);
+        for (int n = 124; n >= 0; n--) expected.add("status-" + n);
+
+        List<String> traversed = new ArrayList<>();
+        for (int offset = 0; offset < expected.size(); offset += 50) {
+            String body = mvc.perform(get("/api/v1/admin/audit").param("issueRef", other.getPublicRef())
+                            .param("limit", "50").param("offset", String.valueOf(offset))
+                            .header(HttpHeaders.AUTHORIZATION, fixtures.bearer(admin)))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(expected.size()))
+                    .andReturn().getResponse().getContentAsString();
+            AuditPageDto page = json.readValue(body, AuditPageDto.class);
+            traversed.addAll(page.items().stream().map(AuditEntryDto::note).toList());
+        }
+        assertThat(traversed).doesNotHaveDuplicates().containsExactlyElementsOf(expected);
+        AuditFilter filter = new AuditFilter(null, other.getPublicRef(), null, null, null, null, null);
+        assertThat(audit.export(filter, 50_000).stream().map(AuditEntryDto::note).toList())
+                .containsExactlyElementsOf(traversed);
+    }
+
+    @Test
     @DisplayName("CSV field escaping")
     void csvField() {
         assertThat(AuditCsv.field(null)).isEmpty();
@@ -152,6 +214,17 @@ class AuditLogIT extends IntegrationTestBase {
         assertThat(AuditCsv.field("-5")).isEqualTo("'-5");
         assertThat(AuditCsv.field("@name")).isEqualTo("'@name");
         assertThat(AuditCsv.field("line1\nline2")).isEqualTo("\"line1\nline2\"");
+        for (String prefix : List.of("", " ", "\t", "\r", "\n", "\u00a0", "\u2003", "\uFEFF", " \t\r\n\u00a0")) {
+            for (String formula : List.of("=1", "+1", "-1", "@name")) {
+                String input = prefix + formula;
+                String expected = "'" + input;
+                if (input.contains("\r") || input.contains("\n")) expected = "\"" + expected + "\"";
+                assertThat(AuditCsv.field(input)).as("prefix %s before %s", prefix, formula).isEqualTo(expected);
+            }
+        }
+        assertThat(AuditCsv.field(" \tordinary note")).isEqualTo(" \tordinary note");
+        assertThat(AuditCsv.field("\u00a0")).isEqualTo("\u00a0");
+        assertThat(AuditCsv.field("'\t=1")).isEqualTo("'\t=1");
     }
 
     private void assertTotal(String query, int expected) throws Exception {

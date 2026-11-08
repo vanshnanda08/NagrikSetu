@@ -40,6 +40,9 @@ docs/*
 !docs/PROJECT_ASSESSMENT.md
 !docs/PROGRESS.md
 !docs/DESIGN-DECISIONS.md
+!docs/AUDIT_FIXES.md
+!docs/END_TO_END_TEST_REPORT.md
+!docs/WORKFLOW_FIXES.md
 !docs/FINAL-PROJECT-REPORT.md
 !docs/MONTH-2-WORK-DONE.md
 

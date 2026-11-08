@@ -146,3 +146,11 @@ checks. Open fixtures start without resolution timestamps or proof. The action
 keeps the original from-state in history and audit; it does not fabricate a repair.
 Real role, metrics, notification and verification behavior is covered by
 `AdminClosureIT` on a separate PostGIS database.
+
+
+`admin-ui-fixtures.mjs` also supports `QA_ROLE=CITIZEN` for isolated report-expiry
+checks. `POST /__qa/control` can refuse one reports or refresh request; refreshes
+return a new fixture token. `reportAttempts` records fixture headers/body/key to
+check identity-preserving retries. Never point this mock at production; it is not
+role-authorization evidence. A temporary UI-only prepared-draft route was used
+for browser checks of an already-uploaded image, without changing the real app.

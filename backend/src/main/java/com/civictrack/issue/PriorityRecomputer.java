@@ -146,7 +146,7 @@ public class PriorityRecomputer {
                 UPDATE issues i
                    SET priority_score = v.score,
                        priority       = v.band,
-                       due_at         = CASE WHEN i.last_escalated_at IS NULL
+                       due_at         = CASE WHEN i.last_escalated_at IS NULL AND i.escalation_level = 0
                                              THEN LEAST(i.due_at, v.due)
                                              ELSE i.due_at
                                         END,

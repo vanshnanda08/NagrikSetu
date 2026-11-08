@@ -154,12 +154,6 @@
   to   { background-position: 200% 0; }
 }
 
-@keyframes pop {
-  0%   { transform: scale(1); }
-  45%  { transform: scale(1.06); }
-  100% { transform: scale(1); }
-}
-
 /* Content arriving. `backwards` so the element is already at the start of the
    animation before it begins, rather than flashing at full opacity for a frame
    while the delay runs down. */
@@ -194,8 +188,6 @@
     opacity var(--dur-fast) var(--ease-standard);
 }
 .u-press:active:not(:disabled) { transform: scale(0.97); }
-
-.u-pop { animation: pop var(--dur-base) var(--ease-spring); }
 
 /* Skeletons use the shared surface and border tokens. */
 .u-skeleton {
