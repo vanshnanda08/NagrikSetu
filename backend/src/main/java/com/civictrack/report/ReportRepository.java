@@ -10,7 +10,14 @@ import java.util.UUID;
 
 public interface ReportRepository extends JpaRepository<Report, UUID> {
 
-    List<Report> findByIssueIdOrderByCreatedAtAsc(UUID issueId);
+    /** Originating evidence wins timestamp ties; UUIDs give the remaining ties a stable order. */
+    @Query(value = """
+            SELECT * FROM reports r WHERE r.issue_id = :issueId
+            ORDER BY r.created_at ASC,
+                     CASE WHEN r.cluster_decision = 'NEW_ISSUE' THEN 0 ELSE 1 END,
+                     r.id ASC
+            """, nativeQuery = true)
+    List<Report> findByIssueIdOrderByCreatedAtAsc(@Param("issueId") UUID issueId);
 
     int countByIssueId(UUID issueId);
 
@@ -79,5 +86,11 @@ public interface ReportRepository extends JpaRepository<Report, UUID> {
     List<Report> findByIdIn(java.util.Collection<UUID> ids);
 
     /** Member reports of several issues at once: the review queue's thumbnails, in one query. */
-    List<Report> findByIssueIdInOrderByCreatedAtAsc(java.util.Collection<UUID> issueIds);
+    @Query(value = """
+            SELECT * FROM reports r WHERE r.issue_id IN (:issueIds)
+            ORDER BY r.created_at ASC,
+                     CASE WHEN r.cluster_decision = 'NEW_ISSUE' THEN 0 ELSE 1 END,
+                     r.id ASC
+            """, nativeQuery = true)
+    List<Report> findByIssueIdInOrderByCreatedAtAsc(@Param("issueIds") java.util.Collection<UUID> issueIds);
 }

@@ -1,5 +1,12 @@
 # NagrikSetu — current progress
 
+Release follow-up, 10 November: Patiala/V11 changes were pushed as `935a30f`;
+the deployment-profile mail-off correction followed as `d684390`. CI exposed
+a pre-existing tied-timestamp report-ordering bug, now corrected with a
+deterministic evidence order and regression coverage. The fresh full backend
+suite passed 381 tests, with 2 optional skips. Final CI/live verification is
+in progress; dated pre-release statements below remain historical.
+
 Hosted recheck, 10 November: health returned 200 / UP after 152.5 seconds;
 database-backed public reads and the Vercel CORS origin passed. An invalid-photo
 probe confirmed active validation without creating a complaint. This supersedes

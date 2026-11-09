@@ -127,7 +127,8 @@ public class PublicIssueController {
      * <p>Ordering is load-bearing: the sequence number the side panel prints
      * is the report's position in the cluster's history, so it has to be
      * assigned from creation order rather than from whatever order the
-     * database felt like returning.
+     * database felt like returning. Timestamp ties put originating evidence
+     * first, then use report IDs to keep the remaining sequence stable.
      */
     @GetMapping("/issues/{id}/reports")
     @Transactional(readOnly = true)

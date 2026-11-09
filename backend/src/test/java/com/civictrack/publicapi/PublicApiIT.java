@@ -36,6 +36,7 @@ class PublicApiIT extends IntegrationTestBase {
     @Autowired private MockMvc mvc;
     @Autowired private ObjectMapper json;
     @Autowired private Fixtures fixtures;
+    @Autowired private org.springframework.jdbc.core.JdbcTemplate jdbc;
 
     @BeforeEach
     void clean() {
@@ -215,6 +216,38 @@ class PublicApiIT extends IntegrationTestBase {
                 .andExpect(jsonPath("$[1].clusterDecision").value("MERGED"))
                 .andExpect(jsonPath("$[1].clusterDistanceM").exists())
                 .andExpect(jsonPath("$[1].effectiveRadiusM").exists());
+    }
+
+    @Test
+    @DisplayName("tied timestamps keep originating evidence first and merged evidence in a stable order")
+    void tiedTimestampsHaveDeterministicEvidenceOrder() throws Exception {
+        Issue issue = reportedIssue();
+        submit(GeoFixtures.latOffsetM(12), GeoFixtures.LNG, 8.0);
+        submit(GeoFixtures.latOffsetM(20), GeoFixtures.LNG, 8.0);
+        // Prepared identifiers deliberately put the origin last by UUID and
+        // invert merge submission order. Ties must not depend on physical rows.
+        var rows = jdbc.queryForList("SELECT id FROM reports WHERE issue_id=? ORDER BY ST_Y(location)", issue.getId());
+        String origin = "ffffffff-ffff-ffff-ffff-ffffffffffff";
+        String first = "00000000-0000-0000-0000-000000000001";
+        String second = "00000000-0000-0000-0000-000000000002";
+        String[] ids = {origin, second, first};
+        for (int n = 0; n < ids.length; n++) {
+            jdbc.update("UPDATE reports SET id=? WHERE id=?", java.util.UUID.fromString(ids[n]), rows.get(n).get("id"));
+        }
+        mvc.perform(get("/api/v1/public/issues/{id}/reports", issue.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(origin))
+                .andExpect(jsonPath("$[0].clusterDecision").value("NEW_ISSUE"))
+                .andExpect(jsonPath("$[1].id").value(first))
+                .andExpect(jsonPath("$[2].id").value(second));
+
+        // Creation time still takes precedence over the origin tiebreaker.
+        jdbc.update("UPDATE reports SET created_at=created_at-interval '1 second' WHERE id=?", java.util.UUID.fromString(second));
+        mvc.perform(get("/api/v1/public/issues/{id}/reports", issue.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(second))
+                .andExpect(jsonPath("$[1].id").value(origin))
+                .andExpect(jsonPath("$[2].id").value(first));
     }
 
     @Test

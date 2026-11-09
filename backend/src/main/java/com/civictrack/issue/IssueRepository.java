@@ -611,7 +611,9 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
             LEFT JOIN LATERAL (
                 SELECT r.landmark FROM reports r
                 WHERE r.issue_id = i.id
-                ORDER BY r.created_at ASC, r.id ASC
+                ORDER BY r.created_at ASC,
+                         CASE WHEN r.cluster_decision = 'NEW_ISSUE' THEN 0 ELSE 1 END,
+                         r.id ASC
                 LIMIT 1
             ) fr ON TRUE
             WHERE ((:readyToCloseOnly = TRUE AND i.status = 'RESOLVED')

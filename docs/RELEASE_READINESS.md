@@ -12,6 +12,15 @@ implementation are preserved. Restore the environment binding deliberately as
 part of the future verified-mail release. The private Render environment
 variable itself has not been changed by this correction.
 
+Release CI then exposed an existing timestamp-tie bug in public report ordering:
+`PublicApiIT.reportsCarryTheAuditTrail` could receive merged evidence before the
+originating report when both had the same timestamp. Report reads and the queue's
+first-landmark lookup now use creation time, originating-report preference for
+ties, then UUID. The regression forces reversed UUIDs and also verifies creation
+time still takes precedence. A fresh isolated full suite passed **383 total:
+381 passed, 2 optional evaluations skipped**, zero failures/errors. CI must be
+rerun on this fix; the earlier failed run is retained as historical evidence.
+
 ## Hosted recheck — 10 November 2026
 
 The user supplied startup/runtime logs covering 8–9 November UTC. They show
