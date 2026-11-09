@@ -117,7 +117,7 @@ def linear_stress_corpus():
     """Six 90 m road defects arranged end-to-end as a locally mergeable chain."""
     rows = []
     sequence = 0
-    origin_lat, origin_lng = 30.93, 75.82
+    origin_lat, origin_lng = 30.386, 76.326
     for defect in range(6):
         for observation in range(3):
             sequence += 1

@@ -38,10 +38,10 @@ class RateLimitServiceTest {
                 .thenReturn(false, true);
         RateLimitService service = new RateLimitService(reports, properties, clock);
 
-        service.checkReport(null, "device-1", "POTHOLE", 30.93, 75.82);
+        service.checkReport(null, "device-1", "POTHOLE", 30.386, 76.326);
 
         assertThatThrownBy(() -> service.checkReport(
-                null, "device-1", "POTHOLE", 30.93, 75.82))
+                null, "device-1", "POTHOLE", 30.386, 76.326))
                 .isInstanceOf(RateLimitExceededException.class);
     }
 
@@ -52,7 +52,7 @@ class RateLimitServiceTest {
         RateLimitService service = new RateLimitService(reports, properties, clock);
 
         assertThatThrownBy(() -> service.checkReport(
-                reporter, "device-2", "POTHOLE", 30.93, 75.82))
+                reporter, "device-2", "POTHOLE", 30.386, 76.326))
                 .isInstanceOf(RateLimitExceededException.class)
                 .hasMessageContaining("daily");
     }

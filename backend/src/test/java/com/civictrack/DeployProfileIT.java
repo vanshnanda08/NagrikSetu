@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.Duration;
 
@@ -26,6 +27,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * works perfectly and reports false numbers.
  */
 @ActiveProfiles({"test", "deploy"})
+// The production cron overrides the disabled test cron. Close this context so
+// its scheduled jobs cannot mutate another test's shared PostGIS fixtures.
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class DeployProfileIT extends IntegrationTestBase {
 
     @Autowired private SlaProperties sla;

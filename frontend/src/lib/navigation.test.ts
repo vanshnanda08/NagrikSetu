@@ -32,7 +32,7 @@ describe("consolidated navigation", () => {
   });
 
   it("preserves filters, paging and map position across a list/map round trip", () => {
-    const query = "status=NEW&category=POTHOLE&ward=12&sort=priority&offset=25&c=30.8%2C75.8%2C31%2C76&z=13";
+    const query = "status=NEW&category=POTHOLE&ward=12&sort=priority&offset=25&c=30.29%2C76.28%2C30.42%2C76.45&z=13";
     const map = new URL(complaintViewHref(query, "map"), "https://example.test");
     expect(map.pathname).toBe("/issues");
     expect(map.searchParams.get("view")).toBe("map");

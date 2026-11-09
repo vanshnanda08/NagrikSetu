@@ -43,6 +43,7 @@ docs/*
 !docs/AUDIT_FIXES.md
 !docs/END_TO_END_TEST_REPORT.md
 !docs/WORKFLOW_FIXES.md
+!docs/RELEASE_READINESS.md
 !docs/FINAL-PROJECT-REPORT.md
 !docs/MONTH-2-WORK-DONE.md
 

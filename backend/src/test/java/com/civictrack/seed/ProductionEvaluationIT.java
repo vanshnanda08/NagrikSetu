@@ -54,7 +54,7 @@ class ProductionEvaluationIT extends IntegrationTestBase {
                 replay(csv,"seed-cap-"+cap,"seeded",corpus,0,cap);
             }
             List<Observation> linear=new ArrayList<>();
-            for(int i=0;i<18;i++) linear.add(new Observation("linear-"+(i/3),"ROAD_DAMAGE",30.93+i*45/111111.0,75.82,8,null,"linear-device-"+i));
+            for(int i=0;i<18;i++) linear.add(new Observation("linear-"+(i/3),"ROAD_DAMAGE",30.386+i*45/111111.0,76.326,8,null,"linear-device-"+i));
             for(boolean cap:new boolean[]{true,false}) {
                 restore(original);
                 jdbc.update("UPDATE categories SET merge_radius_m=60,max_extent_multiplier=?,low_conf_action='MERGE_FLAG' WHERE code='ROAD_DAMAGE'",cap?1.0:99.99);

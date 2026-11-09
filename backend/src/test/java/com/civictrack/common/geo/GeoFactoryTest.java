@@ -15,34 +15,34 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class GeoFactoryTest {
 
-    // Ferozepur Road, near Bharat Nagar Chowk, Ludhiana. The canonical
+    // Patiala demo sector north-west of Thapar Institute, Patiala. The canonical
     // known-good coordinate for this project.
-    private static final double LUDHIANA_LAT = 30.900965;
-    private static final double LUDHIANA_LNG = 75.857277;
+    private static final double PATIALA_LAT = 30.356965;
+    private static final double PATIALA_LNG = 76.363277;
 
     @Test
     @DisplayName("latitude becomes y and longitude becomes x, not the reverse")
     void ordersCoordinatesAsXLngYLat() {
-        Point p = GeoFactory.point(LUDHIANA_LAT, LUDHIANA_LNG);
+        Point p = GeoFactory.point(PATIALA_LAT, PATIALA_LNG);
 
-        assertThat(p.getY()).isEqualTo(LUDHIANA_LAT);
-        assertThat(p.getX()).isEqualTo(LUDHIANA_LNG);
+        assertThat(p.getY()).isEqualTo(PATIALA_LAT);
+        assertThat(p.getX()).isEqualTo(PATIALA_LNG);
         assertThat(p.getSRID()).isEqualTo(4326);
     }
 
     @Test
     @DisplayName("accessors read back what was written")
     void accessorsRoundTrip() {
-        Point p = GeoFactory.point(LUDHIANA_LAT, LUDHIANA_LNG);
+        Point p = GeoFactory.point(PATIALA_LAT, PATIALA_LNG);
 
-        assertThat(GeoFactory.latOf(p)).isEqualTo(LUDHIANA_LAT);
-        assertThat(GeoFactory.lngOf(p)).isEqualTo(LUDHIANA_LNG);
+        assertThat(GeoFactory.latOf(p)).isEqualTo(PATIALA_LAT);
+        assertThat(GeoFactory.lngOf(p)).isEqualTo(PATIALA_LNG);
     }
 
     @Test
     @DisplayName("an out-of-range latitude is rejected by name, not silently accepted")
     void rejectsOutOfRangeLatitude() {
-        assertThatThrownBy(() -> GeoFactory.point(120.0, 30.9))
+        assertThatThrownBy(() -> GeoFactory.point(120.0, 30.356))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Latitude out of range")
                 .hasMessageContaining("lat, lng");
@@ -51,25 +51,25 @@ class GeoFactoryTest {
     @Test
     @DisplayName("an out-of-range longitude is rejected")
     void rejectsOutOfRangeLongitude() {
-        assertThatThrownBy(() -> GeoFactory.point(30.9, 200.0))
+        assertThatThrownBy(() -> GeoFactory.point(30.356, 200.0))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Longitude out of range");
     }
 
     @Test
-    @DisplayName("a swapped Ludhiana coordinate passes the range check, which is why the ward canary exists")
-    void rangeCheckAloneCannotCatchTheLudhianaSwap() {
-        // Both ordinates of a Ludhiana coordinate are under 90, so swapping
+    @DisplayName("a swapped Patiala coordinate passes the range check, which is why the ward canary exists")
+    void rangeCheckAloneCannotCatchThePatialaSwap() {
+        // Both ordinates of a Patiala coordinate are under 90, so swapping
         // them produces a point that is perfectly valid in range terms and
         // completely wrong in fact. The range check catches gross errors only.
         // This is deliberately asserted rather than left implicit: it is the
         // reason WardContainmentIT exists, and someone strengthening this
         // class later should know the range check was never meant to be
         // sufficient on its own.
-        Point swapped = GeoFactory.point(LUDHIANA_LNG, LUDHIANA_LAT);
+        Point swapped = GeoFactory.point(PATIALA_LNG, PATIALA_LAT);
 
-        assertThat(swapped.getY()).isEqualTo(LUDHIANA_LNG);
-        assertThat(GeoFactory.latOf(swapped)).isNotEqualTo(LUDHIANA_LAT);
+        assertThat(swapped.getY()).isEqualTo(PATIALA_LNG);
+        assertThat(GeoFactory.latOf(swapped)).isNotEqualTo(PATIALA_LAT);
     }
 
     @Test

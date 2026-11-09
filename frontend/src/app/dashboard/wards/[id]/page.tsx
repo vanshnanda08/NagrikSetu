@@ -11,6 +11,7 @@ import { SkeletonTileGrid } from "@/components/Skeleton";
 import { request, type ApiError } from "@/lib/api";
 import { absoluteDate, absoluteDateTime } from "@/lib/format";
 import type { WardDashboard } from "@/lib/types";
+import { SERVICE_AREA_CENTER } from "@/lib/serviceArea";
 
 /**
  * Ward page (blueprint 3.9): the dashboard's figures for one ward, its boundary
@@ -70,7 +71,7 @@ export default function WardPage({ params }: { params: Promise<{ id: string }> }
 
 function WardBody({ w }: { w: WardDashboard }) {
   const hasLocation = w.density.length > 0;
-  const center = hasLocation ? { lat: w.density[0].lat, lng: w.density[0].lng } : { lat: 30.9, lng: 75.85 };
+  const center = hasLocation ? { lat: w.density[0].lat, lng: w.density[0].lng } : SERVICE_AREA_CENTER;
 
   return (
     <>

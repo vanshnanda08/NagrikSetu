@@ -139,11 +139,11 @@ class ClusteringServiceIT extends IntegrationTestBase {
     @Test
     @DisplayName("clustering never crosses a ward boundary")
     void neverMergesAcrossWards() {
-        // Straddling the lat 30.90 line between ward 1 and ward 3, 40 m apart
+        // Straddling the lat 30.356 line between ward 1 and ward 3, 40 m apart
         // -- inside the POTHOLE merge radius, so only the ward precondition can
         // keep them separate.
-        ClusterOutcome north = ingestPothole(30.90018, 75.8200, 8);
-        ClusterOutcome south = ingestPothole(30.89982, 75.8200, 8);
+        ClusterOutcome north = ingestPothole(30.35618, 76.3260, 8);
+        ClusterOutcome south = ingestPothole(30.35582, 76.3260, 8);
 
         Integer wardNorth = wardNumberOf(north.issueId());
         Integer wardSouth = wardNumberOf(south.issueId());

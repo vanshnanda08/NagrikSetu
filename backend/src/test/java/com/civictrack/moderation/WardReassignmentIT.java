@@ -34,14 +34,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * and the way it unblocks a cross-ward merge.
  *
  * <p>The seeded wards are a 2x2 grid with the ward 1 / ward 2 boundary at
- * longitude 75.86. A report at 75.8590 is in ward 1 and about 95 m from ward 2;
+ * longitude 76.366. A report at 76.3650 is in ward 1 and about 96 m from ward 2;
  * a report in the middle of ward 1 is more than 3 km from ward 4.
  */
 @AutoConfigureMockMvc
 class WardReassignmentIT extends IntegrationTestBase {
 
-    private static final double LAT = 30.93;
-    private static final double LNG_NEAR_BOUNDARY = 75.8590;
+    private static final double LAT = 30.386;
+    private static final double LNG_NEAR_BOUNDARY = 76.3650;
 
     @Autowired private MockMvc mvc;
     @Autowired private ClusteringService clustering;
@@ -97,7 +97,7 @@ class WardReassignmentIT extends IntegrationTestBase {
     @Test
     @DisplayName("the ward guard refuses a ward the problem is nowhere near, and a no-op move")
     void guardRefusals() throws Exception {
-        UUID inland = ingest(LAT, 75.8200);
+        UUID inland = ingest(LAT, 76.3260);
         reassign(roadsHead, inland, fixtures.wardId(4), null)
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.type").value("https://civictrack.example/problems/moderation-refused"))
@@ -129,7 +129,7 @@ class WardReassignmentIT extends IntegrationTestBase {
     @DisplayName("reassigning one of two issues makes the cross-ward merge possible")
     void reassignThenMerge() throws Exception {
         UUID inWard1 = ingest(LAT, LNG_NEAR_BOUNDARY);
-        UUID inWard2 = ingest(LAT, 75.8612);
+        UUID inWard2 = ingest(LAT, 76.3672);
         assertThat(issues.findById(inWard2).orElseThrow().getWardId()).isEqualTo(fixtures.wardId(2));
 
         merge(roadsHead, inWard2, inWard1).andExpect(status().isConflict())

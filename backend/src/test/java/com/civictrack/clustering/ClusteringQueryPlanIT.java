@@ -76,8 +76,8 @@ class ClusteringQueryPlanIT extends IntegrationTestBase {
                        (SELECT id FROM wards WHERE ward_number = 1),
                        'NEW',
                        ST_SetSRID(ST_MakePoint(
-                           75.79 + (g %% 500) * 0.00012,
-                           30.905 + (g / 500) * 0.00012), 4326),
+                           76.296 + (g %% 500) * 0.00012,
+                           30.361 + (g / 500) * 0.00012), 4326),
                        0.015625, 0.0, 0.0, 1, now() + interval '72 hours',
                        now(), now()
                 FROM generate_series(1, %d) g
@@ -157,10 +157,10 @@ class ClusteringQueryPlanIT extends IntegrationTestBase {
                        OR (i.status = 'RESOLVED'
                            AND i.resolved_at > now() - make_interval(days => 14)))
                   AND ST_DWithin(i.centroid::geography,
-                                 ST_SetSRID(ST_MakePoint(75.8200, 30.9300), 4326)::geography,
+                                 ST_SetSRID(ST_MakePoint(76.3260, 30.3860), 4326)::geography,
                                  157.5)
                 ORDER BY ST_Distance(i.centroid::geography,
-                                     ST_SetSRID(ST_MakePoint(75.8200, 30.9300), 4326)::geography) ASC
+                                     ST_SetSRID(ST_MakePoint(76.3260, 30.3860), 4326)::geography) ASC
                 LIMIT 5
                 """, String.class);
     }

@@ -1,5 +1,12 @@
 # NagrikSetu frontend
 
+Latest follow-up: [release readiness](../docs/RELEASE_READINESS.md), 8 November.
+Patiala map defaults, zoom preservation, Enter/Space marker activation and stable
+selection are implemented locally. Password-recovery routes display a deferral
+notice by default; `NEXT_PUBLIC_EMAIL_RECOVERY_ENABLED=true` is reserved for a
+future release with verified mail delivery. Current code checks: 115 tests,
+ESLint, TypeScript and production build passed. No deployment is implied.
+
 Next.js 16 (App Router), React 19, Tailwind v4.
 
 **Status (2026-11-07).** The agreed frontend scope is implemented, including

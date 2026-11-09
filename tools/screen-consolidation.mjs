@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { json } from './http.mjs';
+import { API, json } from './http.mjs';
 import { qaSignIn, isNavigationCancellation } from './qa-session.mjs';
 const APP = process.env.SCREENS_APP ?? 'http://localhost:3003';
 const output = new URL('../artifacts/screens-consolidation/', import.meta.url);
@@ -15,10 +15,10 @@ const email = `screen-review-${Date.now()}@example.test`, password = 'screen-rev
 await json('/auth/register', { method: 'POST', body: { email, password, fullName: 'Screen Review Citizen' } });
 const browser = await chromium.launch({ channel: 'chrome' });
 const checks = [], accessibility = [], accessibilityExceptions = [], runtime = [];
-const sizes = [{width:1280,height:600},{width:1440,height:900},{width:390,height:844},{width:768,height:1024}];
+const sizes = [{width:1280,height:600},{width:1366,height:768},{width:1440,height:900},{width:1920,height:1080},{width:390,height:844},{width:768,height:1024}];
 async function bridge(context) {
   // Secondary local QA ports are not backend CORS origins. Leave backend configuration unchanged.
-  await context.route('http://localhost:8080/api/v1/**', async route => {
+  await context.route(API+'/**', async route => {
     const cors = {'access-control-allow-origin':'*','access-control-allow-headers':'Authorization, Content-Type','access-control-allow-methods':'GET,POST,PUT,DELETE,OPTIONS'};
     if (route.request().method() === 'OPTIONS') return route.fulfill({status:204,headers:cors});
     if (route.request().url().includes('/stream/')) return route.fulfill({status:503,headers:cors});
@@ -61,6 +61,7 @@ async function visit(page, path, size, name) {
   assert.equal(response.status(),200,`${name}: page loads`);
   await page.locator('h1').first().waitFor();
   await page.waitForTimeout(650);
+  if(path.startsWith('/work?') && path.includes('issue=')) await page.locator('.work-actions').waitFor();
   await layout(page,size,name);
   if(size.width===1280 || size.width===390){await axe(page,`${name}-${size.width}`);await page.screenshot({path:fileURLToPath(new URL(`${name}-${size.width}.png`,output)),fullPage:true});}
   checks.push({kind:'layout',name,path,size});
@@ -96,7 +97,7 @@ try {
       assert.equal(await page.locator('#account-menu').getByRole('link',{name:'Security',exact:true}).count(),0);
       await page.keyboard.press('Escape');assert.equal(await accountToggle.getAttribute('aria-expanded'),'false');assert.equal(await accountToggle.evaluate(el=>document.activeElement===el),true);
     }
-    await page.setViewportSize(sizes[2]);const toggle=page.getByRole('button',{name:'Open menu',exact:true});await toggle.focus();await page.keyboard.press('Enter');
+    await page.setViewportSize(sizes.find(size=>size.width===390));const toggle=page.getByRole('button',{name:'Open menu',exact:true});await toggle.focus();await page.keyboard.press('Enter');
     for(const name of expected)await nav.getByRole('link',{name,exact:true}).waitFor({state:'visible'});
     await page.keyboard.press('Escape');assert.equal(await toggle.evaluate(el=>document.activeElement===el),true);
     checks.push({kind:'navigation',role});
@@ -120,14 +121,13 @@ try {
     if(role==='CITIZEN'){
       await page.goto(APP+'/me/settings');await page.getByRole('button',{name:'Save changes',exact:true}).waitFor();
       let payload;
-      await page.route('**/api/v1/me/profile',async route=>{if(route.request().method()==='PUT'){payload=route.request().postDataJSON();const response=await context.request.get('http://localhost:8080/api/v1/me/profile',{headers:{authorization:route.request().headers().authorization}});const current=await response.json();await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({...current,...payload})});}else await route.fallback();});
+      await page.route('**/api/v1/me/profile',async route=>{if(route.request().method()==='PUT'){payload=route.request().postDataJSON();const response=await context.request.get(API+'/me/profile',{headers:{authorization:route.request().headers().authorization}});const current=await response.json();await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({...current,...payload})});}else await route.fallback();});
       await page.getByRole('button',{name:'Save changes',exact:true}).click();await page.getByText('Saved.',{exact:true}).waitFor();assert.equal(payload.fullName,'Screen Review Citizen');assert.ok(Array.isArray(payload.mutedNotificationTypes));
       await page.getByRole('navigation',{name:'Account settings views'}).getByRole('link',{name:'Security',exact:true}).click();
       const form=page.getByRole('form',{name:'Change password',exact:true});await form.getByLabel('Current password',{exact:true}).fill('fixture-current');await form.getByLabel('New password (at least 10 characters)',{exact:true}).fill('fixture-new-1234');await form.getByLabel('New password again',{exact:true}).fill('mismatch');assert.equal(await form.getByRole('button',{name:'Change password',exact:true}).isEnabled(),false);
       await form.getByLabel('New password again',{exact:true}).fill('fixture-new-1234');let passwordPayload;await page.route('**/api/v1/me/password',async r=>{passwordPayload=r.request().postDataJSON();await r.fulfill({status:204});});await form.getByRole('button',{name:'Change password',exact:true}).click();await form.getByText('Password changed.',{exact:true}).waitFor();assert.deepEqual(passwordPayload,{currentPassword:'fixture-current',newPassword:'fixture-new-1234'});
-      await page.route('**/api/v1/me/security/mfa/setup',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({secret:'VISUAL-SETUP-FIXTURE',provisioningUri:'otpauth://totp/fixture?secret=VISUAL'})}));
-      await page.getByLabel('Current password for authenticator setup',{exact:true}).fill('fixture');await page.getByRole('button',{name:'Set up authenticator',exact:true}).click();await page.getByLabel('Six-digit code',{exact:true}).waitFor();
-      checks.push({kind:'settings-profile-password-mfa-fixtures'});
+      assert.equal(await page.getByRole('button',{name:'Set up authenticator',exact:true}).count(),0,'Ordinary citizens do not need authenticator enrollment');
+      checks.push({kind:'settings-profile-password-fixtures-and-citizen-security'});
       for(const path of ['/work?view=review','/admin?view=audit']){await page.goto(APP+path);await page.getByText(/for supervisors and administrators|for administrators|for municipal staff/).first().waitFor();}
       checks.push({kind:'citizen-workspace-guards'});
       await page.setViewportSize(sizes[0]);await page.goto(APP+'/me/settings');await page.getByRole('button',{name:'Save changes',exact:true}).waitFor();const region=page.getByRole('region',{name:'Profile and notification preferences',exact:true});await region.waitFor();await region.focus();await page.keyboard.press('PageDown');await page.waitForTimeout(100);assert.ok(await region.evaluate(el=>el.scrollTop>0),'Settings fields scroll internally');

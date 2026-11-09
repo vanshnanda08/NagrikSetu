@@ -43,7 +43,7 @@ jobs:
   ping:
     name: Ping the API
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     steps:
       - name: Wake the API and confirm the database answered
         env:
@@ -51,29 +51,21 @@ jobs:
           # change. Falls back to the deployed host.
           API: ${{ vars.API_BASE_URL || 'https://civictrack-api.onrender.com' }}
         run: |
-          set -uo pipefail
+          set -euo pipefail
 
-          # --max-time 90, not the default: the whole point is that the service
-          # may be cold, and a cold Spring Boot start on a free instance takes
-          # the better part of a minute. A short timeout would report the
-          # service as down precisely when the ping was working.
+          # Retry a cold start, but report a sustained outage as a failed job.
+          # The health and database-backed request must both succeed.
           echo "Waking $API ..."
-          CODE=$(curl -sS -o /tmp/health.json -w '%{http_code}' --max-time 90 \
-                   "$API/actuator/health" || echo "000")
-          echo "health -> $CODE"
-          cat /tmp/health.json 2>/dev/null || true
+          curl --fail-with-body --silent --show-error \
+            --retry 2 --retry-delay 5 --retry-all-errors --connect-timeout 10 --max-time 60 \
+            "$API/actuator/health" -o /tmp/health.json
+          cat /tmp/health.json
           echo
 
           # A 200 from the health endpoint alone does not prove the DATABASE is
           # awake, and Supabase pausing is the failure that actually costs
           # something. Hitting a route that has to run a query does.
-          CODE2=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 90 \
-                    "$API/api/v1/public/issues?limit=1" || echo "000")
-          echo "public/issues -> $CODE2"
-
-          if [ "$CODE2" != "200" ]; then
-            echo "::warning::The API did not serve a database-backed request (got $CODE2)."
-            echo "Not failing the run: a cold start or a Render restart looks"
-            echo "identical to an outage from here, and a red X every ten"
-            echo "minutes would be noise rather than a signal."
-          fi
+          curl --fail-with-body --silent --show-error \
+            --retry 2 --retry-delay 5 --retry-all-errors --connect-timeout 10 --max-time 30 \
+            "$API/api/v1/public/issues?limit=1" -o /tmp/keep-alive-issues.json
+          echo "Health and database-backed request succeeded."

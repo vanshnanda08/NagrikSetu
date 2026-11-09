@@ -1,6 +1,6 @@
 /** Local demo checks must never silently accept an error response as fixture data. */
-export const API = 'http://localhost:8080/api/v1';
-export const APP = 'http://localhost:3000';
+export const API = process.env.VERIFY_API ?? 'http://localhost:8080/api/v1';
+export const APP = process.env.SCREENS_APP ?? 'http://localhost:3000';
 
 export async function json(path, { token, method = 'GET', body } = {}) {
   const response = await fetch(API + path, {

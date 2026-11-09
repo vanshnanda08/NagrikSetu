@@ -12,8 +12,8 @@ import org.locationtech.jts.geom.PrecisionModel;
  * <p>JTS orders coordinates {@code (x, y)}, which for SRID 4326 means
  * {@code (longitude, latitude)} — the reverse of how humans, GPS readouts and
  * the Geolocation API say it. Every geographic bug in a project like this is
- * ultimately a swapped lat/lng, and the bug is invisible: a Ludhiana report at
- * (30.9, 75.86) instead of (75.86, 30.9) lands in the Indian Ocean off Somalia
+ * ultimately a swapped lat/lng, and the bug is invisible: a Patiala report at
+ * (30.356, 76.365) instead of (76.365, 30.356) lands in the Indian Ocean off Somalia
  * and simply fails the ward lookup, several layers away from the swap.
  *
  * <p>So the constructor is written once, here, and nothing else in the
@@ -23,7 +23,7 @@ import org.locationtech.jts.geom.PrecisionModel;
  *
  * <p>Note what this class deliberately does <em>not</em> do: it never computes
  * a distance. Planar distance between two SRID 4326 points is in degrees, and
- * a degree of longitude at Ludhiana's latitude is ~96 km against ~111 km for a
+ * a degree of longitude at Patiala's latitude is ~96 km against ~111 km for a
  * degree of latitude, so any planar metre figure would be silently wrong by a
  * latitude-dependent factor. All distances in this system are computed by
  * PostGIS as {@code ST_Distance(a::geography, b::geography)}, which is true

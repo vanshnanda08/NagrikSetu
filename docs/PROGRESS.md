@@ -1,5 +1,19 @@
 # NagrikSetu — current progress
 
+Hosted recheck, 10 November: health returned 200 / UP after 152.5 seconds;
+database-backed public reads and the Vercel CORS origin passed. An invalid-photo
+probe confirmed active validation without creating a complaint. This supersedes
+the availability blocker below, not the remaining genuine-photo, release and
+device checks. The live wards remain in Ludhiana. See [release readiness](RELEASE_READINESS.md).
+
+Latest local follow-up: [release readiness](RELEASE_READINESS.md), 8 November 2026.
+The Patiala V11 migration, map interaction/accessibility corrections, explicit
+email-recovery deferral and test scheduler isolation are verified locally.
+Fresh backend result: 379 passed / 2 optional skips; frontend: 115 passed,
+lint, TypeScript and production build passed. Current API probes time out;
+production recovery/photo verification and native/physical-device checks remain
+open. This working tree has not been committed, pushed or deployed.
+
 Release record: 2026-10-27. Scope decision updated: 2026-11-07.
 Email notifications and email-based password recovery are deferred to a future
 update at the user's request. Provider activation and live delivery/reset testing
@@ -51,7 +65,7 @@ was performed.
 | Security additions | TOTP MFA, recovery codes, refresh-session listing/revocation and browser security headers implemented |
 | Engagement additions | Issue following without priority inflation and private reporter/municipal clarification threads implemented |
 | Installable web client | Manifest, app icons and install prompt implemented alongside existing offline submission support |
-| Database | Flyway migrations V1–V10; V10 adds MFA, session metadata, followers and messages |
+| Database | Local Flyway migrations V1–V11; V11 moves the four demo sectors to Patiala while preserving ward IDs and historical complaint evidence; hosted V11 application is not verified |
 
 MFA role enforcement defaults to enabled for staff, supervisors and
 administrators. The explicit demo profile bypasses mandatory enrolment for

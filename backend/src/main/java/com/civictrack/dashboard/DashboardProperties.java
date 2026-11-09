@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  * The public dashboard's windows and its notion of a day.
  *
  * <p>{@code zone} exists because every daily series is a statement about
- * calendar days, and the database clock is UTC. Bucketed in UTC, a Ludhiana
+ * calendar days, and the database clock is UTC. Bucketed in UTC, a Patiala
  * day would end at 05:30 local time, and a report filed at breakfast would be
  * counted against the previous day.
  */

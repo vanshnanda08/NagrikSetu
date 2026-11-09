@@ -24,6 +24,7 @@ import { uploadPhoto, CLOUDINARY_CONFIGURED } from "@/lib/uploadPhoto";
 import { ApiError } from "@/lib/api";
 import { submitReport } from "@/lib/submitReport";
 import { useSignIn } from "@/lib/signInDialog";
+import { SERVICE_AREA_CENTER, SERVICE_AREA_ZOOM } from "@/lib/serviceArea";
 import { fileSize, metres } from "@/lib/format";
 import {
   composerSchema,
@@ -353,8 +354,9 @@ function ReportComposerForm() {
                   {/* Leaflet is downloaded ONLY at this point. */}
                   <div className="report-map rounded-2xl overflow-hidden border border-rule">
                     <MapCanvas
-                      center={{ lat: lat ?? 30.9, lng: lng ?? 75.85 }}
-                      zoom={17}
+                      center={{ lat: lat ?? SERVICE_AREA_CENTER.lat, lng: lng ?? SERVICE_AREA_CENTER.lng }}
+                      zoom={SERVICE_AREA_ZOOM}
+                      preserveZoomOnCenterChange
                       height={240}
                       onPinPlace={placePin}
                       markers={

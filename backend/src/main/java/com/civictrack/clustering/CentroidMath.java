@@ -77,7 +77,7 @@ public final class CentroidMath {
      * whole algorithm.
      *
      * <p>The sums are accumulated in planar lon/lat, which is a deliberate and
-     * bounded exception to standing rule 2. At Ludhiana's latitude a degree of
+     * bounded exception to standing rule 2. At Patiala's latitude a degree of
      * longitude is about 96 km against 111 km for latitude, so the axes are
      * anisotropic -- but over cluster extents under 150 m the induced centroid
      * error is sub-millimetre, and it never reaches a decision: every threshold

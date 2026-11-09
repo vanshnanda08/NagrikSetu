@@ -41,7 +41,7 @@ const checks = [
   ['PublicIssue',     issue],
   ['PublicIssue (by-ref)', await j(`/public/issues/by-ref/${issue.publicRef}`), 'PublicIssue'],
   ['PublicReport',    (await j(`/public/issues/${issue.id}/reports`))[0]],
-  ['BboxResult',      await j('/public/issues/bbox?south=30.8&west=75.7&north=31.0&east=76.0&limit=1')],
+  ['BboxResult',      await j('/public/issues/bbox?south=30.29&west=76.28&north=30.42&east=76.45&limit=1')],
   ['Category',        (await j('/categories'))[0]],
   ['Ward',            (await j('/wards'))[0]],
   ['DashboardSummary',await j('/dashboard/summary')],

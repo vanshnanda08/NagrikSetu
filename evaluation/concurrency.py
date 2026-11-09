@@ -30,7 +30,7 @@ def main():
     run_id = uuid.uuid4().hex[:12]
     rows = []
     for index, count in enumerate((2, 5, 10, 20, 50)):
-        lat, lng = 30.925 + index * 0.006, 75.82
+        lat, lng = 30.381 + index * 0.006, 76.326
         started = time.perf_counter()
         bodies = [{"categoryCode": "SIGNAGE", "lat": lat, "lng": lng, "accuracyM": 5,
                    "manualPin": False, "description": "Concurrency evaluation",

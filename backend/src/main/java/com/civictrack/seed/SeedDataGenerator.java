@@ -442,9 +442,10 @@ public class SeedDataGenerator implements CommandLineRunner {
 
     private Point generateValidDefectLocation(Random random) {
         while (true) {
-            // Ludhiana Grid: longitude 75.78 .. 75.94, latitude 30.84 .. 30.96
-            double lng = 75.78 + random.nextDouble() * (75.94 - 75.78);
-            double lat = 30.84 + random.nextDouble() * (30.96 - 30.84);
+            // Keep the demo corpus around Thapar Institute in Patiala,
+            // spanning all four illustrative sectors from migration V11.
+            double lng = 76.355 + random.nextDouble() * 0.022;
+            double lat = 30.345 + random.nextDouble() * 0.022;
             
             if (wardRepo.findIdContaining(lat, lng).isPresent()) {
                 return GeoFactory.point(lat, lng);

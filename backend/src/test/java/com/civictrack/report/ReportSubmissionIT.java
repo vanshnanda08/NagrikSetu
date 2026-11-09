@@ -18,16 +18,16 @@ class ReportSubmissionIT extends IntegrationTestBase {
     @BeforeEach void clear() { fixtures.clearIssues(); }
     @Test void responseLossRetryReturnsOriginalWithoutConsumingAllowance() {
         String device=UUID.randomUUID().toString(); UUID id=UUID.randomUUID();
-        var first=submissions.submit(command(device,30.9300),id);
-        assertThat(submissions.submit(command(device,30.9300),id)).isEqualTo(first);
+        var first=submissions.submit(command(device,30.3860),id);
+        assertThat(submissions.submit(command(device,30.3860),id)).isEqualTo(first);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM reports",Integer.class)).isEqualTo(1);
-        assertThatThrownBy(() -> submissions.submit(command(device,30.9301),id)).isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
+        assertThatThrownBy(() -> submissions.submit(command(device,30.3861),id)).isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
     }
     @Test void concurrentNearbySubmissionsAcrossCellsAdmitOnlyOne() throws Exception {
         String device=UUID.randomUUID().toString(); var start=new CountDownLatch(1);
         try(var executor=Executors.newFixedThreadPool(2)) {
-            var a=executor.submit(() -> attempt(device,30.930999,start));
-            var b=executor.submit(() -> attempt(device,30.931001,start));
+            var a=executor.submit(() -> attempt(device,30.386999,start));
+            var b=executor.submit(() -> attempt(device,30.387001,start));
             start.countDown();
             assertThat(a.get(30,TimeUnit.SECONDS)+b.get(30,TimeUnit.SECONDS)).isEqualTo(1);
         }
@@ -39,6 +39,6 @@ class ReportSubmissionIT extends IntegrationTestBase {
         catch(RateLimitExceededException expected) { return 0; }
     }
     private IngestReportCommand command(String device,double lat) {
-        return new IngestReportCommand("POTHOLE",lat,75.82,8.0,false,"Submission test",null,null,"https://example.test/photo.jpg",null,null,device);
+        return new IngestReportCommand("POTHOLE",lat,76.326,8.0,false,"Submission test",null,null,"https://example.test/photo.jpg",null,null,device);
     }
 }

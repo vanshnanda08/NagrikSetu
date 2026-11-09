@@ -6,6 +6,20 @@
 **Audit-fix baseline:** `74c76ec155a2ad8b354ae35b27540c8e58030b9d`, plus current uncommitted changes, verified 2026-11-08.<br>
 **Review scope:** the current working tree, including uncommitted and untracked application files, configuration, migrations, tests, tools, evaluation results and project notes.
 
+**Hosted recheck, 10 November:** API health returned 200 / UP after a
+152.5-second cold start; subsequent database-backed reads and Vercel CORS passed.
+The live ward names are still Ludhiana, so the local Patiala V11 update remains
+unreleased. An invalid-photo probe confirmed the verification guard, without
+creating a complaint; genuine deployed photo submission remains unverified.
+See [release readiness](docs/RELEASE_READINESS.md) for the dated evidence.
+
+**Latest follow-up, 8 November:** [release readiness](docs/RELEASE_READINESS.md)
+records the local Patiala migration, map zoom/keyboard/detail fixes, explicit
+email-recovery deferral, scheduler-test isolation and fresh checks. Backend:
+379 passed, 2 optional skips. Frontend: 115 passed, lint, TypeScript and build
+passed. Current production API probes time out; local results do not certify
+the hosted service or physical-device behavior. Changes remain uncommitted.
+
 This guide describes the repository at the time of review. The working tree contains substantial changes beyond the last commit. A feature present here may therefore differ from the deployed application. The original guide used source inspection and local documentation checks. Subsequent local runtime tests and audit-fix validation are linked below with their dates and limits; they do not establish a new deployment or repeat the earlier benchmarks.
 
 “Confirmed” below means supported by the inspected code or explicitly attributed repository evidence. **Not confirmed** marks something that cannot be established from those sources. Recommendations are suggestions, not promises or approved project plans. No private environment files or secret values are reproduced.
@@ -250,7 +264,7 @@ complaint-system/
 │       ├── main/java/com/civictrack/  Feature packages described below
 │       ├── main/resources/
 │       │   ├── application*.yml       Base, demo, deploy, seed and CDS profiles
-│       │   └── db/migration/          V1–V10 SQL migrations and reference data
+│       │   └── db/migration/          V1–V11 SQL migrations and reference data
 │       └── test/                     Unit/integration tests and test configuration
 ├── frontend/
 │   ├── package.json, package-lock.json  Dependencies, scripts and locked versions
@@ -578,8 +592,14 @@ This diagram shows the main relationships, not every foreign key. For example, i
 | V8 | Capture/screening/redaction fields and photo-hash indexes |
 | V9 | Refresh sessions, resets, email preference/outbox, configuration audit and report idempotency |
 | V10 | MFA/session metadata, recovery codes, followers and private messages |
+| V11 | Moves the four illustrative ward sectors to Patiala near Thapar; preserves ward IDs, officer assignments and historical issue/report coordinates |
 
-V2 wards are a demonstration 2×2 grid over longitude 75.78–75.94 and latitude 30.84–30.96, not verified official municipal boundaries. Choosing a location elsewhere correctly produces an outside-service-area refusal under this reference data. Exact boundary-edge behavior follows the spatial containment query.
+V2 originally defined a demonstration grid around Ludhiana. V11 relocates those
+four illustrative sectors to longitude 76.286–76.446 and latitude 30.296–30.416
+near Thapar Institute, Patiala. They are not official municipal boundaries.
+Existing complaint coordinates remain unchanged. Locations outside the configured
+polygons are refused; exact boundary-edge behavior follows the containment query.
+Do not edit applied migrations or move historical complaints to fit new polygons.
 
 ### Initial category policy
 
@@ -659,7 +679,7 @@ Database transactions and locks protect multi-record changes. Issue entities als
 This is an illustrative journey through implemented behavior, not a claim that these exact residents or events occurred.
 
 1. A resident opens the dashboard and can see public figures immediately. They choose **Report a problem**. Signing in first is useful if they want the issue in My reports and want to vote on its repair.
-2. They choose Pothole, attach a photo and allow location access. For a local demo outside Ludhiana, they use a manual pin inside a configured ward. The browser retains the draft and checks the form.
+2. They choose Pothole, attach a photo and allow location access. For a demo outside the configured Patiala sectors, they use a manual pin inside a configured ward. The browser retains the draft and checks the form.
 3. They submit. The photo uploads first; the backend verifies it, enforces quotas and decides whether this report belongs to existing work. The response gives a public reference.
 4. Another resident/device reports the same category nearby. If radius, ward, extent and status rules allow, the second report joins the same issue. Both photos remain. Distinct-reporter count and priority can increase.
 5. The supervisor sees the issue in Assignments, acknowledges it if still new and assigns the acknowledged ticket to a department crew member. This is an actual required role handoff: crew cannot assign themselves through the assignment endpoint.
@@ -977,13 +997,13 @@ The weekly workflow reads `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP
 |---|---|
 | Tests cannot find Docker | Container runtime and Colima socket profile in `pom.xml` |
 | Server starts but seeded staff cannot log in | Missing password hashes until authorized demo/deploy bootstrap; MFA default versus demo behavior |
-| Report says outside service area | V2's approximate Ludhiana ward grid, not the user's current city |
+| Report says outside service area | Configured ward polygons; V11 uses illustrative Patiala sectors. Confirm the hosted migration version separately |
 | Photo storage unavailable or verification refused | Backend cloud setting, frontend cloud/preset agreement and evidence URL requirements |
 | Repair cannot submit with placeholder | Intentional `uploadRepairProof()` check; configure real uploads |
 | Browser requests blocked by CORS | Exact origin/port in backend allowed origins |
 | Hosted database cannot connect | JDBC URL, session-pooler hostname, credentials and the documented IPv4 constraints |
 | Seed refuses to run | Nonempty application corpus; preserve it and use a separate disposable database |
-| Reset email never arrives | Mail disabled/unconfigured/provider failure; inspect safe diagnostics and outbox rather than assume request failure |
+| Reset email never arrives | Email recovery is intentionally deferred; its frontend forms are unavailable by default. Signed-in password change remains available |
 
 ## 14. Important Technical Decisions
 

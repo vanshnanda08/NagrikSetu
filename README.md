@@ -2,6 +2,24 @@
 
 See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
 
+**Hosted recheck — 10 November:** the API returned HTTP 200 / UP after a
+152.5-second cold start. Category, ward and dashboard reads then passed with the
+correct Vercel CORS origin. A guarded invalid-photo probe confirmed active media
+validation without creating a complaint; genuine deployed photo submission still
+needs checking. The hosted wards remain in Ludhiana; local Patiala/V11 changes
+are not released. See [release readiness](docs/RELEASE_READINESS.md).
+
+**Latest follow-up — 8 November 2026:** the local Patiala/Thapar update includes
+migration V11, wider report-map defaults, preserved pin-selection zoom, keyboard
+marker activation and stable map details. Email recovery screens explicitly show
+the agreed deferral. Fresh local checks passed: 379 backend tests (2 optional
+skips), 115 frontend tests, lint, TypeScript and production builds. These changes
+are uncommitted and have not been deployed. The frontend is reachable at
+[nagrik-setu-vn.vercel.app](https://nagrik-setu-vn.vercel.app/dashboard), but current
+API requests time out; live photo submission is not signed off.
+See [release readiness](docs/RELEASE_READINESS.md) for browser evidence,
+operational steps and remaining device limits.
+
 Municipal issue reporting with bounded incremental geo-clustering, SLA-driven
 escalation, and public accountability.
 
@@ -123,7 +141,7 @@ appearance and uses the consolidated screen structure described above.
 
 | | |
 |---|---|
-| Frontend | https://civic-track-six.vercel.app (HTTP 200 verified 2026-10-27) |
+| Frontend | https://nagrik-setu-vn.vercel.app (HTTP 200 checked 2026-11-08; replaces the retired civic-track-six alias) |
 | API | https://civictrack-api.onrender.com |
 | API docs (Swagger) | https://civictrack-api.onrender.com/swagger-ui/index.html |
 | Backend tests | **277 total: 275 passed, 2 opt-in evaluation tests skipped, 0 failures/errors**, against real PostGIS via Testcontainers |
@@ -432,6 +450,17 @@ runs the API/browser verification job against a fresh PostGIS database, then
 triggers the Render deploy hook if that also passes. Vercel deploys the frontend
 from its own Git integration. A scheduled keep-alive workflow pings the API every ten
 minutes.
+
+The current demo service area is Patiala around Thapar Institute on Bhadson
+Road. The default map centres on 30.355833 N, 76.365 E. Migration V11 moves
+the four illustrative ward sectors to this area, preserving their IDs and
+officer assignments; these are demo sectors, not official municipal wards.
+New seed runs place reports near the campus. Existing complaints retain their
+original GPS locations and audit evidence, so an existing Ludhiana corpus
+will still appear at its recorded locations. The seed runner intentionally
+does not replace populated databases. Apply the normal backend deployment
+to run V11, and deploy the frontend for the new map defaults; no manual
+Flyway repair or edits to applied migrations are needed.
 
 The deployed corpus is the seeded 250 reports across ~110 issues. It was 2,000
 reports and ~800 issues originally; the smaller corpus is deliberate — 800

@@ -1,5 +1,26 @@
 # Verification harnesses
 
+The 8 November follow-up and exact boundaries are in
+[release readiness](../docs/RELEASE_READINESS.md). `screen-consolidation.mjs` and
+`public-audit.mjs` accept `SCREENS_APP` and `VERIFY_API` for isolated local ports;
+the screen audit covers all six requested viewport sizes. The public audit
+expects deferred email recovery by default. `TEST_EMAIL_RECOVERY=true` is only
+for a deliberately enabled future recovery fixture; the historical Mailpit
+feature harness is not a current email-delivery gate.
+
+`release-followup.mjs` requires loopback app/API URLs and `VERIFY_SCRATCH=1`.
+It creates disposable accounts, changes a QA password and may submit a report
+to that scratch API. It checks map zoom/keyboard controls, draft discard,
+storage failures, recovery notices, logout, installability and the cold-offline
+boundary. Optional `VERIFY_EVIDENCE_URL` reuses an existing owned-cloud QA image
+for real worker/API delivery and idempotency; no new media is uploaded. Without
+that value, real worker/media delivery is explicitly recorded as not run.
+
+```bash
+SCREENS_APP=http://localhost:3040 VERIFY_API=http://localhost:8087/api/v1 \
+  VERIFY_SCRATCH=1 node tools/release-followup.mjs
+```
+
 Run against a **local, seeded scratch database**, with the backend on `:8080`
 using the `demo` profile and `civictrack.demo.staff-password=demo1234`, and the
 frontend on `:3000` pointing to that backend. Lifecycle scripts mutate issues and

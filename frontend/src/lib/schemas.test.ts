@@ -19,8 +19,8 @@ import {
 
 const valid = {
   categoryCode: "POTHOLE",
-  lat: 30.93,
-  lng: 75.82,
+  lat: 30.386,
+  lng: 76.326,
   accuracyM: 12.5,
   manualPin: false,
   description: "Deep pothole across the lane",
@@ -65,7 +65,7 @@ describe("composerSchema", () => {
   });
 
   it("rejects coordinates outside the globe, which is how a lat/lng swap shows up", () => {
-    // A swapped pair puts a Ludhiana longitude of 75.82 into lat, which is
+    // A swapped pair puts a Patiala longitude of 76.326 into lat, which is
     // in range -- but 175 is not, and this is the cheap structural catch the
     // server's @DecimalMin/@DecimalMax also make.
     expect(composerSchema.safeParse({ ...valid, lat: 175 }).success).toBe(false);

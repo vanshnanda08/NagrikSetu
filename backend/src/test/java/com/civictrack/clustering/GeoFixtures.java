@@ -20,20 +20,20 @@ package com.civictrack.clustering;
  * different locks and race, which would make the concurrency test flaky in a
  * way that looks exactly like the bug it exists to catch.
  *
- * <p>Note that the demo coordinate from the specification, (30.900965,
- * 75.857277), satisfies neither: it sits 107 m from a ward boundary. It is
+ * <p>Note that the nearby demo coordinate (30.356965,
+ * 76.363277), satisfies neither: it sits 107 m from a ward boundary. It is
  * fine on a projector and unusable as a fixture.
  */
 public final class GeoFixtures {
 
-    public static final double LAT = 30.9300;
-    public static final double LNG = 75.8200;
+    public static final double LAT = 30.3860;
+    public static final double LNG = 76.3260;
 
     /** Metres per degree of latitude. Constant enough at any latitude. */
     private static final double M_PER_DEG_LAT = 111_320.0;
 
-    /** Metres per degree of longitude at this latitude (cos 30.93 ~ 0.858). */
-    private static final double M_PER_DEG_LNG = 95_545.0;
+    /** Approximate metres per degree of longitude at latitude 30.386. */
+    private static final double M_PER_DEG_LNG = 96_111.0;
 
     private GeoFixtures() {
     }

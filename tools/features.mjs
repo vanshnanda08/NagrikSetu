@@ -54,7 +54,7 @@ try {
   await page.goto(APP+'/report/outbox');await page.evaluate(()=>navigator.serviceWorker.ready);
   await context.setOffline(true);
   const id=crypto.randomUUID();
-  const body={categoryCode:'POTHOLE',lat:30.93,lng:75.82,accuracyM:8,manualPin:false,photoUrl:'https://example.test/offline.jpg',deviceId:'offline-'+crypto.randomUUID(),description:'Offline browser fixture'};
+  const body={categoryCode:'POTHOLE',lat:30.386,lng:76.326,accuracyM:8,manualPin:false,photoUrl:'https://example.test/offline.jpg',deviceId:'offline-'+crypto.randomUUID(),description:'Offline browser fixture'};
   await page.evaluate(async ({id,body})=>{
     const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('civictrack-offline',1);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
     await new Promise((resolve,reject)=>{const tx=db.transaction('outbox','readwrite');tx.objectStore('outbox').put({id,userId:null,body,blob:null,cloud:'',preset:'',createdAt:Date.now(),nextAttempt:0,attempts:0,state:'pending'});tx.oncomplete=resolve;tx.onerror=reject;});db.close();

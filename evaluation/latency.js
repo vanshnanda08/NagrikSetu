@@ -15,8 +15,8 @@ export default function () {
   const id = `${scale}-${__VU}-${__ITER}`;
   const body = JSON.stringify({
     categoryCode: "POTHOLE",
-    lat: 30.905 + Math.random() * 0.05,
-    lng: 75.785 + Math.random() * 0.07,
+    lat: 30.361 + Math.random() * 0.05,
+    lng: 76.291 + Math.random() * 0.07,
     accuracyM: 8,
     manualPin: false,
     description: "Latency evaluation report",

@@ -5,7 +5,7 @@ import { submitReport } from "./submitReport";
 
 const original = { userId: "citizen-a", accessToken: "expired-access" };
 const renewed = { ...original, accessToken: "renewed-access" };
-const body = { categoryCode: "POTHOLE", photoUrl: "https://example.test/already-uploaded.jpg", description: "Keep this draft", lat: 30.9, lng: 75.8 };
+const body = { categoryCode: "POTHOLE", photoUrl: "https://example.test/already-uploaded.jpg", description: "Keep this draft", lat: 30.356, lng: 76.306 };
 const result = { publicRef: "CT-2099-000001", issueId: "issue-a" };
 const response = (status: number) => new Response(JSON.stringify(status === 201 ? result : { detail: "Refused" }), { status });
 const auth = (session: AuthenticatedSession | null, refresh: () => Promise<AuthenticatedSession | null>): AuthenticatedRequest =>

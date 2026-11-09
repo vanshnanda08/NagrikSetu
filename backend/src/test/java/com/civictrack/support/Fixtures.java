@@ -106,10 +106,10 @@ public class Fixtures {
         issue.setCategoryCode(categoryCode);
         issue.setWardId(wardId(1));
         issue.setDepartmentId(category.getDepartmentId());
-        issue.setCentroid(GeoFactory.point(30.9300, 75.8200));
+        issue.setCentroid(GeoFactory.point(30.3860, 76.3260));
         issue.setSumW(1.0 / 64);
-        issue.setSumWx(75.8200 / 64);
-        issue.setSumWy(30.9300 / 64);
+        issue.setSumWx(76.3260 / 64);
+        issue.setSumWy(30.3860 / 64);
         issue.setReportCount(1);
         issue.setDistinctReporterCount(1);
         issue.setFirstReportedAt(firstReportedAt);

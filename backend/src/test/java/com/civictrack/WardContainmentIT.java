@@ -19,25 +19,35 @@ import static org.assertj.core.api.Assertions.assertThat;
  * high-likelihood, high-impact risk, and it is: the swap throws nothing,
  * corrupts nothing visibly, and surfaces as a ward lookup failing several
  * layers away from the mistake. A unit test on {@code GeoFactory} cannot catch
- * it, because both ordinates of a Ludhiana coordinate are valid in both
+ * it, because both ordinates of a Patiala coordinate are valid in both
  * positions. Only a round trip against real geometry can, which is what this
  * class is.
  */
 class WardContainmentIT extends IntegrationTestBase {
 
-    // Ferozepur Road, near Bharat Nagar Chowk. Comfortably inside ward 1, not
+    // Patiala demo sector north-west of Thapar Institute. Comfortably inside ward 1, not
     // near an edge, so the test asserts containment rather than tie-breaking.
-    private static final double LUDHIANA_LAT = 30.9300;
-    private static final double LUDHIANA_LNG = 75.8200;
+    private static final double PATIALA_LAT = 30.3860;
+    private static final double PATIALA_LNG = 76.3260;
     private static final int EXPECTED_WARD = 1;
 
     @Autowired
     private JdbcTemplate jdbc;
 
     @Test
-    @DisplayName("a known Ludhiana coordinate falls inside the ward a human would name")
+    @DisplayName("Thapar Institute and nearby locations resolve to the Patiala demo wards")
+    void thaparCampusIsServiced() {
+        assertThat(wardNumberContaining(GeoFactory.point(30.355833, 76.365))).isEqualTo(3);
+        assertThat(wardNumberContaining(GeoFactory.point(30.36, 76.36))).isEqualTo(1);
+        assertThat(wardNumberContaining(GeoFactory.point(30.36, 76.37))).isEqualTo(2);
+        assertThat(wardNumberContaining(GeoFactory.point(30.35, 76.37))).isEqualTo(4);
+        assertThat(wardNumberContaining(GeoFactory.point(30.93, 75.82))).isNull();
+    }
+
+    @Test
+    @DisplayName("a known Patiala coordinate falls inside the ward a human would name")
     void knownCoordinateResolvesToKnownWard() {
-        Integer ward = wardNumberContaining(GeoFactory.point(LUDHIANA_LAT, LUDHIANA_LNG));
+        Integer ward = wardNumberContaining(GeoFactory.point(PATIALA_LAT, PATIALA_LNG));
 
         assertThat(ward).isEqualTo(EXPECTED_WARD);
     }
@@ -45,10 +55,10 @@ class WardContainmentIT extends IntegrationTestBase {
     @Test
     @DisplayName("the same coordinate with lat and lng swapped falls in no ward at all")
     void swappedCoordinateResolvesToNothing() {
-        // (30.93, 75.82) reversed is a point in the Indian Ocean, roughly off
+        // (30.386, 76.326) reversed is a point in the Indian Ocean, roughly off
         // the Somali coast. If a swap is ever introduced upstream, this is the
         // assertion that fails first and names the cause.
-        Point swapped = GeoFactory.point(LUDHIANA_LNG, LUDHIANA_LAT);
+        Point swapped = GeoFactory.point(PATIALA_LNG, PATIALA_LAT);
 
         assertThat(wardNumberContaining(swapped))
                 .as("a swapped coordinate must not resolve to a ward; if this passes, "
@@ -70,7 +80,7 @@ class WardContainmentIT extends IntegrationTestBase {
     @Test
     @DisplayName("a coordinate outside the service area resolves to no ward")
     void coordinateOutsideServiceAreaResolvesToNothing() {
-        // Delhi. Well outside the seeded Ludhiana grid, and the case that must
+        // Delhi. Well outside the seeded Patiala grid, and the case that must
         // produce a clean "outside service area" rejection at ingest rather
         // than a null ward_id on an issue row.
         assertThat(wardNumberContaining(GeoFactory.point(28.6139, 77.2090))).isNull();
@@ -79,14 +89,14 @@ class WardContainmentIT extends IntegrationTestBase {
     @Test
     @DisplayName("distances come back as geodesic metres, not degrees")
     void distanceIsGeodesicMetres() {
-        // Two points 0.0002 degrees of longitude apart at Ludhiana's latitude.
+        // Two points 0.0002 degrees of longitude apart at Patiala's latitude.
         // Planar arithmetic would call this 0.0002 of something; the geography
         // cast calls it roughly 19 m, which is the number the merge radius is
         // actually compared against. Standing rule 2.
         Double metres = jdbc.queryForObject("""
                 SELECT ST_Distance(
-                    ST_SetSRID(ST_MakePoint(75.8570, 30.9010), 4326)::geography,
-                    ST_SetSRID(ST_MakePoint(75.8572, 30.9010), 4326)::geography)
+                    ST_SetSRID(ST_MakePoint(76.3630, 30.3570), 4326)::geography,
+                    ST_SetSRID(ST_MakePoint(76.3632, 30.3570), 4326)::geography)
                 """, Double.class);
 
         assertThat(metres).isBetween(18.0, 20.0);

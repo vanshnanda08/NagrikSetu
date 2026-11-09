@@ -47,7 +47,7 @@ class CloudinaryOrphanSweepIT extends IntegrationTestBase {
                                     first_reported_at, last_reported_at)
                 SELECT 'CT-2026-S' || lpad((floor(random()*899999)+100000)::int::text, 6, '0'),
                        'POTHOLE', (SELECT id FROM wards WHERE ward_number = 1), 'NEW',
-                       ST_SetSRID(ST_MakePoint(75.82, 30.93), 4326),
+                       ST_SetSRID(ST_MakePoint(76.326, 30.386), 4326),
                        0.015625, 0.0, 0.0, 1, now() + interval '72 hours', now(), now()
                 RETURNING id
                 """, UUID.class);
@@ -56,7 +56,7 @@ class CloudinaryOrphanSweepIT extends IntegrationTestBase {
                                      gps_accuracy_m, manual_pin, photo_url, cluster_decision,
                                      created_at)
                 VALUES (?, 'device-test', 'POTHOLE',
-                        ST_SetSRID(ST_MakePoint(75.82, 30.93), 4326),
+                        ST_SetSRID(ST_MakePoint(76.326, 30.386), 4326),
                         8.0, false, ?, 'NEW_ISSUE', now())
                 """, issueId, photoUrl);
     }

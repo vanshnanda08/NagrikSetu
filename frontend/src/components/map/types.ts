@@ -62,6 +62,8 @@ export interface MapDensityCell {
 export interface MapCanvasProps {
   center: LatLng;
   zoom?: number;
+  /** Keep the user's zoom when selecting a new location; explicit zoom changes still apply. */
+  preserveZoomOnCenterChange?: boolean;
   markers?: MapMarker[];
   circles?: MapCircle[];
   height?: number;

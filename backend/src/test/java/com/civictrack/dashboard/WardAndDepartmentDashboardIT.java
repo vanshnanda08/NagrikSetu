@@ -87,7 +87,7 @@ class WardAndDepartmentDashboardIT extends IntegrationTestBase {
         mvc.perform(get("/api/v1/dashboard/wards/{id}", ward1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ward.wardNumber").value(1))
-                .andExpect(jsonPath("$.ward.name").value("Ward 1 - Civil Lines North"))
+                .andExpect(jsonPath("$.ward.name").value("Ward 1 - Thapar North West"))
                 .andExpect(jsonPath("$.ward.boundary").value(org.hamcrest.Matchers.containsString("MultiPolygon")))
                 .andExpect(jsonPath("$.metrics.openCount").value(2))
                 .andExpect(jsonPath("$.metrics.resolvedCount").value(5))

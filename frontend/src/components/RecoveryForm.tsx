@@ -6,14 +6,20 @@ import { PageShell } from "./PageShell";
 import { Button } from "./Button";
 import { request } from "@/lib/api";
 
+// Enable only alongside an operational, verified email recovery service.
+const EMAIL_RECOVERY_ENABLED = process.env.NEXT_PUBLIC_EMAIL_RECOVERY_ENABLED === "true";
+
 export function RecoveryForm({ reset = false }: { reset?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [done, setDone] = useState(false);
   return <PageShell>
     <h1 className="text-display">{reset ? "Choose a new password" : "Reset your password"}</h1>
-    <p className="mt-3 text-body">{reset ? "Reset links expire after 30 minutes and work once." : "Enter your account email. If it is active, we will email a reset link."}</p>
-    {!done && <form className="mt-6 grid gap-4 max-w-md" onSubmit={async (event) => {
+    {!EMAIL_RECOVERY_ENABLED ? <div className="mt-4 max-w-lg space-y-3 text-body">
+      <p>Email-based password recovery is planned for a future update and is currently unavailable.</p>
+      <p>If you are already signed in, you can change your password in <Link className="underline" href="/me/settings?tab=security">Account settings</Link>.</p>
+    </div> : <p className="mt-3 text-body">{reset ? "Reset links expire after 30 minutes and work once." : "Enter your account email. If it is active, we will email a reset link."}</p>}
+    {EMAIL_RECOVERY_ENABLED && !done && <form className="mt-6 grid gap-4 max-w-md" onSubmit={async (event) => {
       event.preventDefault();
       const data = new FormData(event.currentTarget);
       setBusy(true); setMessage("");
@@ -37,6 +43,6 @@ export function RecoveryForm({ reset = false }: { reset?: boolean }) {
       <Button disabled={busy} type="submit">{busy ? "Please wait…" : reset ? "Save password" : "Email reset link"}</Button>
     </form>}
     {message && <p role="status" className="mt-4 text-body">{message}</p>}
-    <p className="mt-4"><Link className="underline" href={reset && !done ? "/forgot-password" : "/login"}>{reset && !done ? "Request a new link" : "Back to sign in"}</Link></p>
+    <p className="mt-4"><Link className="underline" href={EMAIL_RECOVERY_ENABLED && reset && !done ? "/forgot-password" : "/login"}>{EMAIL_RECOVERY_ENABLED && reset && !done ? "Request a new link" : "Back to sign in"}</Link></p>
   </PageShell>;
 }

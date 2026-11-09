@@ -94,7 +94,7 @@ class DashboardMetricsIT extends IntegrationTestBase {
     }
 
     @Test
-    @DisplayName("a day is a Ludhiana day: 01:30 IST on the 2nd is not the 1st")
+    @DisplayName("a day is a Patiala day: 01:30 IST on the 2nd is not the 1st")
     void daysAreLocal() {
         // 20:00 UTC on 1 March is 01:30 IST on 2 March.
         fixtures.issue("POTHOLE", Instant.parse("2026-03-01T20:00:00Z"), NOW.plus(Duration.ofDays(3)));

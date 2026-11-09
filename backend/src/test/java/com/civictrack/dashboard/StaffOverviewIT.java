@@ -117,7 +117,7 @@ class StaffOverviewIT extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.department.id").value(roads.toString()))
                 .andExpect(jsonPath("$.ward.id").value(ward2.toString()))
-                .andExpect(jsonPath("$.ward.name").value("Ward 2 - Bharat Nagar"))
+                .andExpect(jsonPath("$.ward.name").value("Ward 2 - Thapar North East"))
                 .andExpect(jsonPath("$.departmentWork.open").value(1))
                 .andExpect(jsonPath("$.personal.open").value(1))
                 .andExpect(jsonPath("$.departmentPriorities[0].id").value(inside.getId().toString()));

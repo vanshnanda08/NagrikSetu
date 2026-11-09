@@ -12,7 +12,9 @@ import { useBbox, useCategories } from "@/lib/queries";
 import { ISSUE_STATUSES, STATUS, isOverdue, statusWord } from "@/lib/status";
 import { IssueDetailPanel } from "@/components/IssueDetailPanel";
 import { useAuth } from "@/lib/auth";
+import { SERVICE_AREA_CENTER, SERVICE_AREA_ZOOM } from "@/lib/serviceArea";
 import type { ApiError } from "@/lib/api";
+import type { PublicIssue } from "@/lib/types";
 
 /**
  * Issue map (blueprint §3.4): spatial browse of the whole city.
@@ -24,9 +26,6 @@ import type { ApiError } from "@/lib/api";
  * The viewport and filters live in the URL, because "open drainage issues in
  * ward 12" is a link somebody sends (blueprint §3.4, §6).
  */
-
-// Ludhiana. Only the initial view; the URL overrides it when there is one.
-const DEFAULT_CENTER = { lat: 30.9, lng: 75.85 };
 
 function MapInner() {
   const router = useRouter();
@@ -41,7 +40,8 @@ function MapInner() {
   // Which pin is open. Kept out of the URL deliberately: the viewport and the
   // filters are what somebody shares ("drainage issues in ward 12"), and a
   // selected pin is a transient act of reading rather than part of that view.
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIssue, setSelectedIssue] = useState<PublicIssue | null>(null);
+  const selectedId = selectedIssue?.id ?? null;
 
   // Who sees the clustering geometry. A citizen gets a map with dots on it; the
   // merge radius and the extent cap are facts about the engine, and drawing
@@ -84,6 +84,7 @@ function MapInner() {
   );
 
   function setFilter(key: string, value: string) {
+    setSelectedIssue(null);
     const next = new URLSearchParams(params.toString());
     if (value) next.set(key, value);
     else next.delete(key);
@@ -94,16 +95,16 @@ function MapInner() {
   const center =
     saved && saved.length === 4 && saved.every((n) => Number.isFinite(n))
       ? { lat: (saved[0] + saved[2]) / 2, lng: (saved[1] + saved[3]) / 2 }
-      : DEFAULT_CENTER;
-  const zoom = Number(params.get("z")) || 13;
+      : SERVICE_AREA_CENTER;
+  const zoom = Number(params.get("z")) || SERVICE_AREA_ZOOM;
 
   const items = bbox.data?.items ?? [];
   const filtersActive = Boolean(status || category);
 
-  // The selected issue, or null once it has been filtered or panned out of the
-  // result set -- which is the right behaviour: a panel describing something no
-  // longer on the map is a panel about nothing.
-  const selected = items.find((i) => i.id === selectedId) ?? null;
+  // Opening the panel resizes the map and can put its marker outside the next
+  // bounding-box result. Retain the selected record until closed or filtered;
+  // otherwise the panel and map can repeatedly resize and dismiss each other.
+  const selected = items.find((i) => i.id === selectedId) ?? selectedIssue;
 
   return (
     <PageShell wide className="explore-page">
@@ -201,7 +202,7 @@ function MapInner() {
                 // popup. A popup is a second, differently-styled surface that
                 // cannot hold a photo, a history and an action -- and it
                 // covers the map it is anchored to.
-                onClick: () => setSelectedId(i.id),
+                onClick: () => setSelectedIssue(i),
               }))}
               circles={
                 technical && selected
@@ -228,7 +229,7 @@ function MapInner() {
             <IssueDetailPanel
               issue={selected}
               technical={technical}
-              onClose={() => setSelectedId(null)}
+              onClose={() => setSelectedIssue(null)}
             />
           )}
         </div>
@@ -242,7 +243,7 @@ function MapInner() {
             {items.map((item) => (
               <li key={item.id} className="border-b border-rule last:border-0">
                 <button type="button" className="map-issue-option w-full flex flex-wrap items-center gap-3 p-3 text-left hover:bg-surface-sunk"
-                  aria-pressed={selectedId === item.id} onClick={() => setSelectedId(item.id)}>
+                  aria-pressed={selectedId === item.id} onClick={() => setSelectedIssue(item)}>
                   <span className="font-mono text-ref">{item.publicRef}</span>
                   <span className="text-dense">{item.categoryName}</span>
                   <StatusRule status={item.status} />

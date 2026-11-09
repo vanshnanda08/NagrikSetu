@@ -21,7 +21,7 @@ class ContentScreeningServiceTest {
     void profanityReusedPhotoAndOldCaptureAreAllRetainedAsFlags() {
         when(reports.existsByPhotoHash("0123456789abcdef")).thenReturn(true);
         IngestReportCommand command = new IngestReportCommand(
-                "POTHOLE", 30.93, 75.82, 8, false,
+                "POTHOLE", 30.386, 76.326, 8, false,
                 "This shit is dangerous", null, null, "https://example.test/photo.jpg",
                 "0123456789abcdef", Instant.parse("2026-10-01T00:00:00Z"),
                 null, "device-1");
@@ -35,7 +35,7 @@ class ContentScreeningServiceTest {
     @Test
     void ordinaryEvidenceIsNotFlagged() {
         IngestReportCommand command = new IngestReportCommand(
-                "POTHOLE", 30.93, 75.82, 8, false,
+                "POTHOLE", 30.386, 76.326, 8, false,
                 "Deep pothole beside the bus stop", null, null,
                 "https://example.test/photo.jpg", "fedcba9876543210",
                 Instant.parse("2026-10-24T09:00:00Z"), null, "device-2");

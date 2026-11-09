@@ -113,6 +113,7 @@ const CIRCLE_STYLE = {
 export default function MapCanvasInner({
   center,
   zoom = 15,
+  preserveZoomOnCenterChange = false,
   markers = [],
   circles = [],
   height = 420,
@@ -127,6 +128,7 @@ export default function MapCanvasInner({
   const nodeRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerRef = useRef<L.LayerGroup | null>(null);
+  const previousZoom = useRef(zoom);
 
   // Callbacks live in refs so a parent re-rendering with a new closure does not
   // tear down and rebuild the map, which would reset the viewport out from
@@ -238,8 +240,13 @@ export default function MapCanvasInner({
 
   // Recentre only when the caller moves the centre, never on every render.
   useEffect(() => {
-    mapRef.current?.setView([center.lat, center.lng], zoom, { animate: false });
-  }, [center.lat, center.lng, zoom]);
+    const map = mapRef.current;
+    if (!map) return;
+    const nextZoom = preserveZoomOnCenterChange && previousZoom.current === zoom
+      ? map.getZoom() : zoom;
+    previousZoom.current = zoom;
+    map.setView([center.lat, center.lng], nextZoom, { animate: false });
+  }, [center.lat, center.lng, zoom, preserveZoomOnCenterChange]);
 
   // Redraw the overlay. Circles first so markers sit above them.
   useEffect(() => {
@@ -286,6 +293,13 @@ export default function MapCanvasInner({
       });
       if (m.popupHtml) marker.bindPopup(m.popupHtml);
       if (m.onClick) marker.on("click", m.onClick);
+      // Leaflet makes custom div icons focusable but does not activate them
+      // as buttons. Give keyboard users the same action as a pointer click.
+      if (m.onClick || m.popupHtml) marker.on("keydown", (event: L.LeafletKeyboardEvent) => {
+        if (event.originalEvent.key !== "Enter" && event.originalEvent.key !== " ") return;
+        L.DomEvent.stop(event.originalEvent);
+        marker.fire("click", { latlng: marker.getLatLng(), originalEvent: event.originalEvent });
+      });
       marker.addTo(layer);
     }
 
