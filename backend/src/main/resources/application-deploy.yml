@@ -17,6 +17,11 @@
 # application.yml's defaults, which is the same result today but would silently
 # change the day somebody edits that file for another reason.
 civictrack:
+  mail:
+    # Email delivery/recovery is deferred for this release. Keep it off even
+    # when a retained MAIL_ENABLED environment variable is still true.
+    # A future email release must explicitly restore the environment binding.
+    enabled: false
   sla:
     cron: "0 */5 * * * *"
     # Zero disables the override entirely (SlaProperties.demoOverrideActive()).

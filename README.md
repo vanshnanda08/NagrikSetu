@@ -2,6 +2,12 @@
 
 See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
 
+**Release follow-up — 10 November:** reviewed Patiala/map changes were pushed
+as `935a30f`. The deployment profile keeps deferred email delivery disabled even
+if an older Render `MAIL_ENABLED=true` value remains. Provider credentials and
+email implementation are retained for a future release. See
+[release readiness](docs/RELEASE_READINESS.md) for deployment verification status.
+
 **Hosted recheck — 10 November:** the API returned HTTP 200 / UP after a
 152.5-second cold start. Category, ward and dashboard reads then passed with the
 correct Vercel CORS origin. A guarded invalid-photo probe confirmed active media

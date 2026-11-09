@@ -1,6 +1,7 @@
 package com.civictrack;
 
 import com.civictrack.sla.SlaProperties;
+import com.civictrack.notification.MailProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DeployProfileIT extends IntegrationTestBase {
 
     @Autowired private SlaProperties sla;
+    @Autowired private MailProperties mail;
+
+    @Test
+    @DisplayName("the deployed release keeps deferred email delivery disabled")
+    void deployKeepsDeferredEmailDisabled() {
+        assertThat(mail.enabled()).isFalse();
+    }
 
     @Test
     @DisplayName("the deploy profile leaves real SLA deadlines in place")

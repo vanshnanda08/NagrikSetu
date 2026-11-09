@@ -1,5 +1,17 @@
 # Release follow-up — 8 November 2026
 
+## Release follow-up — 10 November 2026
+
+The reviewed Patiala/map release was committed and pushed as `935a30f` at the
+user's request to finish the remaining work. CI/deployment verification is in
+progress. The earlier uncommitted/pre-deployment statements below are dated
+historical records. A follow-up deployment-profile correction keeps email
+delivery off for this deferred-email release even if the retained Render
+`MAIL_ENABLED` variable remains true; provider credentials and the future email
+implementation are preserved. Restore the environment binding deliberately as
+part of the future verified-mail release. The private Render environment
+variable itself has not been changed by this correction.
+
 ## Hosted recheck — 10 November 2026
 
 The user supplied startup/runtime logs covering 8–9 November UTC. They show
