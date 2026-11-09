@@ -1,11 +1,18 @@
 # NagrikSetu — current progress
 
-Release follow-up, 10 November: Patiala/V11 changes were pushed as `935a30f`;
-the deployment-profile mail-off correction followed as `d684390`. CI exposed
-a pre-existing tied-timestamp report-ordering bug, now corrected with a
-deterministic evidence order and regression coverage. The fresh full backend
-suite passed 381 tests, with 2 optional skips. Final CI/live verification is
-in progress; dated pre-release statements below remain historical.
+Verified release, 10 November: Patiala/V11 changes were pushed as `935a30f`,
+the deploy-profile mail-off correction as `d684390`, and deterministic evidence
+ordering as `a728d3500383e602fd064a284c2405a31851516f`. The final application
+[CI run passed all four jobs](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42686876733),
+including backend, frontend, API/browser journeys and the Render deploy trigger.
+Vercel's commit status is successful. Live health and Patiala ward reads passed;
+the user-approved synthetic photo complaint **CT-2026-000918** returned 201,
+with actual Cloudinary upload, loaded evidence, map tiles and photo dialog checks.
+Full backend: 383 total, 381 passed, 2 optional skips; frontend: 115 passed,
+lint, types and production build passed. Native Chrome installation remains
+unsuccessful after another user attempt and foreground/windowed retry.
+See [release readiness](RELEASE_READINESS.md); dated pre-release statements below
+remain historical and are superseded by this result where explicitly checked.
 
 Hosted recheck, 10 November: health returned 200 / UP after 152.5 seconds;
 database-backed public reads and the Vercel CORS origin passed. An invalid-photo
@@ -72,7 +79,7 @@ was performed.
 | Security additions | TOTP MFA, recovery codes, refresh-session listing/revocation and browser security headers implemented |
 | Engagement additions | Issue following without priority inflation and private reporter/municipal clarification threads implemented |
 | Installable web client | Manifest, app icons and install prompt implemented alongside existing offline submission support |
-| Database | Local Flyway migrations V1–V11; V11 moves the four demo sectors to Patiala while preserving ward IDs and historical complaint evidence; hosted V11 application is not verified |
+| Database | Flyway V1–V11; V11 preserves ward IDs and historical complaint evidence; the live API now returns the four Patiala/Thapar demo sectors |
 
 MFA role enforcement defaults to enabled for staff, supervisors and
 administrators. The explicit demo profile bypasses mandatory enrolment for

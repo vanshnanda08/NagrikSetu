@@ -1,10 +1,24 @@
 # NagrikSetu — Complete Project Documentation
 
-**Last reviewed:** 2026-11-08 (Asia/Kolkata).<br>
+**Last reviewed:** 2026-11-10 (Asia/Kolkata).<br>
 **Repository:** `complaint-system`.  
 **Original guide baseline:** `011ecb5` — “Record final cross-browser CI verification”, dated 2026-10-27.<br>
-**Audit-fix baseline:** `74c76ec155a2ad8b354ae35b27540c8e58030b9d`, plus current uncommitted changes, verified 2026-11-08.<br>
-**Review scope:** the current working tree, including uncommitted and untracked application files, configuration, migrations, tests, tools, evaluation results and project notes.
+**Released application baseline:** `a728d3500383e602fd064a284c2405a31851516f`.<br>
+**Review scope:** application source, configuration, migrations, tests, tools and dated verification evidence. Older audit/benchmark findings retain their original scope unless explicitly superseded.
+
+**Verified release, 10 November:** the reviewed interface, workflow/audit fixes,
+Patiala V11 and map changes are committed and pushed. Final
+[CI passed all four jobs](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42686876733),
+and Vercel reports success. Live health and all four Patiala ward reads passed.
+The explicitly approved synthetic complaint **CT-2026-000918** completed real
+Cloudinary upload and report submission (201), followed by loaded photo/map,
+desktop/mobile and evidence-dialog checks. Full backend: 381 passed, 2 optional
+skips; frontend: 115 passed, lint, types and production build passed. The deploy
+profile enforces the agreed email deferral. Native Chrome installation remains
+unsuccessful, and no physical phone was available. See
+[release readiness](docs/RELEASE_READINESS.md) for exact evidence and boundaries.
+The following dated pre-release notes record earlier states, not outstanding
+uncommitted application work.
 
 **Hosted recheck, 10 November:** API health returned 200 / UP after a
 152.5-second cold start; subsequent database-backed reads and Vercel CORS passed.
@@ -20,7 +34,7 @@ email-recovery deferral, scheduler-test isolation and fresh checks. Backend:
 passed. Current production API probes time out; local results do not certify
 the hosted service or physical-device behavior. Changes remain uncommitted.
 
-This guide describes the repository at the time of review. The working tree contains substantial changes beyond the last commit. A feature present here may therefore differ from the deployed application. The original guide used source inspection and local documentation checks. Subsequent local runtime tests and audit-fix validation are linked below with their dates and limits; they do not establish a new deployment or repeat the earlier benchmarks.
+The original guide used source inspection and local documentation checks. Subsequent runtime tests, audit fixes and release verification are linked with their dates and limits. The current release checks do not repeat the earlier academic benchmarks or establish municipal field suitability.
 
 “Confirmed” below means supported by the inspected code or explicitly attributed repository evidence. **Not confirmed** marks something that cannot be established from those sources. Recommendations are suggestions, not promises or approved project plans. No private environment files or secret values are reproduced.
 
@@ -717,12 +731,13 @@ The administrator opens `/admin?view=audit`, filters events and exports CSV if n
 
 The repository describes phases 0–9 and extended security/offline/configuration scope as implemented. Source supports a connected intake → grouping → municipal work → verification → public accountability system, plus authentication, moderation, administration and supporting evaluation. The feature table above narrows this broad “done” label where integration or operational checks remain.
 
-The working tree adds a consolidated light interface, settings tabs, shared `/work` workspace, updated queue pagination, staff department overview, evidence dialogs and ticket-detail navigation. These files are locally present; the README explicitly says the working-tree interface changes have not been deployed.
+The released application includes the consolidated light interface, settings tabs, shared `/work` workspace, updated queue pagination, staff department overview, evidence dialogs and ticket-detail navigation. Final CI and live integration evidence are in the 10 November release record.
 
 ### Recorded checks, not new runs
 
 | Evidence | What it records | Boundary |
 |---|---|---|
+| `docs/RELEASE_READINESS.md`, 10 November | Released application `a728d35`, green CI, 381 backend passes/2 skips, 115 frontend passes, real deployed photo/report and Patiala data | Native installation unsuccessful; physical phone unavailable; not a repeat of every live role action or academic benchmark |
 | `README.md`, `FINAL_AUDIT.md` | October release: 277 backend tests total, 275 passing and two opt-in skips; 82 frontend tests; CI/browser closeout | Historical release evidence, before many current local changes |
 | `docs/PROJECT_ASSESSMENT.md` | November 6 cleanup: 282 backend tests, 280 passing, two intentional skips; 82 frontend tests; lint/types/build and 190 route-role checks | Recorded local/scratch checks, not rerun for this document |
 | `frontend/STAFF_OVERVIEW_VERIFICATION.md`, `STAFF_VERIFICATION.md` | Scoped overview, queue paging, upload recovery and staff workflow/layout checks | Feature-specific recorded evidence; distinguish fixture UI writes from real backend tests |
@@ -740,7 +755,7 @@ The extent-cap experiment shows a trade-off: removing the cap raised seeded F1 t
 | Deferred to future update | Email notifications and email-based password recovery, including provider activation and live delivery/reset checks; code retained |
 | Not implemented | New municipal record provisioning through admin configuration; full service-worker app caching; anonymous verification identity; public arbitrary role registration |
 | Planned for current checks | Review orphan dry runs before deletion; complete physical-device/screen-reader/PWA checks; record a final demo if required |
-| Unknown | Today's live hosting/mail/photo status, field usage/adoption, actual municipal repair quality, current backup schedule execution and production load capacity |
+| Unknown | Directly observed live mail-worker state, field usage/adoption, actual municipal repair quality, current backup schedule execution and production load capacity; live health/photo flow passed on 10 November |
 
 Absence is not always a missing requirement: anonymous verification and unrestricted role selection have security/product trade-offs, and administrator closure now requires a reason and confirmation while preserving public history and role restrictions. No source TODO/FIXME/HACK markers were found in the searched backend/frontend source at review; concrete remaining work is recorded mainly in assessment and verification notes.
 
@@ -750,13 +765,14 @@ Absence is not always a missing requirement: anonymous verification and unrestri
 
 | Date | Commit evidence | Meaning |
 |---|---|---|
+| 2026-11-10 | `935a30f`, `d684390`, `a728d35` | Patiala/map release, deploy-profile email deferral and deterministic evidence ordering; final CI green and real deployed photo/report verified |
 | 2026-10-27 | `011ecb5`, `afe7ce4` | Cross-browser CI verification and non-mail production closeout |
 | 2026-10-26 | `10481bf`, `71d93a3`, `19893be` | Mail diagnostics, separating SMTP health from HTTPS mail and adding HTTPS transactional delivery |
 | 2026-10-26 | `aae062e` | Extended feature/security hardening |
 | 2026-10-11 | `b3c627a`, `41e9ede` and related commits | Documentation, frontend sizing/accessibility and earlier branding/layout work |
 | 2026-10-07 | `db97327`, `a1b605d`, `a21e84f`, `3132867` | Reproducible seeding/backups, supervisor assignment/moderation/dashboard and citizen verification |
 
-There are no newer committed entries in the inspected history. Current work is better inferred from the working tree and November notes: cleanup, consolidated navigation/workspaces, fixed light appearance, responsive density, staff overview, queue pagination, ticket detail access and academic manuscript artifacts.
+November interface/workflow changes have now been released. Remaining evidence gaps concern native installation, physical devices and individually untested operational/accessibility cases. Email delivery/recovery stays deferred.
 
 These are observed areas of activity. **Not confirmed:** the team's exact active assignment, owner, deadline or approved immediate priority. A Git diff proves files changed, not what a developer is currently doing.
 
@@ -787,10 +803,10 @@ The assessment also records proposed engineering improvements. These are documen
 | 2 — completed locally | Align escalation ownership, guards, queue scope and assignee validity | Current valid municipal escalation owners gain access only to their assigned complaint; dual-scope, role, active-status and ward regressions passed |
 | 3 — completed locally | Renew authenticated online report submission after token expiry | 401 retry and failed-renewal/sign-in browser flows passed with the same body/key; changed-account and anonymous-fallback regressions passed |
 | 4 | Keep verification wording and counters consistent | Retain clear fixed-vote, partial-vote and zero-vote distinctions; decide any quorum policy change before changing data semantics |
-| 5 | Finish live photo/device/restore checks | Email and password-recovery delivery are deferred; use configured photo services and isolated records, and record date/environment/limits |
+| 5 — photo complete; device/restore follow-ups remain | Real deployed photo/report passed on 10 November | Native installation unsuccessful; phone unavailable; backup/restore evidence remains dated; email delivery/recovery deferred |
 | 6 | Improve evaluation gates and output provenance | Separate Python/Java/HTTP plot names, fail incorrect concurrency/HTTP runs, record hardware/config and broaden datasets |
 | 7 | Improve operator onboarding and policy language | Decide provisioning requirements before adding new create flows; explain technical settings in municipal terms |
-| 8 | Reconcile documentation and release the reviewed working tree | Repair missing references, rerun relevant gates on the exact release snapshot, then deploy the reviewed version |
+| 8 — complete | Reconcile documentation and release reviewed application | `a728d35` pushed, final CI/Vercel status green; live health, Patiala data and photo/report verified |
 
 Do not change applied migrations or rewrite retained complaint history merely to simplify terminology. Schema changes need new migrations. Better official boundaries, identity assurance and field evaluation would improve real-world suitability, but they are recommendations rather than completed or scheduled deliverables.
 
@@ -895,7 +911,7 @@ Never place server secrets in a `NEXT_PUBLIC_` variable: those values are bundle
 | `CLOUDINARY_CLOUD_NAME` | Backend | Must match the application's upload cloud |
 | `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Backend | Private admin credentials for orphan sweep; not browser upload credentials |
 | `CLOUDINARY_DRY_RUN` | Backend | Defaults true; keeps orphan deletion disabled |
-| `MAIL_ENABLED`, `MAIL_PROVIDER` | Backend | Enable delivery and choose `smtp` or `brevo`; disabled by default |
+| `MAIL_ENABLED`, `MAIL_PROVIDER` | Backend | Mail delivery/provider binding; disabled by default, and the current `deploy` profile explicitly forces mail off for the deferred-email release |
 | `MAIL_FROM`, `MAIL_FROM_NAME`, `PUBLIC_APP_URL` | Backend | Sender identity and user-facing URL used in mail/recovery links |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_AUTH`, `SMTP_STARTTLS` | Backend | SMTP transport settings; local defaults target port 1025 |
 | `SMTP_HEALTH_ENABLED` | Backend | SMTP-specific health probe; normally false for HTTPS mail |
@@ -975,7 +991,7 @@ python3 -m venv .venv-evaluation
 
 ### Deployment and operations
 
-The repository describes Vercel for `frontend/`, Render for the backend Docker image and Supabase PostgreSQL/PostGIS. Current availability is **Not confirmed** by this review. These are recorded deployment targets, not an instruction to recreate credentials or change hosting.
+The application uses Vercel for `frontend/`, Render for the backend Docker image and Supabase PostgreSQL/PostGIS. Health and database-backed public reads passed on 10 November, as did a real deployed photo/report journey. This dated observation is not an uptime guarantee or an instruction to recreate credentials.
 
 1. Configure a PostGIS-capable database and backend environment. With the documented Render/Supabase setup, use the IPv4-reachable **session pooler host on port 5432**, not transaction pooling. `application.yml` and decision DD-040 explain the tested choice. A legacy Compose comment says “never a pooler”; that wording does not capture the later session-pooler fix.
 2. Build/deploy from `backend/Dockerfile`. Its Maven build, Class Data Sharing training and runtime stages package the application for Java 21. Supply runtime configuration/secrets through the host.
@@ -1080,7 +1096,7 @@ Several documentation layers overlap and can disagree: README release status, as
 
 `registerSchema` tests do not establish that the shared live registration dialog uses the same Zod schema; it uses browser/server validation. Frontend transition helpers decide what to show, while the backend decides what is legal. Contract/browser tests are needed because static TypeScript shapes and helper tests cannot prove running API behavior.
 
-The current tree is not a clean committed release. Preserve existing work and verify the exact release snapshot before relying on historical totals or deploying it. This documentation task changed no existing source, dependency or configuration.
+The application release baseline is `a728d3500383e602fd064a284c2405a31851516f`; its CI and deployment evidence are dated above. Documentation closeout may have a later commit without application changes. Preserve subsequent user work and distinguish historical totals from this exact baseline.
 
 ## 16. Beginner-Friendly Glossary
 
@@ -1152,7 +1168,7 @@ The current tree is not a clean committed release. Preserve existing work and ve
 
 ### Current progress
 
-The core system, security features, public/account/work/admin screens, spatial database, tests, evaluation scripts and deployment/backup tooling exist. Current local interface changes go beyond the latest committed release. Existing reports contain substantial passing checks, but no new runtime verification was performed for this guide. Email delivery and email-based password recovery are deferred to a future update. Reviewed media cleanup and device/operational checks remain current follow-ups; present cloud state is Unknown.
+The reviewed application changes are released at `a728d35`, with green CI and a successful real deployed photo/report journey. Email delivery and email-based password recovery are deferred. Native installation remains unsuccessful; physical devices and other dated operational/accessibility limits remain follow-ups. Destructive media cleanup is still opt-in.
 
 ### Most important remaining tasks
 

@@ -1,4 +1,78 @@
-# Release follow-up — 8 November 2026
+# Release verification — 10 November 2026
+
+## Final application release result
+
+Application source: **`a728d3500383e602fd064a284c2405a31851516f`**, pushed to
+`origin/main`. This includes Patiala/map release `935a30f`, mail deferral
+`d684390` and the tied-timestamp evidence-order correction. The
+[final CI run](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42686876733)
+completed successfully: full PostGIS backend suite, frontend lint/types/tests/build,
+API contracts/browser journeys and the Render deployment trigger. Vercel's status
+for this application commit is also successful. The deploy hook's result alone
+is not proof of a completed backend rollout; live checks below verify the service
+and Patiala data, without claiming a directly observed backend commit identifier.
+
+| Final check | Observed result |
+|---|---|
+| Isolated full backend suite | **383 total: 381 passed, 2 optional evaluations skipped**, zero failures/errors |
+| Deferred-mail regression with `MAIL_ENABLED=true` | All 3 focused deploy-profile tests passed; literal `enabled: false` wins over the retained variable binding |
+| Frontend | **115 tests passed**; ESLint and TypeScript passed locally; production build and all frontend gates passed in final CI |
+| Cross-engine/API CI | API contracts, role route journeys, Firefox and WebKit checks passed |
+| Live API | Health 200 / UP; ward API returns all four Patiala/Thapar sectors |
+| Real photo/report | Actual browser upload to Cloudinary returned 200; actual report API returned **201**; receipt, public reads and hosted photo returned successfully |
+| Loaded evidence | Thumbnail loaded at 960×640; full photo dialog opened and closed with Escape; real map tiles loaded; loaded complaint inspected at 1280×768 and 390px width |
+| Native installation | **Unsuccessful / unresolved** on the available laptop; user reports failure or no action; a further windowed active-tab retry produced no prompt |
+
+### Retained, explicitly authorized QA record
+
+Exactly one public QA complaint was created: **CT-2026-000918**, issue
+`863c722d-2cd0-44cc-b4dc-08fd3c6c18f1`, Ward 1 — Thapar North West.
+[Open its public detail](https://nagrik-setu-vn.vercel.app/issues/863c722d-2cd0-44cc-b4dc-08fd3c6c18f1).
+The prepared image and description explicitly say **synthetic test, no civic
+problem, no municipal action required**. The test used simulated coordinates
+and a manual demo pin, not the user's actual location. It used the deployed UI,
+normal compression/upload and strict server evidence verification, with no
+response fixtures. No production account was created. The QA ticket/photo remain
+as authorized evidence; no complaint history or media was deleted, and no further
+test submission is required. There were zero observed application runtime errors
+in this live journey. This verifies the photo flow, not every production role action.
+
+Local evidence (ignored by Git): `artifacts/release-20261110-010413/`.
+Raw request logs contain submission identifiers and are not published. Captures:
+
+- [Live receipt](../artifacts/release-20261110-010413/live-qa-receipt-1280.png)
+- [Loaded desktop detail](../artifacts/release-20261110-010413/live-qa-detail-loaded-1280.png)
+- [Loaded mobile detail](../artifacts/release-20261110-010413/live-qa-detail-loaded-390.png)
+- [Full evidence dialog](../artifacts/release-20261110-010413/live-qa-photo-dialog.png)
+
+### Remaining limits
+
+- Chrome's exported installation diagnostics record
+  `kCancelledDueToMainFrameNavigation` for two install attempts. Chromium can use
+  this result for navigation or a hidden tab; it does not identify the cause of
+  every user attempt. Manifest installability checks passed, but no successful
+  OS installation or standalone installed-app use was observed. No browser flags,
+  security settings or profile files were changed. Chrome's original full-screen
+  layout was restored after the windowed retry.
+- No physical phone was available for real camera/GPS/permission checks.
+  Closed-browser background execution remains platform-dependent. Cold offline
+  app-shell reload is unsupported by the current worker; warm offline reporting
+  and later delivery have separate passing evidence below.
+- Complete manual WCAG certification, newly repeated backup recovery and every
+  untested case in the older audit are not implied by this release result.
+  Destructive Cloudinary cleanup remains opt-in after dry-run review.
+- Email delivery and email-based recovery remain intentionally deferred. The
+  released `deploy` profile enforces mail off even with a retained
+  `MAIL_ENABLED=true`; credentials/future mail code remain. Private Render
+  environment values and the live mail worker were not directly inspected.
+- Free-tier startup delay remains an operational limit: an earlier real cold
+  start took 152.5 seconds. Retries/keep-alive improve recovery, not guaranteed uptime.
+
+## Historical pre-release records
+
+The records below describe the 8 November local snapshot and the earlier
+10 November checks. Their unreleased/photo-pending/CI-pending statements are
+superseded by the final result above only for the explicitly verified cases.
 
 ## Release follow-up — 10 November 2026
 
@@ -78,7 +152,7 @@ this record supersedes only the individual cases explicitly checked here.
   the reproducibility assertion to fail. Production scheduling/policy was not changed.
 - The keep-alive workflow retries cold starts and fails when health or the
   database-backed request remains unavailable. It no longer reports a green run
-  after an unavailable database-backed request. It needs a future push to become active.
+  after an unavailable database-backed request. It was subsequently pushed in `935a30f`.
 - Updated current deployment links, V11/service-area notes, frontend environment
   example and verification tools. No backend authorization, lifecycle, API contract,
   authentication, original-account ownership or media-verification protection was removed.

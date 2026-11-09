@@ -1,11 +1,15 @@
 # NagrikSetu frontend
 
-Latest follow-up: [release readiness](../docs/RELEASE_READINESS.md), 8 November.
+Latest follow-up: [release readiness](../docs/RELEASE_READINESS.md), 10 November.
 Patiala map defaults, zoom preservation, Enter/Space marker activation and stable
-selection are implemented locally. Password-recovery routes display a deferral
+selection are released. Password-recovery routes display a deferral
 notice by default; `NEXT_PUBLIC_EMAIL_RECOVERY_ENABLED=true` is reserved for a
 future release with verified mail delivery. Current code checks: 115 tests,
-ESLint, TypeScript and production build passed. No deployment is implied.
+ESLint, TypeScript and production build passed, including the green application
+CI run for `a728d35`. A real deployed photo/report submission passed with labelled
+QA ticket CT-2026-000918, followed by desktop/mobile evidence rendering and photo
+dialog checks. Native Chrome installation remains unsuccessful on the available
+laptop; manifest eligibility is not an installation pass.
 
 Next.js 16 (App Router), React 19, Tailwind v4.
 

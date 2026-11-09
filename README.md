@@ -2,29 +2,21 @@
 
 See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
 
-**Release follow-up — 10 November:** reviewed Patiala/map changes were pushed
-as `935a30f`. The deployment profile keeps deferred email delivery disabled even
-if an older Render `MAIL_ENABLED=true` value remains. Provider credentials and
-email implementation are retained for a future release. See
-[release readiness](docs/RELEASE_READINESS.md) for deployment verification status.
+**Verified release — 10 November 2026:** application commit
+`a728d3500383e602fd064a284c2405a31851516f` is pushed; [CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42686876733)
+and Vercel reports a successful deployment. Live API health and the Patiala/Thapar
+ward data passed. One explicitly approved, labelled synthetic complaint,
+**CT-2026-000918**, completed a real Cloudinary upload and report submission
+(HTTP 201), with loaded evidence and map tiles on the deployed site.
 
-**Hosted recheck — 10 November:** the API returned HTTP 200 / UP after a
-152.5-second cold start. Category, ward and dashboard reads then passed with the
-correct Vercel CORS origin. A guarded invalid-photo probe confirmed active media
-validation without creating a complaint; genuine deployed photo submission still
-needs checking. The hosted wards remain in Ludhiana; local Patiala/V11 changes
-are not released. See [release readiness](docs/RELEASE_READINESS.md).
-
-**Latest follow-up — 8 November 2026:** the local Patiala/Thapar update includes
-migration V11, wider report-map defaults, preserved pin-selection zoom, keyboard
-marker activation and stable map details. Email recovery screens explicitly show
-the agreed deferral. Fresh local checks passed: 379 backend tests (2 optional
-skips), 115 frontend tests, lint, TypeScript and production builds. These changes
-are uncommitted and have not been deployed. The frontend is reachable at
-[nagrik-setu-vn.vercel.app](https://nagrik-setu-vn.vercel.app/dashboard), but current
-API requests time out; live photo submission is not signed off.
-See [release readiness](docs/RELEASE_READINESS.md) for browser evidence,
-operational steps and remaining device limits.
+The release includes map zoom/keyboard fixes, deterministic evidence ordering
+and enforced email deferral in the `deploy` profile. Checks: **381 backend tests
+passed, 2 optional evaluations skipped; 115 frontend tests**, lint, types, build,
+API contracts and browser journeys passed. Native Chrome installation still
+fails or does nothing on the available laptop; physical-phone checks remain
+unavailable. See [release readiness](docs/RELEASE_READINESS.md) for evidence,
+screenshots and the remaining platform/operational limits. Earlier dated reports
+describe their own snapshots, not current unreleased work.
 
 Municipal issue reporting with bounded incremental geo-clustering, SLA-driven
 escalation, and public accountability.
@@ -39,7 +31,7 @@ A public dashboard publishes the resulting numbers without a login.
 
 ## Current interface
 
-The local frontend uses one light theme and **two municipal workspaces**:
+The frontend uses one light theme and **two municipal workspaces**:
 
 - **Complaints** (`/work`): staff and supervisors share a queue/detail screen.
   Staff use My work; supervisors also get Assignments, Needs review and Team
@@ -85,8 +77,8 @@ on the selected complaint with a Back to queue control.
 
 See [the complete screen map](frontend/SCREENS.md), [frontend setup](frontend/README.md),
 [the general public frontend review](frontend/PUBLIC_VERIFICATION.md), and the
-local screenshots under `artifacts/unified-workspace/`. These working-tree
-changes have not been deployed; the dated release checks below are historical.
+local screenshots under `artifacts/unified-workspace/`. These interface changes
+are included in the released application; the dated checks below are historical.
 The [citizen dry-run review](frontend/CITIZEN_VERIFICATION.md) records the current
 citizen checks, pagination/feedback fixes and evidence-photo dialogs.
 
@@ -137,7 +129,7 @@ run is reviewed. Email notifications and email-based password recovery are outsi
 the current milestone, including provider setup and live delivery/reset testing.
 Existing code/routes are retained for that future update. In-app notifications
 and password changes while signed in remain in scope. Deployment evidence below
-refers to the earlier release; the latest working-tree changes remain local.
+refers to the earlier release; current release evidence is linked above.
 See [the audit](FINAL_AUDIT.md) for security fixes, fresh verification and the
 remaining operational/accessibility checks.
 
@@ -370,7 +362,10 @@ downloads and hashes the actual uploaded pixels.
 
 The following mail setup is retained for the future email/password-recovery
 update; it is not required for the current milestone. To exercise email locally,
-run Mailpit on ports 1025/8025 and set `MAIL_ENABLED=true`. Production mail also
+run Mailpit on ports 1025/8025 and set `MAIL_ENABLED=true` without the `deploy`
+profile. The current `deploy` profile explicitly forces mail off; a future mail
+release must deliberately restore its environment binding and verify delivery.
+Production mail also
 needs `SMTP_HOST`, `SMTP_PORT`, optional SMTP credentials/TLS, `MAIL_FROM`, and
 `PUBLIC_APP_URL`. With mail disabled, messages remain in the outbox and issue work
 continues normally.
