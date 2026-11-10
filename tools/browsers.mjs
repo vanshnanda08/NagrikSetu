@@ -32,36 +32,41 @@ for (const [name, engine] of Object.entries({ firefox, webkit })) {
       env: browserHome ? { ...process.env, CFFIXED_USER_HOME: browserHome } : process.env,
     });
     const context = await browser.newContext();
-    const page = await context.newPage();
     const errors = [];
-    page.on('pageerror', e => errors.push(e.message));
-    // Next prefetches links after hydration and data loading. Replacing the
-    // document after a fixed 500 ms can abort those reads; WebKit reports some
-    // unload cancellations as access-control page errors. Let finite route
-    // reads settle before the next hard navigation. The dashboard's persistent
-    // event stream is intentionally excluded. Actual page errors still fail.
-    const pendingReads = new Set();
-    let lastRead = Date.now();
-    page.on('request', request => {
-      const url = new URL(request.url());
-      if (url.searchParams.has('_rsc') || (url.pathname.startsWith('/api/') && !url.pathname.includes('/stream/'))) {
-        pendingReads.add(request);
-        lastRead = Date.now();
-      }
-    });
-    const finished = request => {
-      if (pendingReads.delete(request)) lastRead = Date.now();
+    const settledPages = [];
+    // Keep each loaded document alive until every assertion finishes. Next can
+    // schedule link prefetches after any finite quiet period; reusing a page
+    // can cancel those reads and trigger WebKit unload errors in Linux CI.
+    // All pages continue reporting genuine errors, including background pages.
+    const newPage = async width => {
+      const page = await context.newPage();
+      page.on('pageerror', e => errors.push(e.message));
+      await page.setViewportSize({ width, height: 900 });
+      const pendingReads = new Set();
+      let lastRead = Date.now();
+      page.on('request', request => {
+        const url = new URL(request.url());
+        if (url.searchParams.has('_rsc') || (url.pathname.startsWith('/api/') && !url.pathname.includes('/stream/'))) {
+          pendingReads.add(request);
+          lastRead = Date.now();
+        }
+      });
+      const finished = request => {
+        if (pendingReads.delete(request)) lastRead = Date.now();
+      };
+      page.on('requestfinished', finished);
+      page.on('requestfailed', finished);
+      const settled = () => expect.poll(
+        () => pendingReads.size === 0 && Date.now() - lastRead >= 750,
+        { timeout: 15_000, message: `${name}: finite page and prefetch reads settle` },
+      ).toBe(true);
+      settledPages.push(settled);
+      return { page, settled };
     };
-    page.on('requestfinished', finished);
-    page.on('requestfailed', finished);
-    const settled = () => expect.poll(
-      () => pendingReads.size === 0 && Date.now() - lastRead >= 750,
-      { timeout: 15_000, message: `${name}: finite page and prefetch reads settle before navigation` },
-    ).toBe(true);
     let checks = 0;
     for (const width of [320, 1280]) {
-      await page.setViewportSize({ width, height: 900 });
       for (const [route, title] of routes) {
+        const { page, settled } = await newPage(width);
         await page.goto(app + route);
         // Streaming/hydration can temporarily retain hidden copies of a page.
         // Assert one visible title, rather than selecting the first DOM match
@@ -76,13 +81,16 @@ for (const [name, engine] of Object.entries({ firefox, webkit })) {
         checks++;
       }
     }
+    const { page, settled } = await newPage(1280);
     await page.goto(app + '/login');
     const dialog = page.locator('dialog[open]');
     await dialog.getByLabel('Email', { exact: true }).fill('keyboard@example.test');
+    await settled();
     await page.keyboard.press('Tab');
     assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('type')), 'password');
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.querySelector('dialog')?.open);
+    await Promise.all(settledPages.map(settled => settled()));
     assert.deepEqual(errors, []);
     console.log(`PASS ${name}: ${checks} responsive route checks, dialog keyboard/Escape, no runtime errors`);
   } catch (error) {

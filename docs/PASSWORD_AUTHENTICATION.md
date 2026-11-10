@@ -52,16 +52,24 @@ desktop administrator screen and mobile staff screen.
 
 The first published follow-up, `8b78d02`, passed backend/frontend CI and all role
 route checks, then failed the WebKit smoke on background RSC reads cancelled by
-the harness's fixed-delay hard navigation. The harness now waits for finite
+the harness's fixed-delay hard navigation. The first follow-up waited for finite
 API/RSC reads and a brief quiet period before replacing each document, excluding
-the deliberately persistent dashboard event stream. No page errors are filtered.
+the deliberately persistent dashboard event stream. No page errors were filtered.
 
-The revised harness passed **three deployed-site repetitions** in both Firefox
-and WebKit. A separate loopback fixture deliberately threw a JavaScript error;
-both engines still failed as expected. This verifies the smoke's sensitivity,
-not a promise that arbitrary rapid reloads or every Safari scenario are certified.
-The new commit's GitHub CI and full deployed complaint journey still need their
-own results recorded after publication.
+The quiet-period harness passed **three deployed-site repetitions** in both
+Firefox and WebKit, but commit `9ea7852` still reproduced an unload/prefetch error
+in Linux WebKit CI. Its backend and frontend jobs and all role-route checks
+passed; the browser failure correctly blocked the Render deployment.
+
+The follow-up keeps each route/width document open until all assertions finish,
+rather than replacing it while Next may schedule another prefetch. Every page,
+including background pages, continues reporting uncaught errors. The login
+keyboard/Escape interaction remains exercised. No application errors are filtered
+and application prefetch behavior is unchanged. A loopback fixture deliberately
+throws a JavaScript error; both engines must still fail. These checks do not
+certify arbitrary rapid reloads or every Safari scenario. The follow-up's GitHub
+CI and full deployed complaint journey still need their own results recorded
+after publication.
 
 Local evidence, ignored by Git: `artifacts/password-auth-20261110/` contains final
 suite counts/logs, build results, 24 captures and `ui-results.json`.
