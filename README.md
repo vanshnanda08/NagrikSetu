@@ -615,3 +615,12 @@ The final project report and demo runbook are in `docs/`.
 
 See [the current progress record](docs/PROGRESS.md) for the completed scope,
 verification boundaries, migration state and outstanding operator checks.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+The MIT License applies to original project code and documentation. Third-party
+components retain their own licenses, including `paper/IEEEtran.cls` and
+`paper/IEEEtran.bst`, which remain under the LaTeX Project Public License (LPPL).
+See [paper/THIRD_PARTY.md](paper/THIRD_PARTY.md) for their notices.
