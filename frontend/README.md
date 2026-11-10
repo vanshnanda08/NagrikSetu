@@ -1,5 +1,12 @@
 # NagrikSetu frontend
 
+**Live browser verification — 11 November:** application `6846b1b` has
+[green CI](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244) and a successful Vercel deployment. Password-only access was
+verified for citizen/staff/supervisor/admin. The real photo-to-closure journey
+passed 16 workflow groups and 30 desktop/mobile layouts; QA ticket CT-2026-000919
+is closed. [Current report and captures](../docs/DAILY_USAGE_VERIFICATION.md).
+Earlier dated results below retain their original scope.
+
 The [10 November daily-use rehearsal](../docs/DAILY_USAGE_VERIFICATION.md)
 exercises real photo uploads, role handoffs, two repair rounds, administrator
 closure and signed-in offline recovery. It records 20 passing workflow checks,

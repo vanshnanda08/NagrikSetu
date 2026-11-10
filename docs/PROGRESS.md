@@ -1,12 +1,16 @@
 # NagrikSetu — current progress
 
-Scope update, 10 November: [authenticator support is retired](PASSWORD_AUTHENTICATION.md)
-for all roles. Passwords, role/department/ward restrictions and rotating/revocable
-sessions remain. Final local checks: 386 backend passes/2 optional skips,
-115 frontend passes, lint/types/build, 16 UI groups and 24 Security layouts.
-The browser-smoke navigation correction passed three deployed repetitions and
-still detects a genuine runtime error. Fresh release CI/live role handoff remains
-to be recorded after publishing this update.
+Verified follow-up, 11 November: application `6846b1b` is pushed and
+[CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244); Vercel reports success. The live citizen-to-administrator
+journey passed **16 workflow groups and 30 layouts**, including real photos,
+reopening, corrected repair, citizen confirmation, closure reason and CSV export.
+QA ticket **CT-2026-000919 is closed**. [Full report/screenshots](DAILY_USAGE_VERIFICATION.md).
+[Authenticator support is retired](PASSWORD_AUTHENTICATION.md) for all roles;
+passwords, role/scope guards and session controls remain. Local gates passed:
+386 backend tests/2 optional skips, 115 frontend tests, lint/types/build and
+24 Security layouts. The retained-document browser smoke passed Linux CI and
+continues detecting genuine errors. Physical phone tests remain unavailable;
+email recovery is deferred and native installation is outside browser-only scope.
 
 Daily-use rehearsal, 10 November: [20 workflow checks and 30 layouts passed](DAILY_USAGE_VERIFICATION.md)
 against disposable data with real photo uploads, including citizen rejection,

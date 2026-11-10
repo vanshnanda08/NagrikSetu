@@ -2,8 +2,10 @@
 
 At the user's request, authenticator enrollment, one-time/recovery-code sign-in
 and mandatory municipal MFA are retired for every role. The citizen → municipal
-handoff remains part of the ongoing deployed dry run; this document records the
-implementation and local verification, not a completed production rollout.
+handoff passed on the deployed site: password-only sign-in and permitted
+workspace access worked for all four roles, followed by the complete complaint
+journey. [The live report](DAILY_USAGE_VERIFICATION.md) records 16 workflow groups,
+30 layouts and closed QA ticket CT-2026-000919.
 
 ## Behavior
 
@@ -68,8 +70,16 @@ keyboard/Escape interaction remains exercised. No application errors are filtere
 and application prefetch behavior is unchanged. A loopback fixture deliberately
 throws a JavaScript error; both engines must still fail. These checks do not
 certify arbitrary rapid reloads or every Safari scenario. The follow-up's GitHub
-CI and full deployed complaint journey still need their own results recorded
-after publication.
+CI passed on follow-up `6846b1b6bbb334db3eeec3dc2a40e7ea6a96ec39`:
+[run 42888337244](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244)
+is green for backend, frontend, API/role/browser journeys and the Render hook.
+Vercel reports successful deployment. The live complaint journey passed with
+three actual photo uploads, supervisor/staff handoff, citizen rejection and
+confirmation, administrator closure with a reason and filtered audit CSV export.
+All four deployed Security pages show password and session controls. Citizen
+desktop/mobile layout, real other-session revocation and logout also passed.
+The report records the expected sign-in throttle wait and initial network retry;
+neither protection nor strict photo validation was disabled.
 
 Local evidence, ignored by Git: `artifacts/password-auth-20261110/` contains final
 suite counts/logs, build results, 24 captures and `ui-results.json`.

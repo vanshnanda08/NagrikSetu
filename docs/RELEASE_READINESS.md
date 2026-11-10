@@ -1,13 +1,20 @@
 # Release verification — 10 November 2026
 
-Subsequent scope update: the user retired authenticator setup and requirements
-for all roles. [Password-only verification](PASSWORD_AUTHENTICATION.md) records
-386 backend passes/2 optional skips, 115 frontend passes, lint/types/build and
-24 local Security layouts. `8b78d02` was pushed and deployed on Vercel, but its
-CI WebKit smoke failed on cancelled background prefetch reads. The bounded
-navigation-settling correction passed three deployed repetitions while retaining
-runtime-error detection. New release CI and the complete live role handoff are
-still pending; the earlier release results below retain their dated scope.
+Current password-only follow-up: **`6846b1b6bbb334db3eeec3dc2a40e7ea6a96ec39`**
+is pushed. [CI run 42888337244](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244)
+passed backend, frontend, API/role/browser journeys and the Render deployment
+trigger; Vercel reports success. The WebKit smoke keeps loaded documents alive
+through its assertions and still rejects genuine JavaScript errors. All four
+live roles have signed in with passwords and read their permitted workspaces.
+[Password-only verification](PASSWORD_AUTHENTICATION.md) also records 386 local
+backend passes/2 optional skips, 115 frontend passes and 24 Security layouts.
+The complete live complaint handoff passed **16 workflow groups and 30 layouts**:
+[CT-2026-000919](https://nagrik-setu-vn.vercel.app/issues/d30419d1-9755-45a7-bb85-a1e58f7a7727)
+is closed after assignment, two repair rounds, citizen confirmation and audited
+administrator closure/CSV export. [Current report and captures](DAILY_USAGE_VERIFICATION.md)
+record actual checks, the observed retry/network interruptions and remaining
+physical-device boundaries. Earlier dated results retain their original scope.
+Authenticator requirements are retired by user choice.
 
 Subsequent [daily-use rehearsal](DAILY_USAGE_VERIFICATION.md): 20 workflow checks,
 30 layouts, actual hosted photos and independent SQL verification passed against

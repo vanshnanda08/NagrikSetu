@@ -1,5 +1,13 @@
 # NagrikSetu — Complete Project Documentation
 
+**Deployed follow-up — 11 November:** application `6846b1b6bbb334db3eeec3dc2a40e7ea6a96ec39` is pushed;
+[all CI jobs passed](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244), Vercel reports success, and password-only sign-in
+works for all four live roles. [The deployed daily-use report](docs/DAILY_USAGE_VERIFICATION.md)
+records 16 passing workflow groups and 30 layouts. QA complaint CT-2026-000919
+completed real photo reporting, assignment, repair rejection/resubmission, citizen
+confirmation, reasoned administrator closure and audit CSV export. Email recovery
+remains deferred; physical-phone checks remain unavailable.
+
 **Authentication scope, 10 November:** all roles now use password sign-in.
 Authenticator enrollment, code challenges and mandatory MFA are retired by user
 decision. [Local verification](docs/PASSWORD_AUTHENTICATION.md) passed 386 backend
@@ -14,10 +22,10 @@ environment. Fresh backend/frontend checks passed. A staff singular-count label
 was corrected locally. This does not replace the report's explicit deployed
 WebKit rapid-navigation limitation or physical-device boundaries.
 
-**Last reviewed:** 2026-11-10 (Asia/Kolkata).<br>
+**Last reviewed:** 2026-11-11 (Asia/Kolkata).<br>
 **Repository:** `complaint-system`.  
 **Original guide baseline:** `011ecb5` — “Record final cross-browser CI verification”, dated 2026-10-27.<br>
-**Released application baseline:** `a728d3500383e602fd064a284c2405a31851516f`.<br>
+**Released application baseline:** `6846b1b6bbb334db3eeec3dc2a40e7ea6a96ec39`.<br>
 **Review scope:** application source, configuration, migrations, tests, tools and dated verification evidence. Older audit/benchmark findings retain their original scope unless explicitly superseded.
 
 **Verified release, 10 November:** the reviewed interface, workflow/audit fixes,

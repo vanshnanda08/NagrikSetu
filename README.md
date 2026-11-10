@@ -2,6 +2,14 @@
 
 See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
 
+**Deployed verification — 11 November:** application `6846b1b` is pushed;
+[CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244). The live citizen → supervisor → staff → citizen confirmation
+→ administrator closure journey passed: **16 workflow groups and 30 layouts**,
+with labelled QA complaint [CT-2026-000919](https://nagrik-setu-vn.vercel.app/issues/d30419d1-9755-45a7-bb85-a1e58f7a7727) now closed. All roles use
+password sign-in. See [the current report and screenshots](docs/DAILY_USAGE_VERIFICATION.md)
+for exact checks, retry observations and remaining physical-device boundaries.
+Earlier dated entries below retain their historical scope.
+
 **Password-only scope — 10 November:** authenticator setup, login codes and
 municipal MFA requirements are removed at the user's request. Password changes,
 role/scope guards and session controls remain. [Verification](docs/PASSWORD_AUTHENTICATION.md):
