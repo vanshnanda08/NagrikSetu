@@ -1,5 +1,12 @@
 # NagrikSetu — Complete Project Documentation
 
+**Daily-use follow-up — 10 November:** [the latest rehearsal](docs/DAILY_USAGE_VERIFICATION.md)
+records 20 passing workflow/continuity checks and 30 layouts, real hosted photos,
+two citizen verification rounds and administrator closure in a disposable
+environment. Fresh backend/frontend checks passed. A staff singular-count label
+was corrected locally. This does not replace the report's explicit deployed
+WebKit rapid-navigation limitation or physical-device boundaries.
+
 **Last reviewed:** 2026-11-10 (Asia/Kolkata).<br>
 **Repository:** `complaint-system`.  
 **Original guide baseline:** `011ecb5` — “Record final cross-browser CI verification”, dated 2026-10-27.<br>
@@ -14,8 +21,10 @@ The explicitly approved synthetic complaint **CT-2026-000918** completed real
 Cloudinary upload and report submission (201), followed by loaded photo/map,
 desktop/mobile and evidence-dialog checks. Full backend: 381 passed, 2 optional
 skips; frontend: 115 passed, lint, types and production build passed. The deploy
-profile enforces the agreed email deferral. Native Chrome installation remains
-unsuccessful, and no physical phone was available. See
+profile enforces the agreed email deferral. **Browser-only scope, agreed
+10 November:** native Chrome/PWA installation and standalone installed-app checks
+are excluded from completion requirements; previous attempts were unsuccessful.
+Physical-phone browser checks remain unavailable. See
 [release readiness](docs/RELEASE_READINESS.md) for exact evidence and boundaries.
 The following dated pre-release notes record earlier states, not outstanding
 uncommitted application work.
@@ -681,7 +690,7 @@ Database transactions and locks protect multi-record changes. Issue entities als
 | Administrator configuration | Edits existing category policy, user access and organization responsibility | `ConfigurationPanel.tsx`, `AdminConfigurationController.java`, audit table | Completed for existing records; new-record provisioning Not implemented |
 | Event audit and CSV | Supports accountability/review across transitions, escalations and moderation | `AuditPanel.tsx`, `AuditQueries.java`, `AuditCsv.java` | Completed; bounded export |
 | Persistent drafts/outbox | Preserves work on weak connections and retries explicit offline submission | `composer.tsx`, `offlineStore.ts`, worker and Next offline route | Completed implementation; full offline navigation Not implemented |
-| Installable web app | Provides manifest/icons and browser install entry point | `app/manifest.ts`, `PwaInstall.tsx`, public icons | Partially completed evidence: installed-device behavior Unknown |
+| Optional installation support | Existing manifest/icons and browser install entry point retained | `app/manifest.ts`, `PwaInstall.tsx`, public icons | Installation/standalone-app verification excluded from browser-only scope by user decision, 10 November |
 | Media orphan cleanup | Finds uploaded images abandoned before report submission | `CloudinaryOrphanSweep.java`, admin client and job | Completed dry-run implementation; enabling deletion is Planned after review |
 | Deployment, CI and backups | Builds releases and preserves database records | Dockerfile, workflows, `scripts/backup.sh`, `restore.sh` | Completed tooling; current hosted state Unknown |
 | Academic evaluation | Measures grouping quality, chain behavior, scale and concurrency | `evaluation/`, opt-in backend tests, retained CSV/PDFs | Completed retained experiments; generalization Not confirmed |
@@ -754,7 +763,7 @@ The extent-cap experiment shows a trade-off: removing the cap raised seeded F1 t
 | Partially completed | Installed-app/device evidence; deadline, owner-scope and assignment fixes are verified locally |
 | Deferred to future update | Email notifications and email-based password recovery, including provider activation and live delivery/reset checks; code retained |
 | Not implemented | New municipal record provisioning through admin configuration; full service-worker app caching; anonymous verification identity; public arbitrary role registration |
-| Planned for current checks | Review orphan dry runs before deletion; complete physical-device/screen-reader/PWA checks; record a final demo if required |
+| Planned for current checks | Review orphan dry runs before deletion; physical-phone browser and screen-reader checks where required; final demo if required; installation excluded |
 | Unknown | Directly observed live mail-worker state, field usage/adoption, actual municipal repair quality, current backup schedule execution and production load capacity; live health/photo flow passed on 10 November |
 
 Absence is not always a missing requirement: anonymous verification and unrestricted role selection have security/product trade-offs, and administrator closure now requires a reason and confirmation while preserving public history and role restrictions. No source TODO/FIXME/HACK markers were found in the searched backend/frontend source at review; concrete remaining work is recorded mainly in assessment and verification notes.
@@ -772,7 +781,7 @@ Absence is not always a missing requirement: anonymous verification and unrestri
 | 2026-10-11 | `b3c627a`, `41e9ede` and related commits | Documentation, frontend sizing/accessibility and earlier branding/layout work |
 | 2026-10-07 | `db97327`, `a1b605d`, `a21e84f`, `3132867` | Reproducible seeding/backups, supervisor assignment/moderation/dashboard and citizen verification |
 
-November interface/workflow changes have now been released. Remaining evidence gaps concern native installation, physical devices and individually untested operational/accessibility cases. Email delivery/recovery stays deferred.
+November interface/workflow changes have now been released. Remaining evidence gaps concern physical-phone browser use and individually untested operational/accessibility cases. Native installation is excluded by the user's browser-only scope decision; email delivery/recovery stays deferred.
 
 These are observed areas of activity. **Not confirmed:** the team's exact active assignment, owner, deadline or approved immediate priority. A Git diff proves files changed, not what a developer is currently doing.
 
@@ -790,7 +799,7 @@ update, not as a condition of current completion.
 ### Current operator follow-ups
 
 1. Review Cloudinary dry-run logs before enabling destructive orphan cleanup. Keep the age/deletion bounds.
-2. Complete physical-device, screen-reader and installed-PWA checks where required.
+2. Complete physical-phone browser and screen-reader checks where required; installed-PWA checks are excluded.
 3. Record the final demo using `docs/DEMO-RUNBOOK.md` if a submission video is required.
 
 The assessment also records proposed engineering improvements. These are documented proposals, not evidence of scheduled implementation.
@@ -803,7 +812,7 @@ The assessment also records proposed engineering improvements. These are documen
 | 2 — completed locally | Align escalation ownership, guards, queue scope and assignee validity | Current valid municipal escalation owners gain access only to their assigned complaint; dual-scope, role, active-status and ward regressions passed |
 | 3 — completed locally | Renew authenticated online report submission after token expiry | 401 retry and failed-renewal/sign-in browser flows passed with the same body/key; changed-account and anonymous-fallback regressions passed |
 | 4 | Keep verification wording and counters consistent | Retain clear fixed-vote, partial-vote and zero-vote distinctions; decide any quorum policy change before changing data semantics |
-| 5 — photo complete; device/restore follow-ups remain | Real deployed photo/report passed on 10 November | Native installation unsuccessful; phone unavailable; backup/restore evidence remains dated; email delivery/recovery deferred |
+| 5 — photo complete; device/restore follow-ups remain | Real deployed photo/report passed on 10 November | Installation excluded by user decision; phone unavailable; backup/restore evidence remains dated; email delivery/recovery deferred |
 | 6 | Improve evaluation gates and output provenance | Separate Python/Java/HTTP plot names, fail incorrect concurrency/HTTP runs, record hardware/config and broaden datasets |
 | 7 | Improve operator onboarding and policy language | Decide provisioning requirements before adding new create flows; explain technical settings in municipal terms |
 | 8 — complete | Reconcile documentation and release reviewed application | `a728d35` pushed, final CI/Vercel status green; live health, Patiala data and photo/report verified |
@@ -1168,7 +1177,7 @@ The application release baseline is `a728d3500383e602fd064a284c2405a31851516f`; 
 
 ### Current progress
 
-The reviewed application changes are released at `a728d35`, with green CI and a successful real deployed photo/report journey. Email delivery and email-based password recovery are deferred. Native installation remains unsuccessful; physical devices and other dated operational/accessibility limits remain follow-ups. Destructive media cleanup is still opt-in.
+The reviewed application changes are released at `a728d35`, with green CI and a successful real deployed photo/report journey. Email delivery and email-based password recovery are deferred. Browser-only use is the agreed scope; native installation is excluded. Physical-phone browser checks and other dated operational/accessibility limits remain follow-ups. Destructive media cleanup is still opt-in.
 
 ### Most important remaining tasks
 

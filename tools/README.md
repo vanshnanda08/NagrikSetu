@@ -1,5 +1,32 @@
 # Verification harnesses
 
+The [10 November daily-use rehearsal](../docs/DAILY_USAGE_VERIFICATION.md) uses
+`daily-journey.mjs` for real citizen photo reports, grouping, supervisor assignment,
+staff clarification/proof, rejected and confirmed repairs, administrator closure,
+CSV export, profile/notification/follow actions and warm offline delivery.
+It requires a disposable migrated database, demo-profile seeded municipal
+accounts, strict media verification, real public Cloudinary upload settings and
+an independent production frontend. It refuses non-loopback service URLs.
+Supply three labelled synthetic JPEGs named `photo-0.jpg`, `photo-1.jpg` and
+`photo-2.jpg`. This harness **uploads media** and retains hosted QA assets.
+
+```bash
+# Set JOURNEY_PASSWORD to the scratch bootstrap password without recording it in Git.
+JOURNEY_SCRATCH=1 JOURNEY_APP=http://localhost:3041 \
+  JOURNEY_API=http://localhost:8088/api/v1 \
+  JOURNEY_OUTPUT="$PWD/artifacts/daily-journey" \
+  JOURNEY_PHOTOS="/path/to/labelled-qa-photos" \
+  node tools/daily-journey.mjs
+```
+
+Keep `JOURNEY_STATE_DIR`, if used, in a private temporary directory: it contains
+browser session cookies. `JOURNEY_RESUME=1` reuses recorded completed steps and
+the original actors; it does not repeat the principal complaint/votes.
+`JOURNEY_LAYOUTS_ONLY=1` completes outstanding loaded layout captures.
+`JOURNEY_SUPPLEMENT=1` resumes newly added continuity checks on an existing run.
+Do not reuse a partially completed *individual* write step without inspecting
+the actual record first. A completed ordinary run refuses another submission.
+
 The 8 November follow-up and exact boundaries are in
 [release readiness](../docs/RELEASE_READINESS.md). `screen-consolidation.mjs` and
 `public-audit.mjs` accept `SCREENS_APP` and `VERIFY_API` for isolated local ports;

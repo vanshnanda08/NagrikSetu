@@ -1,6 +1,20 @@
 # Release verification — 10 November 2026
 
+Subsequent [daily-use rehearsal](DAILY_USAGE_VERIFICATION.md): 20 workflow checks,
+30 layouts, actual hosted photos and independent SQL verification passed against
+disposable data. The full citizen-to-administrator closure and signed-in offline
+delivery were exercised. A minor staff label correction and the new harness/report
+are part of the publication follow-up; deployed WebKit rapid-navigation smoke has
+an explicit limitation. Fresh deployed results will be recorded separately from
+this local rehearsal.
+
 ## Final application release result
+
+**Scope decision — 10 November:** the user will access the site in a normal
+browser only. Chrome/PWA installation and standalone installed-app verification
+are excluded from current completion requirements. The unsuccessful attempts
+below remain historical evidence, not an open blocker. Existing manifest,
+icons and service-worker reporting functionality are retained.
 
 Application source: **`a728d3500383e602fd064a284c2405a31851516f`**, pushed to
 `origin/main`. This includes Patiala/map release `935a30f`, mail deferral
@@ -21,7 +35,7 @@ and Patiala data, without claiming a directly observed backend commit identifier
 | Live API | Health 200 / UP; ward API returns all four Patiala/Thapar sectors |
 | Real photo/report | Actual browser upload to Cloudinary returned 200; actual report API returned **201**; receipt, public reads and hosted photo returned successfully |
 | Loaded evidence | Thumbnail loaded at 960×640; full photo dialog opened and closed with Escape; real map tiles loaded; loaded complaint inspected at 1280×768 and 390px width |
-| Native installation | **Unsuccessful / unresolved** on the available laptop; user reports failure or no action; a further windowed active-tab retry produced no prompt |
+| Native installation | **Out of scope by user decision**; earlier attempts were unsuccessful, not a passing installation check |
 
 ### Retained, explicitly authorized QA record
 
@@ -47,7 +61,7 @@ Raw request logs contain submission identifiers and are not published. Captures:
 
 ### Remaining limits
 
-- Chrome's exported installation diagnostics record
+- Historical installation result (now out of scope): Chrome's exported diagnostics record
   `kCancelledDueToMainFrameNavigation` for two install attempts. Chromium can use
   this result for navigation or a hidden tab; it does not identify the cause of
   every user attempt. Manifest installability checks passed, but no successful
@@ -233,10 +247,10 @@ Required operator follow-up, in order:
 
 ## Remaining physical/platform boundaries
 
-- Physical-phone camera/GPS/permission behavior and actual installed-app use
-  remain unverified; the available device was a desktop/laptop.
-- Native PWA installation remains open after the earlier unsuccessful user attempt.
-  Manifest eligibility alone does not establish successful installation.
+- Physical-phone browser camera/GPS/permission behavior remains unverified;
+  the available device was a desktop/laptop.
+- Native PWA installation was unsuccessful and subsequently excluded from
+  scope by the user on 10 November. It is no longer an open completion check.
 - Closed-browser background execution depends on the browser/OS and is not
   guaranteed. Warm-tab offline persistence/delivery passed; cold offline navigation
   requires future app-shell caching work if that becomes a requirement.

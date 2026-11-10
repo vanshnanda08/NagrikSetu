@@ -52,7 +52,7 @@ export function WorkQueue() {
     <p className="page-description mt-1 text-dense">Your department’s work, ordered by priority and deadline. Select a complaint to work on it.</p>
     <div className={`work-master-detail${selectedId ? " has-selection" : ""}`}>
       <section className="work-queue" aria-label="Work queue">
-        <div className="work-queue-heading"><h2 className="text-heading">My work</h2>{rows && <span className="text-meta text-ink-muted" aria-live="polite">{offset === 0 && !hasNext ? `${rows.length} complaints` : rows.length ? `${offset + 1}–${offset + rows.length}${hasNext ? " · more available" : ""}` : "No complaints on this page"}</span>}</div>
+        <div className="work-queue-heading"><h2 className="text-heading">My work</h2>{rows && <span className="text-meta text-ink-muted" aria-live="polite">{offset === 0 && !hasNext ? `${rows.length} complaint${rows.length === 1 ? "" : "s"}` : rows.length ? `${offset + 1}–${offset + rows.length}${hasNext ? " · more available" : ""}` : "No complaints on this page"}</span>}</div>
         <nav className="work-queue-tabs" aria-label="Queue filters">
           {TABS.map(item => <Link key={item.value} href={workHref(params.toString(), { view: "mine", tab: item.value, issue: null, queueOffset: null })} scroll={false} aria-current={tab === item.value ? "page" : undefined}>{item.label}</Link>)}
         </nav>

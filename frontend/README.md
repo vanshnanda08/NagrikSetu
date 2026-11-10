@@ -1,5 +1,10 @@
 # NagrikSetu frontend
 
+The [10 November daily-use rehearsal](../docs/DAILY_USAGE_VERIFICATION.md)
+exercises real photo uploads, role handoffs, two repair rounds, administrator
+closure and signed-in offline recovery. It records 20 passing workflow checks,
+30 layouts, the local staff-count correction and the deployed WebKit smoke limitation.
+
 Latest follow-up: [release readiness](../docs/RELEASE_READINESS.md), 10 November.
 Patiala map defaults, zoom preservation, Enter/Space marker activation and stable
 selection are released. Password-recovery routes display a deferral
@@ -8,8 +13,9 @@ future release with verified mail delivery. Current code checks: 115 tests,
 ESLint, TypeScript and production build passed, including the green application
 CI run for `a728d35`. A real deployed photo/report submission passed with labelled
 QA ticket CT-2026-000918, followed by desktop/mobile evidence rendering and photo
-dialog checks. Native Chrome installation remains unsuccessful on the available
-laptop; manifest eligibility is not an installation pass.
+dialog checks. **Browser-only scope, agreed 10 November:** normal browser use is
+supported; Chrome/PWA installation and standalone installed-app testing are no
+longer completion requirements. Existing manifest/worker code is retained.
 
 Next.js 16 (App Router), React 19, Tailwind v4.
 

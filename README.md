@@ -2,6 +2,15 @@
 
 See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
 
+**Daily-use rehearsal — 10 November:** the citizen photo report → supervisor
+assignment → staff proof → rejected/repaired → citizen confirmation → admin
+closure journey passed in a disposable environment with real hosted photos.
+20 workflow/continuity checks and 30 layouts passed. A staff singular-count label
+was corrected locally. See [the final daily-use report](docs/DAILY_USAGE_VERIFICATION.md)
+for screenshots, fresh checks and the deployed WebKit rapid-navigation limitation.
+This record describes the local rehearsal; subsequent publication and deployed
+verification are tracked in [release readiness](docs/RELEASE_READINESS.md).
+
 **Verified release — 10 November 2026:** application commit
 `a728d3500383e602fd064a284c2405a31851516f` is pushed; [CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42686876733)
 and Vercel reports a successful deployment. Live API health and the Patiala/Thapar
@@ -12,9 +21,10 @@ ward data passed. One explicitly approved, labelled synthetic complaint,
 The release includes map zoom/keyboard fixes, deterministic evidence ordering
 and enforced email deferral in the `deploy` profile. Checks: **381 backend tests
 passed, 2 optional evaluations skipped; 115 frontend tests**, lint, types, build,
-API contracts and browser journeys passed. Native Chrome installation still
-fails or does nothing on the available laptop; physical-phone checks remain
-unavailable. See [release readiness](docs/RELEASE_READINESS.md) for evidence,
+API contracts and browser journeys passed. **Browser-only scope, agreed
+10 November:** use the site in a normal browser; Chrome/PWA installation and
+standalone installed-app checks are excluded from completion requirements.
+Physical-phone browser checks remain unavailable. See [release readiness](docs/RELEASE_READINESS.md) for evidence,
 screenshots and the remaining platform/operational limits. Earlier dated reports
 describe their own snapshots, not current unreleased work.
 
@@ -116,8 +126,8 @@ strict server evidence checks, offline queue recovery, keyboard/VoiceOver checks
 and twelve desktop/mobile layout inspections. Chrome now offers installation,
 but native installation did not complete on the available laptop. Physical-phone
 checks were unavailable. The later full role-by-role journey is recorded in
-[the end-to-end report](docs/END_TO_END_TEST_REPORT.md); native installation
-and the remaining device/browser boundaries are still open.
+[the end-to-end report](docs/END_TO_END_TEST_REPORT.md). Native installation was
+subsequently excluded from scope; remaining browser/device limits still apply.
 
 ## Project status
 
@@ -174,8 +184,8 @@ appearance and uses the consolidated screen structure described above.
 ### Remaining operator checks
 
 - Review Cloudinary orphan-sweep dry-run output before enabling deletion.
-- Follow up native PWA installation and physical-phone checks where required;
-  desktop keyboard, basic VoiceOver and queued-report recovery checks are recorded
+- Follow up physical-phone browser checks where required; native installation is out of scope.
+  Desktop keyboard, basic VoiceOver and queued-report recovery checks are recorded
   in [quality verification](frontend/QUALITY_VERIFICATION.md).
 - Complete the final role-by-role browser journey after the other checks.
 - Record the final demo using `docs/DEMO-RUNBOOK.md` if a submission video is required.

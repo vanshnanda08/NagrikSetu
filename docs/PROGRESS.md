@@ -1,5 +1,12 @@
 # NagrikSetu — current progress
 
+Daily-use rehearsal, 10 November: [20 workflow checks and 30 layouts passed](DAILY_USAGE_VERIFICATION.md)
+against disposable data with real photo uploads, including citizen rejection,
+repair resubmission, administrator closure and authenticated offline recovery.
+Fresh backend 381 passes/2 skips; frontend 115 passes, lint/types/build passed.
+The follow-up includes one staff count-label correction. Deployed WebKit rapid-navigation
+errors are recorded separately from the passing ordinary-navigation diagnostic.
+
 Verified release, 10 November: Patiala/V11 changes were pushed as `935a30f`,
 the deploy-profile mail-off correction as `d684390`, and deterministic evidence
 ordering as `a728d3500383e602fd064a284c2405a31851516f`. The final application
@@ -9,8 +16,9 @@ Vercel's commit status is successful. Live health and Patiala ward reads passed;
 the user-approved synthetic photo complaint **CT-2026-000918** returned 201,
 with actual Cloudinary upload, loaded evidence, map tiles and photo dialog checks.
 Full backend: 383 total, 381 passed, 2 optional skips; frontend: 115 passed,
-lint, types and production build passed. Native Chrome installation remains
-unsuccessful after another user attempt and foreground/windowed retry.
+lint, types and production build passed. Native Chrome installation attempts
+were unsuccessful; the user subsequently chose **browser-only use** on
+10 November. Installation/standalone-app checks are no longer required.
 See [release readiness](RELEASE_READINESS.md); dated pre-release statements below
 remain historical and are superseded by this result where explicitly checked.
 
@@ -123,7 +131,8 @@ Render health endpoint returned `UP` and the Vercel dashboard returned HTTP 200.
 The scheduled backup rerun passed restore verification and encrypted upload; the
 downloaded artifact subsequently decrypted with GPG exit code 0.
 
-- Follow up native PWA installation and physical-phone checks. Desktop keyboard,
+- Follow up physical-phone browser checks. Native installation is out of scope
+  by user decision on 10 November. Desktop keyboard,
   basic VoiceOver and API-outage recovery are recorded above; they do not certify
   full accessibility, cold offline navigation or closed-browser background sync.
 - Complete the explicitly blocked/untested cases in the end-to-end report;
