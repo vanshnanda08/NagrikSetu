@@ -131,8 +131,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter(JwtProperties properties) {
-        return TokenSupport.roleClaimConverter(properties);
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        return TokenSupport.roleClaimConverter();
     }
 
     @Bean

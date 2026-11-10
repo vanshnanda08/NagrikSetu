@@ -4,20 +4,18 @@ import com.civictrack.IntegrationTestBase;
 import com.civictrack.support.MutableClock;
 import com.civictrack.user.auth.AuthService;
 import com.civictrack.user.auth.InvalidCredentialsException;
-import com.civictrack.user.auth.MfaRequiredException;
-import com.civictrack.user.auth.TotpService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.TestPropertySource;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.ByteBuffer;
 import java.time.Instant;
-import java.util.Locale;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,82 +26,99 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
+@TestPropertySource(properties = "civictrack.security.jwt.require-privileged-mfa=true")
 class SecurityFeaturesIT extends IntegrationTestBase {
     @Autowired AuthService auth;
-    @Autowired TotpService totp;
     @Autowired UserRepository users;
     @Autowired MutableClock clock;
     @Autowired MockMvc mvc;
+    @Autowired JdbcTemplate jdbc;
 
-    AppUser admin;
+    AppUser account;
 
     @BeforeEach
     void prepare() {
         clock.set(Instant.parse("2026-10-24T12:00:00Z"));
-        admin = auth.register("mfa-" + UUID.randomUUID() + "@example.test", null,
-                "secure-password-123", "MFA administrator");
-        admin.setRole(Role.ADMIN);
-        admin = users.save(admin);
+        account = auth.register("password-session-" + UUID.randomUUID() + "@example.test", null,
+                "secure-password-123", "Password session account");
+        account.setRole(Role.ADMIN);
+        account = users.save(account);
     }
 
-    @Test
-    void privilegedAccountIsLimitedUntilMfaIsEnabledAndVerified() throws Exception {
-        var before = auth.login(admin.getEmail(), "secure-password-123", null);
-        mvc.perform(get("/api/v1/admin/configuration")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + before.tokens().accessToken()))
-                .andExpect(status().isForbidden());
-
-        TotpService.Setup setup = totp.begin(admin.getId(), "secure-password-123");
-        var recovery = totp.enable(admin.getId(), code(setup.secret(), clock.instant()));
-        assertThat(recovery).hasSize(10).doesNotHaveDuplicates();
-
-        assertThatThrownBy(() -> auth.login(admin.getEmail(), "secure-password-123", null))
-                .isInstanceOf(MfaRequiredException.class);
-        assertThatThrownBy(() -> auth.login(admin.getEmail(), "secure-password-123", "000000"))
-                .isInstanceOf(InvalidCredentialsException.class);
-
-        clock.set(clock.instant().plusSeconds(30));
-        var verified = auth.login(admin.getEmail(), "secure-password-123", code(setup.secret(), clock.instant()));
-        mvc.perform(get("/api/v1/admin/configuration")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + verified.tokens().accessToken()))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void enabledFactorCannotBeReplacedOrRecoveryCodesRegeneratedBySetup() {
-        var setup = totp.begin(admin.getId(), "secure-password-123");
-        String currentCode = code(setup.secret(), clock.instant());
-        var recovery = totp.enable(admin.getId(), currentCode);
-        assertThatThrownBy(() -> totp.begin(admin.getId(), "secure-password-123"))
-                .isInstanceOf(ProfileRefusedException.class);
-        assertThatThrownBy(() -> totp.enable(admin.getId(), currentCode))
-                .isInstanceOf(ProfileRefusedException.class);
-        assertThat(auth.login(admin.getEmail(), "secure-password-123", recovery.get(0))).isNotNull();
-    }
-
-    @Test
-    void unverifiedMunicipalSessionCannotReadOrPostPrivateMessages() throws Exception {
-        var login = auth.login(admin.getEmail(), "secure-password-123");
+    @ParameterizedTest
+    @EnumSource(value = Role.class, names = {"CITIZEN", "STAFF", "SUPERVISOR", "ADMIN"})
+    void everyRoleCanUseItsWorkspaceWithPasswordAuthentication(Role role) throws Exception {
+        account.setRole(role);
+        account.setDepartmentId(jdbc.queryForObject("SELECT id FROM departments WHERE code='ROADS'", UUID.class));
+        users.save(account);
+        var login = auth.login(account.getEmail(), "secure-password-123");
         String bearer = "Bearer " + login.tokens().accessToken();
-        mvc.perform(get("/api/v1/issues/{id}/messages", UUID.randomUUID())
-                        .header(HttpHeaders.AUTHORIZATION, bearer))
-                .andExpect(status().isForbidden());
-        mvc.perform(post("/api/v1/issues/{id}/messages", UUID.randomUUID())
-                        .header(HttpHeaders.AUTHORIZATION, bearer)
-                        .contentType("application/json").content("{\"body\":\"Where is the problem?\"}"))
+        String path = switch (role) {
+            case STAFF -> "/api/v1/staff/queue";
+            case SUPERVISOR -> "/api/v1/supervisor/queue";
+            case ADMIN -> "/api/v1/admin/configuration";
+            default -> "/api/v1/me/reports";
+        };
+        mvc.perform(get(path).header(HttpHeaders.AUTHORIZATION, bearer)).andExpect(status().isOk());
+        if (role != Role.ADMIN) {
+            mvc.perform(get("/api/v1/admin/configuration").header(HttpHeaders.AUTHORIZATION, bearer))
+                    .andExpect(status().isForbidden());
+        }
+    }
+
+    @Test
+    void legacyEnrollmentCannotRequireCodesOrBlockPasswordLogin() throws Exception {
+        account.setMfaEnabled(true);
+        account.setMfaSecret("inert-legacy-secret-not-used-for-authentication");
+        users.save(account);
+        var login = auth.login(account.getEmail(), "secure-password-123");
+        String bearer = "Bearer " + login.tokens().accessToken();
+        mvc.perform(get("/api/v1/admin/configuration").header(HttpHeaders.AUTHORIZATION, bearer))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/v1/me/security").header(HttpHeaders.AUTHORIZATION, bearer))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mfaEnabled").value(false))
+                .andExpect(jsonPath("$.mfaRequired").value(false))
+                .andExpect(jsonPath("$.recoveryCodesRemaining").value(0));
+        // Removing the feature does not delete historical account data.
+        assertThat(users.findById(account.getId()).orElseThrow().getMfaSecret())
+                .isEqualTo("inert-legacy-secret-not-used-for-authentication");
+    }
+
+    @Test
+    void retiredEnrollmentEndpointsCannotCreateOrEnableAnAuthenticator() throws Exception {
+        String bearer = "Bearer " + auth.login(account.getEmail(), "secure-password-123").tokens().accessToken();
+        for (String path : new String[]{"/mfa/setup", "/mfa/enable"}) {
+            mvc.perform(post("/api/v1/me/security" + path).header(HttpHeaders.AUTHORIZATION, bearer)
+                            .contentType("application/json").content("{}"))
+                    .andExpect(status().isGone());
+        }
+        assertThat(users.findById(account.getId()).orElseThrow().isMfaEnabled()).isFalse();
+        assertThat(users.findById(account.getId()).orElseThrow().getMfaSecret()).isNull();
+    }
+
+    @Test
+    void legacyLoginPayloadDoesNotGrantMunicipalPermissionsToACitizen() throws Exception {
+        account.setRole(Role.CITIZEN);
+        users.save(account);
+        var response = mvc.perform(post("/api/v1/auth/login").contentType("application/json")
+                        .content("{\"email\":\"" + account.getEmail()
+                                + "\",\"password\":\"secure-password-123\",\"mfaCode\":\"123456\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.role").value("CITIZEN"))
+                .andExpect(jsonPath("$.mfaSetupRequired").value(false))
+                .andReturn();
+        String token = new com.fasterxml.jackson.databind.ObjectMapper()
+                .readTree(response.getResponse().getContentAsString()).get("accessToken").asText();
+        mvc.perform(get("/api/v1/admin/configuration")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    void recoveryCodesAreSingleUseAndSessionFamiliesCanBeRevoked() throws Exception {
-        TotpService.Setup setup = totp.begin(admin.getId(), "secure-password-123");
-        String recovery = totp.enable(admin.getId(), code(setup.secret(), clock.instant())).get(0);
-        var first = auth.login(admin.getEmail(), "secure-password-123", recovery);
-        assertThatThrownBy(() -> auth.login(admin.getEmail(), "secure-password-123", recovery))
-                .isInstanceOf(InvalidCredentialsException.class);
-
-        clock.set(clock.instant().plusSeconds(30));
-        var second = auth.login(admin.getEmail(), "secure-password-123", code(setup.secret(), clock.instant()));
+    void passwordSessionFamiliesCanStillBeListedAndRevoked() throws Exception {
+        var first = auth.login(account.getEmail(), "secure-password-123");
+        var second = auth.login(account.getEmail(), "secure-password-123");
         String bearer = "Bearer " + second.tokens().accessToken();
         mvc.perform(get("/api/v1/me/security/sessions").header(HttpHeaders.AUTHORIZATION, bearer))
                 .andExpect(status().isOk())
@@ -117,31 +132,17 @@ class SecurityFeaturesIT extends IntegrationTestBase {
         assertThat(auth.refresh(second.tokens().refreshToken()).tokens().refreshToken()).isNotBlank();
     }
 
-    private static String code(String secret, Instant instant) {
-        try {
-            byte[] key = decode(secret);
-            long counter = instant.getEpochSecond() / 30;
-            Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(new SecretKeySpec(key, "HmacSHA1"));
-            byte[] hash = mac.doFinal(ByteBuffer.allocate(8).putLong(counter).array());
-            int offset = hash[hash.length - 1] & 15;
-            int binary = ((hash[offset] & 127) << 24) | ((hash[offset + 1] & 255) << 16)
-                    | ((hash[offset + 2] & 255) << 8) | (hash[offset + 3] & 255);
-            return "%06d".formatted(binary % 1_000_000);
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-    }
-
-    private static byte[] decode(String value) {
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
-        int buffer = 0, bits = 0;
-        for (char c : value.toUpperCase(Locale.ROOT).toCharArray()) {
-            buffer = (buffer << 5) | alphabet.indexOf(c);
-            bits += 5;
-            if (bits >= 8) { out.write((buffer >> (bits - 8)) & 255); bits -= 8; }
-        }
-        return out.toByteArray();
+    @Test
+    void refreshStillReflectsRoleChangesRatherThanOldSecondFactorFlags() throws Exception {
+        var before = auth.login(account.getEmail(), "secure-password-123");
+        account.setRole(Role.CITIZEN);
+        users.save(account);
+        var after = auth.refresh(before.tokens().refreshToken());
+        mvc.perform(get("/api/v1/admin/configuration")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + after.tokens().accessToken()))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/me/reports")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + after.tokens().accessToken()))
+                .andExpect(status().isOk());
     }
 }

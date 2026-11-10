@@ -1,5 +1,12 @@
 # Verification harnesses
 
+Current authentication is password-only for every role; authenticator setup is
+retired. Security fixtures and active audit steps now check password/session
+controls and refusal of retired enrollment paths. Earlier dated MFA results below
+are historical. See [password authentication](../docs/PASSWORD_AUTHENTICATION.md).
+The Firefox/WebKit smoke waits for finite API/RSC reads before its next hard
+navigation; the persistent event stream is excluded and page errors still fail.
+
 The [10 November daily-use rehearsal](../docs/DAILY_USAGE_VERIFICATION.md) uses
 `daily-journey.mjs` for real citizen photo reports, grouping, supervisor assignment,
 staff clarification/proof, rejected and confirmed repairs, administrator closure,

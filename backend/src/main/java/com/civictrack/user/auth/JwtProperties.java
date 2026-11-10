@@ -38,13 +38,6 @@ public record JwtProperties(
          * every fortnight to report a pothole. Every use rotates the token and
          * replay revokes its server-side family.
          */
-        @DefaultValue("P30D") Duration refreshTtl,
-
-        /**
-         * Requires a verified second factor before municipal roles are granted.
-         * The scripted demo profile may disable this so seeded accounts remain
-         * automation-friendly; production keeps the secure default.
-         */
-        @DefaultValue("true") boolean requirePrivilegedMfa
+        @DefaultValue("P30D") Duration refreshTtl
 ) {
 }

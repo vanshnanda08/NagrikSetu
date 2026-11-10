@@ -73,14 +73,16 @@ public class AppUser {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    /** AES-GCM encrypted Base32 TOTP secret. Never exposed after enrolment starts. */
+    /** Historical enrollment data; unused by the password-only authentication flow. */
+    // Inert legacy columns retained so applied migrations and account history
+    // remain intact. Password authentication does not depend on these fields.
     @Column(name = "mfa_secret", length = 512)
     private String mfaSecret;
 
     @Column(name = "mfa_enabled", nullable = false)
     private boolean mfaEnabled;
 
-    /** Last accepted TOTP time-step, which prevents a code being replayed. */
+    /** Historical counter retained with the original schema, never consulted. */
     @Column(name = "mfa_last_counter")
     private Long mfaLastCounter;
 

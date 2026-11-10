@@ -1,5 +1,14 @@
 # Release verification — 10 November 2026
 
+Subsequent scope update: the user retired authenticator setup and requirements
+for all roles. [Password-only verification](PASSWORD_AUTHENTICATION.md) records
+386 backend passes/2 optional skips, 115 frontend passes, lint/types/build and
+24 local Security layouts. `8b78d02` was pushed and deployed on Vercel, but its
+CI WebKit smoke failed on cancelled background prefetch reads. The bounded
+navigation-settling correction passed three deployed repetitions while retaining
+runtime-error detection. New release CI and the complete live role handoff are
+still pending; the earlier release results below retain their dated scope.
+
 Subsequent [daily-use rehearsal](DAILY_USAGE_VERIFICATION.md): 20 workflow checks,
 30 layouts, actual hosted photos and independent SQL verification passed against
 disposable data. The full citizen-to-administrator closure and signed-in offline

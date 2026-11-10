@@ -38,14 +38,6 @@ public class GlobalExceptionHandler {
 
     private static final String BASE = "https://civictrack.example/problems/";
 
-    @ExceptionHandler(com.civictrack.user.auth.MfaRequiredException.class)
-    ProblemDetail onMfaRequired(com.civictrack.user.auth.MfaRequiredException ex) {
-        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        pd.setType(URI.create(BASE + "mfa-required"));
-        pd.setTitle("Multi-factor authentication required");
-        return pd;
-    }
-
     @ExceptionHandler(com.civictrack.abuse.RateLimitExceededException.class)
     ResponseEntity<ProblemDetail> onRateLimit(com.civictrack.abuse.RateLimitExceededException ex) {
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());

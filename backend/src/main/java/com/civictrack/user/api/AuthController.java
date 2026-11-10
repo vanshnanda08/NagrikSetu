@@ -3,7 +3,6 @@ package com.civictrack.user.api;
 import com.civictrack.abuse.RateLimitService;
 import com.civictrack.user.AppUser;
 import com.civictrack.user.auth.AuthService;
-import com.civictrack.user.auth.JwtProperties;
 import com.civictrack.user.dto.LoginRequest;
 import com.civictrack.user.dto.RefreshRequest;
 import com.civictrack.user.dto.RegisterRequest;
@@ -33,7 +32,6 @@ public class AuthController {
 
     private final AuthService auth;
     private final RateLimitService rateLimits;
-    private final JwtProperties jwtProperties;
 
     @PostMapping("/register")
     public ResponseEntity<TokenResponse> register(@Valid @RequestBody RegisterRequest request,
@@ -50,7 +48,7 @@ public class AuthController {
     public TokenResponse login(@Valid @RequestBody LoginRequest request,
                                HttpServletRequest servletRequest) {
         rateLimits.checkLogin(request.email(), clientAddress(servletRequest));
-        AuthService.Authenticated result = auth.login(request.email(), request.password(), request.mfaCode());
+        AuthService.Authenticated result = auth.login(request.email(), request.password());
         return response(result);
     }
 
@@ -78,8 +76,7 @@ public class AuthController {
     }
 
     private TokenResponse response(AuthService.Authenticated result) {
-        return TokenResponse.of(result.tokens(), result.user(),
-                jwtProperties.requirePrivilegedMfa());
+        return TokenResponse.of(result.tokens(), result.user());
     }
 
     private static String clientAddress(HttpServletRequest request) {

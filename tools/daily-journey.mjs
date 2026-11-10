@@ -20,7 +20,7 @@ await mkdir(output,{recursive:true});
 const layoutsOnly=process.env.JOURNEY_LAYOUTS_ONLY==='1';
 const supplement=process.env.JOURNEY_SUPPLEMENT==='1';
 if(!layoutsOnly&&!supplement)assert.equal(await readFile(join(output,'completed.json'),'utf8').then(()=>true,()=>false),false,'Completed run already exists; inspect it instead of uploading again');
-const result=process.env.JOURNEY_RESUME==='1'||layoutsOnly||supplement?JSON.parse(await readFile(join(output,'results.json'),'utf8')):{startedAt:new Date().toISOString(),environment:{app:APP,api:API,media:'Real Cloudinary uploads and strict server verification; synthetic images',data:'Disposable local database',municipalAuth:'Demo profile seeded accounts; production MFA is not bypassed'},checks:[],http:[],errors:[],layouts:[],actors:{}};
+const result=process.env.JOURNEY_RESUME==='1'||layoutsOnly||supplement?JSON.parse(await readFile(join(output,'results.json'),'utf8')):{startedAt:new Date().toISOString(),environment:{app:APP,api:API,media:'Real Cloudinary uploads and strict server verification; synthetic images',data:'Disposable local database',municipalAuth:'Seeded accounts with normal password authentication and unchanged role/scope guards'},checks:[],http:[],errors:[],layouts:[],actors:{}};
 delete result.failure;
 const browser=await chromium.launch({channel:'chrome'});
 const contexts=[];

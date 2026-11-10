@@ -40,8 +40,6 @@ public class TokenService {
     static final String CLAIM_DEPARTMENT = "dept";
     static final String CLAIM_WARD = "ward";
     static final String CLAIM_NAME = "name";
-    public static final String CLAIM_MFA = "mfa";
-    public static final String CLAIM_MFA_REQUIRED = "mfa_required";
     public static final String CLAIM_SESSION = "sid";
     public static final String TYPE_ACCESS = "access";
     static final String TYPE_REFRESH = "refresh";
@@ -79,26 +77,18 @@ public class TokenService {
     }
 
     public TokenPair issue(AppUser user) {
-        return issue(user, UUID.randomUUID(), false);
+        return issue(user, UUID.randomUUID());
     }
 
     public TokenPair issue(AppUser user, UUID family) {
-        return issue(user, family, false);
-    }
-
-    public TokenPair issue(AppUser user, boolean mfaVerified) {
-        return issue(user, UUID.randomUUID(), mfaVerified);
-    }
-
-    public TokenPair issue(AppUser user, UUID family, boolean mfaVerified) {
         Instant now = clock.instant();
-        String refresh = sign(user, TYPE_REFRESH, now, props.refreshTtl(), family, mfaVerified);
-        jdbc.update("INSERT INTO refresh_sessions(token_hash,user_id,family_id,expires_at,created_at,last_used_at,mfa_verified) VALUES (?,?,?,?,?,?,?)",
+        String refresh = sign(user, TYPE_REFRESH, now, props.refreshTtl(), family);
+        jdbc.update("INSERT INTO refresh_sessions(token_hash,user_id,family_id,expires_at,created_at,last_used_at) VALUES (?,?,?,?,?,?)",
                 TokenDigests.sha256(refresh), user.getId(), family,
                 java.sql.Timestamp.from(now.plus(props.refreshTtl())), java.sql.Timestamp.from(now),
-                java.sql.Timestamp.from(now), mfaVerified);
+                java.sql.Timestamp.from(now));
         return new TokenPair(
-                sign(user, TYPE_ACCESS, now, props.accessTtl(), family, mfaVerified),
+                sign(user, TYPE_ACCESS, now, props.accessTtl(), family),
                 refresh,
                 props.accessTtl().toSeconds());
     }
@@ -114,7 +104,7 @@ public class TokenService {
     }
 
     private String sign(AppUser user, String type, Instant now, java.time.Duration ttl,
-                        UUID family, boolean mfaVerified) {
+                        UUID family) {
         JwtClaimsSet.Builder claims = JwtClaimsSet.builder()
                 .id(UUID.randomUUID().toString())
                 .issuer(props.issuer())
@@ -124,9 +114,7 @@ public class TokenService {
                 .claim(CLAIM_TYPE, type)
                 .claim(CLAIM_ROLE, user.getRole().name())
                 .claim(CLAIM_NAME, user.getFullName())
-                .claim(CLAIM_SESSION, family.toString())
-                .claim(CLAIM_MFA, mfaVerified)
-                .claim(CLAIM_MFA_REQUIRED, props.requirePrivilegedMfa());
+                .claim(CLAIM_SESSION, family.toString());
 
         // Authorisation scope travels in the token so that the guard bean can
         // answer "same department?" without a query on every request. The cost

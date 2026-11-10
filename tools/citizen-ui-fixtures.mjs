@@ -5,12 +5,12 @@ const API='http://localhost:8080/api/v1',port=8081,now=new Date().toISOString();
 const read=async path=>{const r=await fetch(API+path);if(!r.ok)throw Error('Public fixture source: '+r.status);return r.json();};
 const [publicIssues,categories,wards]=await Promise.all([read('/public/issues?limit=1'),read('/categories'),read('/wards')]);
 const issue={...publicIssues.items[0],id:randomUUID(),publicRef:'CT-2099-999901',status:'PENDING_VERIFICATION',resolutionNote:'QA fixture repair proof; no civic record is changed.',resolutionPhotoUrl:'https://res.cloudinary.com/demo/image/upload/sample.jpg'};
-const session={accessToken:'fixture-access',refreshToken:'fixture-refresh',userId:randomUUID(),fullName:'Citizen UI fixture',role:'CITIZEN',mfaSetupRequired:false};
+const session={accessToken:'fixture-access',refreshToken:'fixture-refresh',userId:randomUUID(),fullName:'Citizen UI fixture',role:'CITIZEN'};
 const profile={userId:session.userId,email:'fixture-citizen@example.test',fullName:session.fullName,phone:null,role:'CITIZEN',departmentName:null,wardName:null,mutedNotificationTypes:[],mutableNotificationTypes:['RESOLVED','REOPENED','REJECTED','INFO_REQUESTED','CITIZEN_REPLIED']};
 const reports=Array.from({length:125},(_,n)=>({reportId:randomUUID(),reportedAt:now,description:'QA report '+(n+1),landmark:'QA location '+(n+1),photoUrl:issue.resolutionPhotoUrl,merged:n%2===0,issue:{...issue,publicRef:'CT-2099-'+String(n+1).padStart(6,'0')}}));
 const notifications=Array.from({length:125},(_,n)=>({id:n+1,issueId:issue.id,type:n===0?'VERIFY_REQUESTED':'RESOLVED',title:'QA notification '+(n+1),body:'An isolated frontend fixture update.',createdAt:now,readAt:null}));
 const baseView={issue,beforePhotoUrl:issue.resolutionPhotoUrl,submittedAt:now,silenceDeadline:new Date(Date.now()+3600000).toISOString(),round:1,eligible:true,ineligibleReason:null,myVerdict:null,myReason:null,confirmations:0,rejections:0,required:2};
-let following=false,emailEnabled=false,mfaEnabled=false,messages=[{id:1,authorRole:'STAFF',kind:'REQUEST_INFO',body:'QA: which side of the street is affected?',createdAt:now}],votes=null;
+let following=false,emailEnabled=false,messages=[{id:1,authorRole:'STAFF',kind:'REQUEST_INFO',body:'QA: which side of the street is affected?',createdAt:now}],votes=null;
 let sessions=[{familyId:randomUUID(),createdAt:now,lastUsedAt:now,expiresAt:now,revoked:false,current:true},{familyId:randomUUID(),createdAt:now,lastUsedAt:now,expiresAt:now,revoked:false,current:false}];
 const failures=new Set(),captured=[];
 const dashboard=new Map(await Promise.all(['/dashboard/summary','/dashboard/metrics','/dashboard/departments','/dashboard/breaching'].map(async path=>[path,await read(path)])));
@@ -28,9 +28,8 @@ const server=http.createServer(async(req,res)=>{
  if(path==='/me/profile'){if(req.method==='PUT')Object.assign(profile,body);return send(profile);}
  if(path==='/me/email-preferences'){if(req.method==='PUT')emailEnabled=body.enabled;return send({enabled:emailEnabled});}
  if(path==='/me/password')return send(null,204);
- if(path==='/me/security')return send({mfaEnabled,mfaRequired:false,recoveryCodesRemaining:mfaEnabled?10:0});
- if(path==='/me/security/mfa/setup')return send({secret:'JBSWY3DPEHPK3PXP',provisioningUri:'otpauth://totp/Fixture?secret=JBSWY3DPEHPK3PXP'});
- if(path==='/me/security/mfa/enable'){mfaEnabled=true;return send({recoveryCodes:Array.from({length:10},(_,n)=>'fixture-code-'+n)});}
+ if(path==='/me/security')return send({mfaEnabled:false,mfaRequired:false,recoveryCodesRemaining:0});
+ if(path.startsWith('/me/security/mfa/'))return send({detail:'Authenticator support has been removed.'},410);
  if(path==='/me/security/sessions')return send(sessions);
  if(path==='/me/security/sessions/revoke-others'){sessions=sessions.filter(s=>s.current);return send({revoked:1});}
  if(path.startsWith('/me/security/sessions/')){sessions=sessions.filter(s=>s.familyId!==path.split('/').at(-1));return send({revoked:true});}

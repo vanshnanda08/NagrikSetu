@@ -21,13 +21,10 @@ public record TokenResponse(
         String role,
         boolean mfaSetupRequired
 ) {
-    public static TokenResponse of(TokenService.TokenPair pair, AppUser user,
-                                   boolean requirePrivilegedMfa) {
+    public static TokenResponse of(TokenService.TokenPair pair, AppUser user) {
         return new TokenResponse(
                 pair.accessToken(), pair.refreshToken(), "Bearer", pair.expiresInSeconds(),
                 user.getId(), user.getFullName(), user.getRole().name(),
-                requirePrivilegedMfa
-                        && com.civictrack.user.auth.TotpService.required(user)
-                        && !user.isMfaEnabled());
+                false); // Retained response field for older clients; authenticator support is retired.
     }
 }

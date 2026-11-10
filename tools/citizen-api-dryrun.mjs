@@ -1,6 +1,6 @@
 // Local-only citizen API dry run. Creates one isolated QA account; never writes complaints.
 import assert from 'node:assert/strict';
-import { createHmac, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 const APP='http://localhost:3000',API='http://localhost:8080/api/v1';
 const dir=new URL('../artifacts/citizen-review/',import.meta.url);await mkdir(dir,{recursive:true});
@@ -16,8 +16,8 @@ async function call(c,path,{method='GET',body,frontend=false,status=200,origin}=
  assert.ok((Array.isArray(status)?status:[status]).includes(response.status),`${method} ${path}: HTTP ${response.status}`);
  return {response,data};
 }
-async function signIn(c,passphrase=password,mfaCode){const {data}=await call(c,'/api/auth/login',{frontend:true,method:'POST',body:{email,password:passphrase,...(mfaCode?{mfaCode}:{})}});assert.equal(data.role,'CITIZEN');assert.ok(data.accessToken);assert.equal('refreshToken'in data,false);c.token=data.accessToken;return data;}
-function totp(secret){const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';let buffer=0,bits=0;const bytes=[];for(const char of secret){buffer=(buffer<<5)|alphabet.indexOf(char);bits+=5;if(bits>=8){bytes.push((buffer>>(bits-8))&255);bits-=8;}}const counter=Buffer.alloc(8);counter.writeBigUInt64BE(BigInt(Math.floor(Date.now()/30000)));const digest=createHmac('sha1',Buffer.from(bytes)).update(counter).digest(),offset=digest.at(-1)&15;return String((digest.readUInt32BE(offset)&0x7fffffff)%1000000).padStart(6,'0');}
+async function signIn(c,passphrase=password){const {data}=await call(c,'/api/auth/login',{frontend:true,method:'POST',body:{email,password:passphrase}});assert.equal(data.role,'CITIZEN');assert.ok(data.accessToken);assert.equal('refreshToken'in data,false);c.token=data.accessToken;return data;}
+
 try{
  const guest=client(),citizen=client();
  const health=await fetch('http://localhost:8080/actuator/health');assert.equal((await health.json()).status,'UP');
@@ -40,8 +40,7 @@ try{
  assert.equal((await call(citizen,'/me/security')).data.mfaEnabled,false);const other=client();await signIn(other);let sessions=(await call(citizen,'/me/security/sessions')).data;assert.ok(sessions.some(s=>s.current));let second=sessions.find(s=>!s.current&&!s.revoked);assert.ok(second);await call(citizen,`/me/security/sessions/${second.familyId}`,{method:'DELETE'});await call(other,'/api/auth/refresh',{frontend:true,method:'POST',status:401});pass('Device list identifies the current session and revokes another device');
  const third=client();await signIn(third);await call(citizen,'/me/security/sessions/revoke-others',{method:'POST'});await call(third,'/api/auth/refresh',{frontend:true,method:'POST',status:401});refreshed=await call(citizen,'/api/auth/refresh',{frontend:true,method:'POST'});citizen.token=refreshed.data.accessToken;pass('Revoke other devices retains the current session');
  await call(citizen,'/me/password',{method:'POST',body:{currentPassword:'wrong-password',newPassword},status:[400,403,409,422]});await call(citizen,'/me/password',{method:'POST',body:{currentPassword:password,newPassword},status:204});await call(citizen,'/api/auth/refresh',{frontend:true,method:'POST',status:401});await signIn(citizen,newPassword);pass('Password validation/change revokes refresh sessions; the new password signs in');
- const {data:setup}=await call(citizen,'/me/security/mfa/setup',{method:'POST',body:{currentPassword:newPassword}});assert.ok(setup.secret&&setup.provisioningUri);const {data:enabled}=await call(citizen,'/me/security/mfa/enable',{method:'POST',body:{code:totp(setup.secret)}});assert.equal(enabled.recoveryCodes.length,10);assert.equal(new Set(enabled.recoveryCodes).size,10);assert.equal((await call(citizen,'/me/security')).data.mfaEnabled,true);await call(citizen,'/api/auth/refresh',{frontend:true,method:'POST',status:401});pass('Authenticator enrollment verifies a real TOTP code and issues ten recovery codes');
- await call(client(),'/api/auth/login',{frontend:true,method:'POST',body:{email,password:newPassword},status:401});await signIn(citizen,newPassword,enabled.recoveryCodes[0]);assert.equal((await call(citizen,'/me/security')).data.recoveryCodesRemaining,9);pass('MFA is demanded at login and a recovery login consumes one code');
+ for(const path of ['/me/security/mfa/setup','/me/security/mfa/enable'])await call(citizen,path,{method:'POST',body:{},status:410});pass('Retired authenticator endpoints cannot enroll a factor');
  await call(citizen,'/api/auth/logout',{frontend:true,method:'POST',status:200});await call(citizen,'/api/auth/refresh',{frontend:true,method:'POST',status:204});pass('Sign-out clears the local session cookie');
  for(const path of ['/report-worker.js','/manifest.webmanifest','/icon.svg'])assert.equal((await fetch(APP+path)).status,200);pass('Offline worker, install manifest and icon are served');
  console.log(`PASS ${checks.length} citizen API dry-run groups; no complaints submitted, messages posted, votes cast or issues transitioned`);

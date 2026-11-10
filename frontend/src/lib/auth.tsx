@@ -27,14 +27,13 @@ export interface Session {
   userId: string;
   fullName: string;
   role: Role;
-  mfaSetupRequired?: boolean;
 }
 
 interface AuthValue {
   session: Session | null;
   /** True until the first silent refresh settles, so guards do not flash. */
   initialising: boolean;
-  signIn: (email: string, password: string, mfaCode?: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   register: (input: RegisterInput) => Promise<void>;
   signOut: () => Promise<void>;
   /** Runs a request with the access token, refreshing once on a 401. */
@@ -98,11 +97,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     void refresh().finally(() => setInitialising(false));
   }, [refresh]);
 
-  const signIn = useCallback(async (email: string, password: string, mfaCode?: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, mfaCode: mfaCode || null }),
+      body: JSON.stringify({ email, password }),
     });
     if (!res.ok) {
       const problem = await res.json().catch(() => null);

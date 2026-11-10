@@ -1,5 +1,12 @@
 # NagrikSetu — Complete Project Documentation
 
+**Authentication scope, 10 November:** all roles now use password sign-in.
+Authenticator enrollment, code challenges and mandatory MFA are retired by user
+decision. [Local verification](docs/PASSWORD_AUTHENTICATION.md) passed 386 backend
+tests (2 optional skips), 115 frontend tests, lint/types/build and 24 Security layouts.
+Password/session controls and municipal role/scope restrictions remain. Historical
+MFA descriptions in dated evidence are superseded for current implementation.
+
 **Daily-use follow-up — 10 November:** [the latest rehearsal](docs/DAILY_USAGE_VERIFICATION.md)
 records 20 passing workflow/continuity checks and 30 layouts, real hosted photos,
 two citizen verification rounds and administrator closure in a disposable
@@ -242,7 +249,7 @@ Versions below are repository declarations, not statements about the latest avai
 | Spring Boot 3.5.16 | Starts the HTTP server and wires services, configuration and scheduled jobs | `CivicTrackApplication.java`, `application*.yml` |
 | Spring Web and Bean Validation | Maps HTTP paths to controllers and checks request fields | Feature `api/` packages and request records |
 | Spring Security OAuth2 Resource Server | Verifies bearer JWTs and enforces role checks | `config/SecurityConfig.java`, `user/auth/TokenSupport.java`; no handwritten JWT authentication filter |
-| BCrypt / JWT / TOTP | Protect passwords, issue signed access credentials and support authenticator codes | `user/auth/`; BCrypt cost 12, 15-minute access and 30-day refresh defaults |
+| BCrypt / JWT | Protect passwords and issue signed access credentials | `user/auth/`; BCrypt cost 12, 15-minute access and 30-day refresh defaults |
 | Spring Data JPA, Hibernate Spatial, JDBC | Read/write ordinary entities and execute spatial/aggregate SQL | Repositories, entities, dashboard queries and JDBC-backed security/configuration tables |
 | PostgreSQL and PostGIS | Durable records plus ward containment, distances, map queries and spatial indexes | Local/test image `postgis/postgis:17-3.4`; hosted database described as Supabase |
 | Flyway | Applies ordered database changes | SQL files in `backend/src/main/resources/db/migration/`, versions V1 through V10; Hibernate validates rather than creates the schema |
@@ -331,7 +338,7 @@ All package names in this table are relative to `backend/src/main/java/com/civic
 | `me/` | Current user's reports; identity always comes from authentication |
 | `dashboard/` | Public city/ward/department aggregates, scoped staff overview and restricted team analytics |
 | `stream/` | Server-sent event connections and dashboard-change notifications |
-| `user/` | Users, roles, profile changes and preferences; `auth/` owns passwords, tokens, MFA and recovery; `api/` exposes account routes |
+| `user/` | Users, roles, profile changes and preferences; `auth/` owns passwords and rotating tokens; `api/` exposes account routes |
 | `category/`, `department/`, `ward/` | Reference records connecting defect policy, organization and geographic scope; category/ward read APIs |
 | `notification/` | In-app notifications, unread/read actions and retrying mail outbox |
 | `media/` | Photo URL/pixel verification, Cloudinary admin access and bounded orphan cleanup |
@@ -369,7 +376,7 @@ Paths in the implementation column are relative to `frontend/src/`.
 | `/me/reports` | Current user's paginated reports and fixes awaiting a vote | `app/me/reports/page.tsx` |
 | `/me/verify/[id]` | Before/after evidence, current round and fixed/not-fixed action | `app/me/verify/[id]/page.tsx` |
 | `/me/notifications` | Paginated updates, unread counts and mark-read controls | `app/me/notifications/page.tsx` |
-| `/me/settings` | Profile/preferences; `?tab=security` exposes password/session and role-appropriate authenticator settings | `app/me/settings/page.tsx`, `components/account/` |
+| `/me/settings` | Profile/preferences; `?tab=security` exposes password and signed-in device settings | `app/me/settings/page.tsx`, `components/account/` |
 | `/login`, `/register` | Entry routes for a shared sign-in/registration dialog | Corresponding `app/` pages, `components/SignInDialog.tsx`, `lib/signInDialog.tsx` |
 | `/forgot-password`, `/reset-password` | Request recovery and set a new password | Corresponding `app/` pages and `components/RecoveryForm.tsx` |
 | `/work` | Shared complaints workspace; role determines permitted views | `app/work/page.tsx`, `components/work/ComplaintsShell.tsx` |
@@ -458,7 +465,7 @@ All paths in the table have prefix `/api/v1`. An `{id}` is normally a UUID, whil
 | GET `/me/notifications`, `/unread-count`; POST `/me/notifications/read` | Own updates/count and mark selected/all read | `notification/api/NotificationController.java` |
 | GET/PUT `/me/profile`; POST `/me/password` | Profile/preferences and password change | `user/api/ProfileController.java` |
 | GET/PUT `/me/email-preferences` | Own optional email setting | `user/api/EmailPreferencesController.java` |
-| GET `/me/security`; POST `/me/security/mfa/setup`, `/mfa/enable` | Status and authenticator enrollment | `user/api/AccountSecurityController.java` |
+| GET `/me/security` | Compatibility status; retired enrollment paths return 410 | `user/api/AccountSecurityController.java` |
 | GET `/me/security/sessions`; DELETE `/me/security/sessions/{familyId}`; POST `/me/security/sessions/revoke-others` | Own refresh-session families | Same controller |
 | GET `/staff/queue` | Scoped municipal queue, with tab/limit/offset | `issue/api/StaffQueueController.java` |
 | GET `/staff/overview` | Staff-only department and personal work totals/previews | `issue/api/StaffOverviewController.java` |
@@ -487,7 +494,7 @@ Self-registration creates `CITIZEN` only. Password policy and BCrypt hashing liv
 
 The browser receives refresh credentials only as an HttpOnly, SameSite=Lax cookie; it is Secure in production. Next handlers check origins around cookie operations. `auth.tsx` shares an in-flight refresh and uses Web Locks where available to coordinate tabs.
 
-Municipal roles require authenticator MFA by default; initial enrollment is supported before granting full municipal authority. TOTP includes replay checks and one-use recovery codes. The `demo` profile disables the mandatory municipal MFA requirement. Current citizen settings hide new enrollment, although existing enabled factors and backend enrollment functionality remain.
+All roles use password authentication. Authenticator enrollment, one-time-code login checks and municipal MFA requirements were removed on 10 November at the user's request. Password hashing, role/department/ward guards, access-token validation, refresh rotation and session revocation remain. Existing enrollment columns and migration V10 are retained as inert historical schema; compatibility status fields report false/zero and retired enrollment routes return 410.
 
 Role checks alone are insufficient. `IssueAccessGuard` allows administrators city scope, supervisors matching department **or** ward scope, and staff matching department plus an optional ward restriction. `Guards.IS_ASSIGNEE` supplies per-transition ownership checks. `REOPENED → IN_PROGRESS` deliberately has no assignee guard in the current transition table. See section 15 for gaps between these rules and queue/escalation/assignment paths.
 
@@ -571,7 +578,7 @@ Spatial points use SRID 4326, the usual latitude/longitude coordinate system. `G
 | `password_resets` | Hashed reset credentials, expiry and use time |
 | `mail_outbox` | Recipient, subject/body, retry count, next attempt and sent state |
 | `report_submissions` | Identity-bound submission key, payload hash and saved result for safe retries |
-| `mfa_recovery_codes` | User and hashed one-use recovery code with use time |
+| `mfa_recovery_codes` | Inert legacy table retained with applied V10; no current authentication code reads it |
 | `issue_followers` | Issue/user relationship; independent of report counts |
 | `issue_messages` | Private issue thread, author role, request/reply kind, text and time |
 | `shedlock` | Scheduler lease names, owners and expiry |
@@ -685,7 +692,7 @@ Database transactions and locks protect multi-record changes. Issue entities als
 | Live dashboard | Refreshes time-sensitive figures after changes | `DashboardStream.java`, `StreamController.java`, `useDashboardStream()` | Completed; SSE signal plus normal reads/polling |
 | Team performance | Gives supervisors scoped crew/trend/backlog views | `AnalyticsPanel.tsx`, `DepartmentAnalyticsService.java`, `StaffAnalyticsQueries.java` | Completed; restricted separately from public department data |
 | Profile and password maintenance | Lets users update their own details/preferences and change passwords | `components/account/`, `ProfileService.java`, password policy | Completed |
-| Rotating sessions and MFA | Protects municipal access and lets users revoke sessions | `auth.tsx`, auth proxy routes, `AuthService.java`, `TotpService.java`, security controller | Completed; issued access-token revocation is not immediate |
+| Password sign-in and rotating sessions | Authenticates users and lets them revoke sessions | `auth.tsx`, auth proxy routes, `AuthService.java`, security controller | Completed; issued access-token revocation is not immediate |
 | Password recovery and opt-in email | Existing recovery/outbox code retained for a later release | `PasswordRecoveryService.java`, `MailDelivery.java`, `mail_outbox` | Deferred to a future update by user decision; not a current completion requirement |
 | Administrator configuration | Edits existing category policy, user access and organization responsibility | `ConfigurationPanel.tsx`, `AdminConfigurationController.java`, audit table | Completed for existing records; new-record provisioning Not implemented |
 | Event audit and CSV | Supports accountability/review across transitions, escalations and moderation | `AuditPanel.tsx`, `AuditQueries.java`, `AuditCsv.java` | Completed; bounded export |
@@ -848,7 +855,7 @@ cd backend
 mvn spring-boot:run
 ```
 
-This uses realistic base timings and mandatory privileged MFA. For the workshop/demo account bootstrap, use the `demo` profile and supply your own local demo password. The command below deliberately reads your environment variable rather than documenting a password value:
+This uses realistic base timings and password authentication. For the workshop/demo account bootstrap, use the `demo` profile and supply your own local demo password. The command below deliberately reads your environment variable rather than documenting a password value:
 
 ```bash
 cd backend
@@ -913,7 +920,7 @@ Never place server secrets in a `NEXT_PUBLIC_` variable: those values are bundle
 | `DATABASE_URL` | Backend/scripts | JDBC PostgreSQL URL for Spring and the seed/backup scripts; use an appropriate plain PostgreSQL DSN for Python/psql tools instead |
 | `DATABASE_USER`, `DATABASE_PASSWORD` | Backend/scripts | Database account configuration |
 | `JWT_SECRET` | Backend | Signing key; at least 32 bytes required by code, unique production value supplied outside source |
-| `REQUIRE_PRIVILEGED_MFA` | Backend | Defaults true outside the demo profile |
+| `REQUIRE_PRIVILEGED_MFA` (retired) | Backend | No effect; authenticator support is removed from all profiles |
 | `CORS_ALLOWED_ORIGINS` | Backend | Exact comma-separated frontend origins |
 | `PORT` | Backend | Server listen port; default 8080 |
 | `VERIFY_PHOTO_EVIDENCE` | Backend | Evidence fetch/hash validation; defaults true |
@@ -934,8 +941,8 @@ Spring does not automatically load `backend/.env.seed` as an application-wide do
 
 | Profile | Intended use | Important difference |
 |---|---|---|
-| Base/default | Normal backend operation | Five-minute civic sweeps, 72-hour voting timeout, seven-day closure, real photo verification, privileged MFA |
-| `demo` | Local workshops/automation | Base category hours replaced by 0.05 hours before priority scaling; civic sweep every 20 seconds; one-minute rearm floor; one-hour vote timeout; one-day closure; mandatory privileged MFA disabled |
+| Base/default | Normal backend operation | Five-minute civic sweeps, 72-hour voting timeout, seven-day closure, real photo verification, password authentication |
+| `demo` | Local workshops/automation | Base category hours replaced by 0.05 hours before priority scaling; civic sweep every 20 seconds; one-minute rearm floor; one-hour vote timeout; one-day closure; password authentication |
 | `deploy` | Hosted seeded account bootstrap with real timing | Enables the shared bootstrap without importing demo's compressed timing |
 | `seed` | Reproducible corpus generation | Enables generator and disables SLA/verification/orphan cron writers |
 | `cds` | Docker image training only | Disables database-dependent initialization during archive generation; not a deployment profile |
@@ -1006,7 +1013,7 @@ The application uses Vercel for `frontend/`, Render for the backend Docker image
 2. Build/deploy from `backend/Dockerfile`. Its Maven build, Class Data Sharing training and runtime stages package the application for Java 21. Supply runtime configuration/secrets through the host.
 3. Configure both frontend API bases for the hosted API and real Cloudinary public settings before building `frontend/`. Configure the backend CORS origin to match the frontend.
 4. For real reporting, match frontend/backend Cloudinary clouds and configure the unsigned upload preset appropriately. Keep backend evidence verification on.
-5. If using `deploy` bootstrap, supply its password property securely. Keep privileged MFA enabled and use realistic timings.
+5. If using `deploy` bootstrap, supply its password property securely. Use strong account passwords and realistic timings.
 6. GitHub CI tests backend, frontend and running-app/browser journeys. The Render deploy job depends on those gates and uses secret `RENDER_DEPLOY_HOOK_URL` on pushes to `main`. Vercel uses its separate Git integration; the backend gate does not by itself prove synchronized frontend release timing.
 7. Mail setup is reserved for the future email/password-recovery update: SMTP or Brevo, sender/public URL and appropriate health setting. It is not required for the current milestone. Source implementation does not establish actual provider delivery.
 
@@ -1021,7 +1028,7 @@ The weekly workflow reads `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP
 | Symptom | Evidence-based place to check |
 |---|---|
 | Tests cannot find Docker | Container runtime and Colima socket profile in `pom.xml` |
-| Server starts but seeded staff cannot log in | Missing password hashes until authorized demo/deploy bootstrap; MFA default versus demo behavior |
+| Server starts but seeded staff cannot log in | Missing password hashes until authorized demo/deploy bootstrap; check current password and active account status |
 | Report says outside service area | Configured ward polygons; V11 uses illustrative Patiala sectors. Confirm the hosted migration version separately |
 | Photo storage unavailable or verification refused | Backend cloud setting, frontend cloud/preset agreement and evidence URL requirements |
 | Repair cannot submit with placeholder | Intentional `uploadRepairProof()` check; configure real uploads |

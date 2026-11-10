@@ -2,6 +2,13 @@
 
 See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
 
+**Password-only scope — 10 November:** authenticator setup, login codes and
+municipal MFA requirements are removed at the user's request. Password changes,
+role/scope guards and session controls remain. [Verification](docs/PASSWORD_AUTHENTICATION.md):
+386 backend passes/2 optional skips, 115 frontend passes, lint/types/build and
+24 Security layouts passed locally. Publication and the live complaint journey
+are tracked separately; historical MFA descriptions below are not current scope.
+
 **Daily-use rehearsal — 10 November:** the citizen photo report → supervisor
 assignment → staff proof → rejected/repaired → citizen confirmation → admin
 closure journey passed in a disposable environment with real hosted photos.
@@ -178,7 +185,7 @@ appearance and uses the consolidated screen structure described above.
 | 9 | Rate limiting, anti-abuse screening, privacy redaction, demo scenario, remaining blueprint screens, and final report | ✅ done |
 | Extended scope | Refresh-token rotation and reuse detection, audited admin configuration, persistent drafts, and background offline submission | ✅ done |
 | Future update | Email notifications and email-based password recovery; existing implementation retained | Deferred by user decision; excluded from current completion requirements |
-| Production essentials | Authenticator MFA and recovery codes for municipal roles, active-session revocation, issue following, private clarification threads, installable PWA manifest, and security headers | ✅ done |
+| Production essentials | Password authentication, active-session revocation, issue following, private clarification threads and security headers; authenticator support retired by user decision on 10 November | ✅ implemented |
 | UI | Frontend refresh (not a numbered phase): NagrikSetu branding and logo, glass theme with a navy / orange / sky palette, one-screen desktop layout for every page, root redirect to the dashboard, accessibility fixes | ✅ done, verified locally 2026-10-11 |
 
 ### Remaining operator checks
@@ -222,10 +229,10 @@ evidence are retained; no application code was removed or disabled by this decis
   reuse-detecting token families, and password/access changes revoke refresh
   sessions. Email-based password recovery is deferred; its existing one-use
   reset-link implementation is retained for the future update.
-- **Protected municipal access.** Staff, supervisor and administrator roles
-  require time-based authenticator MFA in production, with one-use recovery
-  codes and replay protection. Every user can inspect and revoke refresh-token
-  session families from the security screen.
+- **Municipal access.** Staff, supervisors and administrators sign in with their
+  account password. Role, department and ward guards still restrict their actions.
+  Every user can inspect and revoke refresh-token sessions from the Security screen.
+  Authenticator enrollment, codes and requirements were removed by user decision.
 - **Email delivery — future update.** The retained email implementation is opt-in and
   uses a transactional outbox with bounded retries. In-app notifications and
   issue transitions still succeed when the mail service is down.
@@ -359,11 +366,10 @@ escalation happen while a slide is still on screen — which means nearly every
 seeded issue reads as overdue. Run without the profile for realistic deadlines,
 at the cost of not being able to log in.
 
-Production requires MFA before a municipal account receives its role
-authority. The `demo` profile deliberately disables that requirement only for
-seeded browser automation and workshops; it does not change the production
-default. MFA can still be enrolled and exercised at `/me/security` under the
-normal profile.
+All roles use password authentication. `/me/settings?tab=security` provides
+password changes and signed-in device management. Authenticator setup and login
+challenges are retired in every profile; the former `REQUIRE_PRIVILEGED_MFA`
+setting no longer enables them. Existing account passwords are unchanged.
 
 `verify-evidence=false` is only for the local placeholder-photo demo. Production
 must leave verification enabled and set the same Cloudinary cloud in

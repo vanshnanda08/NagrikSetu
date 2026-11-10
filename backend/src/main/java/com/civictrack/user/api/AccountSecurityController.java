@@ -1,13 +1,8 @@
 package com.civictrack.user.api;
 
-import com.civictrack.user.AppUser;
 import com.civictrack.user.ProfileRefusedException;
 import com.civictrack.user.UserRepository;
 import com.civictrack.user.auth.TokenService;
-import com.civictrack.user.auth.TotpService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +12,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,38 +20,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** MFA enrolment and server-side refresh-session control for the current user. */
+/** Password-authenticated account status and refresh-session control. */
 @RestController
 @RequestMapping("/api/v1/me/security")
 @RequiredArgsConstructor
 public class AccountSecurityController {
-    private final TotpService totp;
     private final UserRepository users;
     private final JdbcTemplate jdbc;
-    private final com.civictrack.user.auth.JwtProperties properties;
     private final java.time.Clock clock;
 
     @GetMapping
     @Transactional(readOnly = true)
     public SecurityStatus status(@AuthenticationPrincipal Jwt jwt) {
-        AppUser user = users.findById(userId(jwt))
-                .orElseThrow(() -> new ProfileRefusedException("The account no longer exists."));
-        return new SecurityStatus(user.isMfaEnabled(), properties.requirePrivilegedMfa() && TotpService.required(user),
-                jdbc.queryForObject("SELECT count(*) FROM mfa_recovery_codes WHERE user_id=? AND used_at IS NULL",
-                        Integer.class, user.getId()));
+        if (!users.existsById(userId(jwt))) {
+            throw new ProfileRefusedException("The account no longer exists.");
+        }
+        // Compatibility projection for cached clients. No enrollment data is read.
+        return new SecurityStatus(false, false, 0);
     }
 
-    @PostMapping("/mfa/setup")
-    public TotpService.Setup setup(@Valid @RequestBody SetupRequest body, @AuthenticationPrincipal Jwt jwt) {
-        return totp.begin(userId(jwt), body.currentPassword());
-    }
-
-    public record SetupRequest(@NotBlank @Size(max = 100) String currentPassword) {}
-    public record Code(@NotBlank @jakarta.validation.constraints.Pattern(regexp = "[0-9]{6}") String code) {}
-
-    @PostMapping("/mfa/enable")
-    public RecoveryCodes enable(@Valid @RequestBody Code body, @AuthenticationPrincipal Jwt jwt) {
-        return new RecoveryCodes(totp.enable(userId(jwt), body.code()));
+    @PostMapping({"/mfa/setup", "/mfa/enable"})
+    public void retiredAuthenticator() {
+        throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.GONE,
+                "Authenticator support has been removed. Sign in with your account password.");
     }
 
     @GetMapping("/sessions")
@@ -117,7 +103,6 @@ public class AccountSecurityController {
     }
 
     public record SecurityStatus(boolean mfaEnabled, boolean mfaRequired, int recoveryCodesRemaining) {}
-    public record RecoveryCodes(List<String> recoveryCodes) {}
     public record SessionView(UUID familyId, Instant createdAt, Instant lastUsedAt,
                               Instant expiresAt, boolean revoked, boolean current) {}
 }

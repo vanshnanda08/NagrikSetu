@@ -51,10 +51,7 @@ try {
   await page.goto(APP+`/me/verify/${issue.id}`);await page.getByRole('button',{name:'Not fixed',exact:true}).click();await page.getByLabel('What is still wrong? (optional)',{exact:true}).fill('The repair has not held.');await capture('verification-choice');await axe('verification-choice');
   await page.route('**/api/v1/issues/*/verify',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({verdict:'NOT_FIXED',status:'REOPENED',outcome:'REOPENED',confirmations:0,rejections:1,required:1})}));await page.getByRole('button',{name:'Send: not fixed',exact:true}).click();await page.getByText(/You said.*not fixed/).first().waitFor();await capture('verification-recorded-success');
   await page.goto(APP+'/me/security');
-  await page.route('**/api/v1/me/security/mfa/setup',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({secret:'JBSWY3DPEHPK3PXP',provisioningUri:'otpauth://totp/NagrikSetu:visual-fixture?secret=JBSWY3DPEHPK3PXP'})}));
-  await page.route('**/api/v1/me/security/mfa/enable',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({recoveryCodes:Array.from({length:10},(_,i)=>`VISUAL-${i+1}-FIXTURE`)})}));
-  await page.getByLabel('Current password',{exact:true}).fill('visual-fixture');await page.getByRole('button',{name:'Set up authenticator',exact:true}).click();await page.getByLabel('Six-digit code',{exact:true}).fill('123456');await capture('authenticator-setup-fixture');await axe('authenticator-setup-fixture');
-  await page.getByRole('button',{name:'Confirm and enable',exact:true}).click();await page.getByRole('heading',{name:'Save these recovery codes now',exact:true}).waitFor();await capture('recovery-codes-fixture');await axe('recovery-codes-fixture');
+  await page.getByRole('heading',{name:'Signed-in devices',exact:true}).waitFor();await capture('security-devices');await axe('security-devices');
   let profileFixture;
   await page.route('**/api/v1/me/profile',async r=>{
     if(r.request().method()==='PUT') await r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({...profileFixture,...JSON.parse(r.request().postData())})});

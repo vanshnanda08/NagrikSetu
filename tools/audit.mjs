@@ -1,20 +1,8 @@
 // Run only against the local demo scratch API. Never uses production accounts.
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
-import { createHmac } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';
 import { APP, json, login } from './http.mjs';
-
-function totp(secret) {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  let buffer = 0, bits = 0; const bytes = [];
-  for (const c of secret) { buffer = (buffer << 5) | alphabet.indexOf(c); bits += 5;
-    if (bits >= 8) { bytes.push((buffer >> (bits - 8)) & 255); bits -= 8; } }
-  const time = Buffer.alloc(8); time.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
-  const hash = createHmac('sha1', Buffer.from(bytes)).update(time).digest();
-  const offset = hash.at(-1) & 15;
-  return String((hash.readUInt32BE(offset) & 0x7fffffff) % 1000000).padStart(6, '0');
-}
 
 const browser = await chromium.launch({ channel: 'chrome' });
 const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
@@ -38,31 +26,20 @@ try {
   const cookie = (await context.cookies()).find(c => c.name === 'civictrack_refresh');
   assert.ok(cookie.httpOnly && cookie.secure && cookie.sameSite === 'Lax');
   await page.goto(APP + '/me/security');
-  await page.getByLabel('Current password for authenticator setup', { exact: true }).fill(password);
-  await page.getByRole('button', { name: 'Set up authenticator' }).click();
-  const secret = await page.locator('code').first().textContent();
-  await page.getByLabel('Six-digit code').fill(totp(secret));
-  await page.getByRole('button', { name: 'Confirm and enable' }).click();
-  await page.getByRole('heading', { name: 'Save these recovery codes now' }).waitFor();
-  const recovery = await page.locator('[role="status"] li').allTextContents();
-  assert.equal(recovery.length, 10);
+  assert.equal(await page.getByRole('button', { name: 'Set up authenticator' }).count(), 0);
   await context.request.post(APP + '/api/auth/logout');
   await page.goto(APP + '/login?next=javascript:alert(1)');
   const dialog = page.locator('dialog');
   await dialog.getByLabel('Email', { exact: true }).fill(email);
   await dialog.getByLabel('Password', { exact: true }).fill(password);
   await dialog.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await dialog.getByLabel('Authenticator or recovery code').fill(recovery[0]);
-  await dialog.getByRole('button', { name: 'Sign in', exact: true }).click();
   await page.waitForURL(APP + '/dashboard');
-  assert.equal((await context.request.post(APP + '/api/auth/login', { data: { email, password, mfaCode: recovery[0] } })).status(), 401);
-  console.log('PASS MFA enrolment, recovery login, one-use recovery and safe redirect');
+  console.log('PASS password-only login and safe redirect');
 
   const other = await browser.newContext();
-  const otherLogin = await other.request.post(APP + '/api/auth/login', { data: { email, password, mfaCode: recovery[1] } });
+  const otherLogin = await other.request.post(APP + '/api/auth/login', { data: { email, password } });
   assert.equal(otherLogin.status(), 200);
   await page.goto(APP + '/me/security');
-  await page.getByRole('tab', { name: 'Devices & app', exact: true }).click();
   await page.getByRole('button', { name: 'Sign out other devices' }).click();
   await page.getByRole('status').filter({ hasText: 'Session access updated.' }).waitFor();
   assert.equal((await other.request.post(APP + '/api/auth/refresh')).status(), 401);

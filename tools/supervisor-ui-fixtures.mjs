@@ -8,11 +8,11 @@ const [page,categories,wards]=await Promise.all([read('/public/issues?limit=1'),
 const base=page.items[0],category=categories.find(c=>c.code==='POTHOLE'),ward=wards[0];
 const member=randomUUID(),other=randomUUID(),department=category.departmentId;
 const scope=await read('/dashboard/wards/'+ward.id);
-const session={accessToken:'isolated-supervisor-access',refreshToken:'isolated-supervisor-refresh',userId:member,fullName:'Supervisor UI fixture',role:'SUPERVISOR',mfaSetupRequired:false};
+const session={accessToken:'isolated-supervisor-access',refreshToken:'isolated-supervisor-refresh',userId:member,fullName:'Supervisor UI fixture',role:'SUPERVISOR'};
 const profile={id:member,createdAt:now,email:'fixture-supervisor@example.test',fullName:session.fullName,phone:null,role:'SUPERVISOR',mutedNotificationTypes:[],mutableNotificationTypes:['RESOLVED','REOPENED','REJECTED','INFO_REQUESTED','CITIZEN_REPLIED']};
 const states=['NEW','ACKNOWLEDGED','ASSIGNED','IN_PROGRESS','REOPENED','PENDING_VERIFICATION','ASSIGNED'];
 let rows=Array.from({length:225},(_,i)=>({...base,id:randomUUID(),publicRef:`CT-2099-${String(i+1).padStart(6,'0')}`,categoryCode:'POTHOLE',categoryName:category.displayName,wardId:ward.id,wardName:ward.name,departmentId:department,departmentName:'Roads fixture department',status:i<7?states[i]:'NEW',priority:'HIGH',priorityScore:1000-i,assignedTo:[2,3,5].includes(i%7)?member:i%7===6?other:null,firstReportedAt:now,dueAt:now,effectiveDeadline:now,pausedSeconds:0,landmark:`Isolated test location ${i+1}`,escalationLevel:0}));
-let password='fixture-pass-1234', emailEnabled=false,mfaEnabled=false,empty=false;
+let password='fixture-pass-1234', emailEnabled=false,empty=false;
 let sessions=[{familyId:randomUUID(),createdAt:now,lastUsedAt:now,expiresAt:now,current:true,revoked:false},{familyId:randomUUID(),createdAt:now,lastUsedAt:now,expiresAt:now,current:false,revoked:false}];
 const notices=Array.from({length:125},(_,i)=>({id:i+1,issueId:rows[i].id,type:'CITIZEN_REPLIED',title:`QA citizen reply ${i+1}`,body:'An isolated supervisor notification.',createdAt:now,readAt:null}));
 const messages=new Map(),history=new Map(),failures=new Set(),captured=[];
@@ -58,9 +58,8 @@ const server=http.createServer(async(req,res)=>{
  if(path==='/me/profile'){if(req.method==='PUT')Object.assign(profile,body);return send(profile);}
  if(path==='/me/email-preferences'){if(req.method==='PUT')emailEnabled=body.enabled;return send({enabled:emailEnabled});}
  if(path==='/me/password'){if(body.currentPassword!==password)return send({detail:'The current password is incorrect.'},403);if(body.newPassword===password)return send({detail:'Choose a different password.'},400);password=body.newPassword;return send(null,204);}
- if(path==='/me/security')return send({mfaEnabled,mfaRequired:false,recoveryCodesRemaining:mfaEnabled?10:0});
- if(path==='/me/security/mfa/setup')return send({secret:'JBSWY3DPEHPK3PXP',provisioningUri:'otpauth://totp/Fixture?secret=JBSWY3DPEHPK3PXP'});
- if(path==='/me/security/mfa/enable'){mfaEnabled=true;return send({recoveryCodes:Array.from({length:10},(_,n)=>'fixture-code-'+n)});}
+ if(path==='/me/security')return send({mfaEnabled:false,mfaRequired:false,recoveryCodesRemaining:0});
+ if(path.startsWith('/me/security/mfa/'))return send({detail:'Authenticator support has been removed.'},410);
  if(path==='/me/security/sessions')return send(sessions);
  if(path==='/me/security/sessions/revoke-others'){sessions=sessions.filter(s=>s.current);return send({revoked:1});}
  if(path.startsWith('/me/security/sessions/')){sessions=sessions.filter(s=>s.familyId!==path.split('/').at(-1));return send({revoked:true});}

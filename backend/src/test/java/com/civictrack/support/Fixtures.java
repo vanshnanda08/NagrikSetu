@@ -84,7 +84,7 @@ public class Fixtures {
     }
 
     public String accessToken(AppUser user) {
-        return tokens.issue(user, user.getRole() != Role.CITIZEN).accessToken();
+        return tokens.issue(user).accessToken();
     }
 
     public String refreshToken(AppUser user) {

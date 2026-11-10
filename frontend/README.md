@@ -25,7 +25,7 @@ profile, persistent drafts and offline submission. Email notifications and
 email-based password recovery are deferred to a future update; their existing
 screens/code and historical checks are retained, with no current requirement for
 provider activation or live delivery/reset testing. In-app notifications and
-password changes while signed in remain in scope. The latest additions are authenticator MFA and session controls at
+password changes while signed in remain in scope. Account session controls are available at
 `/me/settings?tab=security`, issue following, private clarification threads, an installable
 web-app manifest and browser security headers. The NagrikSetu interface restores the committed blue/orange glass design in light mode only, with responsive layouts.
 
@@ -90,8 +90,9 @@ for every role and both desktop/mobile sign-out controls.
 See [Citizen verification](CITIZEN_VERIFICATION.md) for the current citizen dry run,
 paging/retry fixes, responsive evidence dialogs, screenshots and remaining limits.
 Ordinary citizen security settings show password and device management directly.
-Authenticator enrollment UI remains available to municipal accounts; already-enabled citizen
-factors and server-side authentication protections are preserved.
+All roles now use password sign-in. Authenticator setup, recovery-code prompts
+and mandatory enrollment notices are removed; password changes and session
+revocation remain available.
 Explore issues groups list/map views, Account settings groups profile/security,
 Complaints (`/work`) combines staff queues, selected-complaint work actions and
 supervisor assignment/review/performance views. Administration groups configuration/audit. Previous URLs redirect to the grouped views, preserving

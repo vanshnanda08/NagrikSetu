@@ -35,6 +35,29 @@ for (const [name, engine] of Object.entries({ firefox, webkit })) {
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
+    // Next prefetches links after hydration and data loading. Replacing the
+    // document after a fixed 500 ms can abort those reads; WebKit reports some
+    // unload cancellations as access-control page errors. Let finite route
+    // reads settle before the next hard navigation. The dashboard's persistent
+    // event stream is intentionally excluded. Actual page errors still fail.
+    const pendingReads = new Set();
+    let lastRead = Date.now();
+    page.on('request', request => {
+      const url = new URL(request.url());
+      if (url.searchParams.has('_rsc') || (url.pathname.startsWith('/api/') && !url.pathname.includes('/stream/'))) {
+        pendingReads.add(request);
+        lastRead = Date.now();
+      }
+    });
+    const finished = request => {
+      if (pendingReads.delete(request)) lastRead = Date.now();
+    };
+    page.on('requestfinished', finished);
+    page.on('requestfailed', finished);
+    const settled = () => expect.poll(
+      () => pendingReads.size === 0 && Date.now() - lastRead >= 750,
+      { timeout: 15_000, message: `${name}: finite page and prefetch reads settle before navigation` },
+    ).toBe(true);
     let checks = 0;
     for (const width of [320, 1280]) {
       await page.setViewportSize({ width, height: 900 });
@@ -47,7 +70,7 @@ for (const [name, engine] of Object.entries({ firefox, webkit })) {
         const caseLabel = `${name} ${width}px ${route}`;
         await expect(heading, caseLabel).toHaveCount(1, { timeout: 15_000 });
         await expect(heading, caseLabel).toHaveText(title);
-        await page.waitForTimeout(500);
+        await settled();
         await expect(heading, caseLabel).toHaveCount(1);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, `${name} ${width} ${route}`);
         checks++;

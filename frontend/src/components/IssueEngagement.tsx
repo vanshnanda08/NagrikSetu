@@ -29,7 +29,7 @@ export function IssueEngagement({ issueId }: { issueId: string }) {
   const messages = useQuery({
     queryKey: ["issue", issueId, "messages", session?.userId],
     queryFn: () => authed((token) => request<Message[]>(`/issues/${issueId}/messages`, { token })),
-    enabled: Boolean(session && !session.mfaSetupRequired),
+    enabled: Boolean(session),
     retry: false,
   });
   const post = useMutation({

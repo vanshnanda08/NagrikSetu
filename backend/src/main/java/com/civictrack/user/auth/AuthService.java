@@ -29,7 +29,6 @@ public class AuthService {
     private final TokenService tokens;
     private final org.springframework.jdbc.core.JdbcTemplate jdbc;
     private final java.time.Clock clock;
-    private final TotpService totp;
 
     @Transactional
     public AppUser register(String email, String phone, String rawPassword, String fullName) {
@@ -53,18 +52,11 @@ public class AuthService {
 
     @Transactional
     public Authenticated login(String email, String rawPassword) {
-        return login(email, rawPassword, null);
-    }
-
-    @Transactional
-    public Authenticated login(String email, String rawPassword, String mfaCode) {
         var ids = jdbc.queryForList("SELECT id FROM users WHERE lower(email)=lower(?) FOR UPDATE",UUID.class,email == null ? "" : email.trim());
         if (ids.isEmpty()) throw new InvalidCredentialsException("Email or password is incorrect");
         AppUser user = users.findById(ids.get(0)).orElseThrow(() -> new InvalidCredentialsException("Email or password is incorrect"));
         verify(user, rawPassword);
-        totp.verifyLogin(user, mfaCode);
-        boolean mfaVerified = user.isMfaEnabled();
-        return new Authenticated(user, tokens.issue(user, mfaVerified));
+        return new Authenticated(user, tokens.issue(user));
     }
 
     @Transactional(noRollbackFor = InvalidCredentialsException.class)
@@ -93,11 +85,10 @@ public class AuthService {
         // token: over thirty days a user can change department, be demoted, or
         // be deactivated, and a refreshed access token must reflect the account
         // as it is now rather than as it was when the refresh token was minted.
-        boolean mfaVerified = Boolean.TRUE.equals(session.get("mfa_verified"));
         jdbc.update("UPDATE refresh_sessions SET consumed_at = ?, last_used_at = ? WHERE token_hash = ?",
                 java.sql.Timestamp.from(clock.instant()), java.sql.Timestamp.from(clock.instant()),
                 TokenDigests.sha256(refreshToken));
-        return new Authenticated(user, tokens.issue(user, family, mfaVerified));
+        return new Authenticated(user, tokens.issue(user, family));
     }
 
     @Transactional

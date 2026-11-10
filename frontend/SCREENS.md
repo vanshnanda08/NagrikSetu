@@ -15,7 +15,7 @@ light theme is retained.
 | My reports | `/me/reports` | Paginated signed-in submissions, grouping outcomes, current progress and links to eligible fix verification. |
 | Complaint details | `/issues/[id]` | Compact summary plus Evidence & fix, Location & grouping, and History/Updates panels. Report descriptions, landmarks and submission times accompany the photos. Photos open in full-size dialogs. Work queues provide explicit View ticket details links; contextual Back to work queue restores the filter, page and selected ticket. Status, deadlines, proof, all timeline entries, following and eligible clarification remain accessible. |
 | Notifications | `/me/notifications` | Paginated in-app updates, unread state, mark-read actions/retry and links to the relevant complaint/verification. Available through the header bell. |
-| Account settings | `/me/settings`, `?tab=security` | Profile & preferences: contact details, event preferences and email preferences. Citizen security: password changes and signed-in devices directly, with app-install information. Municipal accounts retain Authenticator / Devices & app tabs. Citizens with an already-enabled factor retain its status and existing sign-in protection; new citizen enrollment is not offered. Available through the account menu. |
+| Account settings | `/me/settings`, `?tab=security` | Profile & preferences: contact details, event preferences and email preferences. Security for every role: password changes and signed-in devices directly, with optional app information. Authenticator setup, code prompts and mandatory enrollment are retired. Available through the account menu. |
 
 Citizen primary navigation is **Dashboard · Explore issues · Report a problem ·
 My reports**. Guests see the first three. Notifications and account settings are
@@ -172,7 +172,7 @@ evidence under `artifacts/screens-consolidation/`.
 - `node tools/screen-consolidation.mjs`: **78 page/layout checks** and **21
   interaction/redirect checks** passed across public, citizen, staff, supervisor
   and administrator contexts. This covers shared navigation, all earlier grouped
-  screens, legacy redirects, settings validation/MFA fixtures and internal scroll.
+  screens, legacy redirects, settings validation/session fixtures and internal scroll.
   No runtime errors or actionable accessibility findings. Two spatial-marker
   target-size scans are recorded as equivalent-control exceptions only when the
   selector or element markup identifies a map marker and the corresponding

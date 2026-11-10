@@ -1,5 +1,13 @@
 # NagrikSetu — current progress
 
+Scope update, 10 November: [authenticator support is retired](PASSWORD_AUTHENTICATION.md)
+for all roles. Passwords, role/department/ward restrictions and rotating/revocable
+sessions remain. Final local checks: 386 backend passes/2 optional skips,
+115 frontend passes, lint/types/build, 16 UI groups and 24 Security layouts.
+The browser-smoke navigation correction passed three deployed repetitions and
+still detects a genuine runtime error. Fresh release CI/live role handoff remains
+to be recorded after publishing this update.
+
 Daily-use rehearsal, 10 November: [20 workflow checks and 30 layouts passed](DAILY_USAGE_VERIFICATION.md)
 against disposable data with real photo uploads, including citizen rejection,
 repair resubmission, administrator closure and authenticated offline recovery.
@@ -84,14 +92,15 @@ was performed.
 | Phases 8–9 | Evaluation artifacts, abuse controls, privacy redaction, remaining screens, final report and demo runbook implemented |
 | Extended scope | Refresh-token rotation/reuse detection, audited admin configuration and background offline submission implemented |
 | Future update | Email notifications and email-based password recovery deferred; existing reset/outbox code and prior tests retained |
-| Security additions | TOTP MFA, recovery codes, refresh-session listing/revocation and browser security headers implemented |
+| Security additions | Password sign-in, refresh-session listing/revocation and browser security headers; authenticator support retired on 10 November |
 | Engagement additions | Issue following without priority inflation and private reporter/municipal clarification threads implemented |
 | Installable web client | Manifest, app icons and install prompt implemented alongside existing offline submission support |
 | Database | Flyway V1–V11; V11 preserves ward IDs and historical complaint evidence; the live API now returns the four Patiala/Thapar demo sectors |
 
-MFA role enforcement defaults to enabled for staff, supervisors and
-administrators. The explicit demo profile bypasses mandatory enrolment for
-seeded automation. Revoking refresh sessions prevents future refreshes; issued
+All roles use password sign-in; no profile requires authenticator enrollment.
+Legacy enrollment paths return 410 and compatibility status fields are false.
+Applied migrations and historical enrollment columns remain intact.
+Revoking refresh sessions prevents future refreshes; issued
 access tokens retain their bounded lifetime of up to 15 minutes.
 
 ## Historical release verification — 27 October 2026
