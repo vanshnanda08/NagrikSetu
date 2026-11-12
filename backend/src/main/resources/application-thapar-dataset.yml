@@ -1,0 +1,14 @@
+# Explicitly isolated builder, never a deployment/automatic-startup profile.
+civictrack:
+  media:
+    verify-evidence: true
+  mail:
+    enabled: false
+  seed:
+    enabled: false
+  sla:
+    cron: "-"
+  verification:
+    cron: "-"
+  cloudinary:
+    cron: "-"

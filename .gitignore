@@ -44,6 +44,7 @@ docs/*
 !docs/END_TO_END_TEST_REPORT.md
 !docs/DAILY_USAGE_VERIFICATION.md
 !docs/PASSWORD_AUTHENTICATION.md
+!docs/THAPAR_DATASET.md
 !docs/WORKFLOW_FIXES.md
 !docs/RELEASE_READINESS.md
 !docs/FINAL-PROJECT-REPORT.md
@@ -55,3 +56,6 @@ artifacts/*
 !artifacts/evaluation/
 !artifacts/evaluation/*.csv
 !artifacts/evaluation/*.pdf
+
+# Optional dataset refresh tools.
+scripts/__pycache__/

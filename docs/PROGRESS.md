@@ -1,5 +1,17 @@
 # NagrikSetu — current progress
 
+Thapar sample refresh, 11 November: **50 sample issue records / 90 reports** are
+live, replacing only the identified 40/40 legacy dataset. The two other QA
+complaints and all 19 previous accounts remain; 12 synthetic citizens were added.
+The guarded process passed backup restore, same-seed reproduction, rollback,
+mixed-report protection and repeat replacement. Final backend: 389 total,
+387 passed/2 optional skips; deployed API/Chrome: 15 functional groups plus
+30 responsive layouts, with no observed runtime errors or API 5xx responses.
+[Dataset report](THAPAR_DATASET.md) includes exact category/status distributions,
+synthetic evidence, backup paths and safe rerun instructions. Normal live SLA
+processing remains enabled. Dataset code/tool additions are uncommitted; no
+frontend source changes, source push or code deployment were made in this task.
+
 Verified follow-up, 11 November: application `6846b1b` is pushed and
 [CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244); Vercel reports success. The live citizen-to-administrator
 journey passed **16 workflow groups and 30 layouts**, including real photos,

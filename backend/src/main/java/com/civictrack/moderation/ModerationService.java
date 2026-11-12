@@ -145,7 +145,7 @@ public class ModerationService {
         // overdue. That is the truthful answer: the problem has been reported
         // for that long, and it was only hidden inside another ticket.
         Issue created = new Issue();
-        created.setPublicRef(issues.nextPublicRef());
+        created.setPublicRef(com.civictrack.common.generation.GenerationScope.publicRef(issues::nextPublicRef));
         created.setCategoryCode(original.getCategoryCode());
         created.setWardId(original.getWardId());
         created.setDepartmentId(original.getDepartmentId());

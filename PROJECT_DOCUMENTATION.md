@@ -1,5 +1,17 @@
 # NagrikSetu — Complete Project Documentation
 
+**Deployed sample refresh — 11 November:** [Thapar dataset v2](docs/THAPAR_DATASET.md)
+replaces the 40 identified legacy sample issues/reports with **50 issue records
+containing 90 reports**, including one retained merge redirect. The two other QA
+complaints, existing accounts, configuration and reference data remain. Actual
+clustering and workflow services ran against isolated restored databases before
+the sample-only atomic production import. All ten categories, all nine statuses,
+synthetic verified evidence and 89 days of activity are represented. Final
+backend: 387 passes/2 optional skips; deployed review: 15 functional groups and
+30 responsive layouts. Exact counts, backups, reproducibility commands and
+limitations are in the dataset report. The data is live; source additions remain
+uncommitted. Earlier release checks below retain their original dated scope.
+
 **Deployed follow-up — 11 November:** application `6846b1b6bbb334db3eeec3dc2a40e7ea6a96ec39` is pushed;
 [all CI jobs passed](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244), Vercel reports success, and password-only sign-in
 works for all four live roles. [The deployed daily-use report](docs/DAILY_USAGE_VERIFICATION.md)
@@ -874,7 +886,7 @@ mvn spring-boot:run \
 
 Set `LOCAL_DEMO_PASSWORD` in that terminal first, using a local-only value. `civictrack.demo.staff-password` is an actual bootstrap property. The media override is appropriate only for local synthetic/placeholder evidence. Real evidence mode needs the application's Cloudinary cloud and must stay enabled for production. Current repair-proof UI still requires real configured photo upload; disabling backend verification does not make its placeholder proof acceptable.
 
-Seeded account identifiers include the administrator `commissioner@civictrack.example`, supervisor `head.roads@civictrack.example` and staff `crew.roads@civictrack.example`. Their password comes from your bootstrap setting, not this guide. Register a new citizen through the app for citizen verification demonstrations.
+Seeded account identifiers include the administrator `commissioner@civictrack.example`, supervisor `head.roads@civictrack.example` and staff `crew.roads@civictrack.example`. Their password comes from your bootstrap setting, not this guide. Register a citizen through the app, or use a privately recorded synthetic citizen from the separate [Thapar v2 dataset](docs/THAPAR_DATASET.md), for verification demonstrations.
 
 Check startup:
 

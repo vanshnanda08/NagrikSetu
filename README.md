@@ -2,6 +2,17 @@
 
 See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
 
+**Thapar dataset refresh — 11 November:** the deployed database now includes
+**50 synthetic sample issue records / 90 reports**, replacing only the identified
+40-issue/40-report Thapar sample. Two separate QA complaints and all 19 existing
+accounts were preserved; totals at verification were **52 issues / 92 reports**.
+All ten categories and nine workflow states are covered around Thapar/Patiala,
+with actual clustering, verification, moderation and labelled hosted evidence.
+The [dataset report and repeatable procedure](docs/THAPAR_DATASET.md) records
+distributions, backups, preservation checks, 387 backend passes/2 optional skips,
+15 deployed functional groups and 30 desktop/mobile layouts. Data is applied;
+the generator/tool source changes are not yet committed or pushed.
+
 **Deployed verification — 11 November:** application `6846b1b` is pushed;
 [CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244). The live citizen → supervisor → staff → citizen confirmation
 → administrator closure journey passed: **16 workflow groups and 30 layouts**,
@@ -408,9 +419,10 @@ Seeded logins, all with the password passed above:
 | SUPERVISOR | `head.roads@civictrack.example` (and one per department, plus four ward officers) |
 | STAFF | `crew.roads@civictrack.example`, `crew.water@`, `crew.sanitation@` |
 
-There is no seeded citizen login — citizens in the corpus have no password.
-Register in the app to exercise `/me/reports`. Reporting itself needs no
-account at all.
+The original evaluation corpus has no usable seeded citizen password. The
+separate [Thapar v2 demonstration dataset](docs/THAPAR_DATASET.md) adds 12 synthetic
+citizen logins with credentials saved privately outside Git. Otherwise register
+in the app to exercise `/me/reports`. Reporting itself needs no account at all.
 
 ## Testing
 

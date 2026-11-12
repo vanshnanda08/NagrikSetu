@@ -1,0 +1,878 @@
+{
+  "assets": {
+    "proof-problem-01": {
+      "category": "ILLEGAL_DUMPING",
+      "publicId": "nagriksetu_thapar_demo_v2_224dba28e16e51e7612c9113",
+      "repair": true,
+      "sha256": "224dba28e16e51e7612c9113b58c5346e7667ced71e398fcf37a9df2c9bbc89b",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343104/nagriksetu_thapar_demo_v2_224dba28e16e51e7612c9113.jpg"
+    },
+    "proof-problem-03": {
+      "category": "STRAY_ANIMAL",
+      "publicId": "nagriksetu_thapar_demo_v2_ee26a282306d1b0ddbd5c7f2",
+      "repair": true,
+      "sha256": "ee26a282306d1b0ddbd5c7f2bd6675637ae59232b82d99379849ddbd4fb6bfe0",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343116/nagriksetu_thapar_demo_v2_ee26a282306d1b0ddbd5c7f2.jpg"
+    },
+    "proof-problem-05": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_d8037044430d18f2f6208e42",
+      "repair": true,
+      "sha256": "d8037044430d18f2f6208e42bd019231eaabe44dfac9205a6405e21ae114e66a",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343108/nagriksetu_thapar_demo_v2_d8037044430d18f2f6208e42.jpg"
+    },
+    "proof-problem-06": {
+      "category": "ROAD_DAMAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_69c04f093d02b4bb52adad91",
+      "repair": true,
+      "sha256": "69c04f093d02b4bb52adad91598513360622f67e6dfe505d924b451d864820de",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343109/nagriksetu_thapar_demo_v2_69c04f093d02b4bb52adad91.jpg"
+    },
+    "proof-problem-07": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_9a5e466873a2cc13371450d0",
+      "repair": true,
+      "sha256": "9a5e466873a2cc13371450d0e6caaa9c8f4f17a52f69b4496331fbc8130f3258",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343113/nagriksetu_thapar_demo_v2_9a5e466873a2cc13371450d0.jpg"
+    },
+    "proof-problem-09": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_50129e3f454ca099276854bc",
+      "repair": true,
+      "sha256": "50129e3f454ca099276854bc917935869969cdc113df9c2a800bf188755defff",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343110/nagriksetu_thapar_demo_v2_50129e3f454ca099276854bc.jpg"
+    },
+    "proof-problem-11": {
+      "category": "WATER_LEAK",
+      "publicId": "nagriksetu_thapar_demo_v2_3b7fac7a0187a694eada19e8",
+      "repair": true,
+      "sha256": "3b7fac7a0187a694eada19e8bfbbbc61bf08cf53743f4229431f3722d57baed2",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343111/nagriksetu_thapar_demo_v2_3b7fac7a0187a694eada19e8.jpg"
+    },
+    "proof-problem-12": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_57b0351ec830267ee6eb11da",
+      "repair": true,
+      "sha256": "57b0351ec830267ee6eb11dafc1a9f0c7ba7eac4541deda34daf701741a6536d",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343111/nagriksetu_thapar_demo_v2_57b0351ec830267ee6eb11da.jpg"
+    },
+    "proof-problem-13": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_263bb6c655acb4e205bfa376",
+      "repair": true,
+      "sha256": "263bb6c655acb4e205bfa376fe6cc5df179eb0a20da09dce3f8796f8611027d5",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343111/nagriksetu_thapar_demo_v2_263bb6c655acb4e205bfa376.jpg"
+    },
+    "proof-problem-16": {
+      "category": "WATER_LEAK",
+      "publicId": "nagriksetu_thapar_demo_v2_c53b2f2790d518d6bf0a320c",
+      "repair": true,
+      "sha256": "c53b2f2790d518d6bf0a320c0cb076b08d506644e69212a3c1130bb82c848392",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343106/nagriksetu_thapar_demo_v2_c53b2f2790d518d6bf0a320c.jpg"
+    },
+    "proof-problem-23": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_84ee7489369ad518e9949e82",
+      "repair": true,
+      "sha256": "84ee7489369ad518e9949e829bdc41b23cb67085d2a6d9ab657d295a1d3cd0cd",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343108/nagriksetu_thapar_demo_v2_84ee7489369ad518e9949e82.jpg"
+    },
+    "proof-problem-24": {
+      "category": "WATER_LEAK",
+      "publicId": "nagriksetu_thapar_demo_v2_a13e1c8eaeaba7379521d501",
+      "repair": true,
+      "sha256": "a13e1c8eaeaba7379521d5019ffa75ef92a96964a5772a6389a39f1c9682bf33",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343115/nagriksetu_thapar_demo_v2_a13e1c8eaeaba7379521d501.jpg"
+    },
+    "proof-problem-25": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_5b4ed15f56c7c8d034f7effe",
+      "repair": true,
+      "sha256": "5b4ed15f56c7c8d034f7effefb30d530335637b66e3d82ad5d2967246ac9bc70",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343114/nagriksetu_thapar_demo_v2_5b4ed15f56c7c8d034f7effe.jpg"
+    },
+    "proof-problem-27": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_5284f5cdc637137295e53db5",
+      "repair": true,
+      "sha256": "5284f5cdc637137295e53db5451f70ee66289ad0b621bd510ede13a135d7e405",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343108/nagriksetu_thapar_demo_v2_5284f5cdc637137295e53db5.jpg"
+    },
+    "proof-problem-28": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_4715f0790522d1cc75790850",
+      "repair": true,
+      "sha256": "4715f0790522d1cc7579085024aa60729b56a27385649a1b2a0113563d111a64",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343105/nagriksetu_thapar_demo_v2_4715f0790522d1cc75790850.jpg"
+    },
+    "proof-problem-32": {
+      "category": "SIGNAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_6597977498cc78e8fe6482a2",
+      "repair": true,
+      "sha256": "6597977498cc78e8fe6482a2df3652c87d62a5fc3ddd9d8e011f020a03886459",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343112/nagriksetu_thapar_demo_v2_6597977498cc78e8fe6482a2.jpg"
+    },
+    "proof-problem-35": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_05333253639e7f62fd807fa3",
+      "repair": true,
+      "sha256": "05333253639e7f62fd807fa38be77ad480a994508620723190bbcb629ca843ed",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343113/nagriksetu_thapar_demo_v2_05333253639e7f62fd807fa3.jpg"
+    },
+    "proof-problem-38": {
+      "category": "ILLEGAL_DUMPING",
+      "publicId": "nagriksetu_thapar_demo_v2_5607d2184774e77258bc089e",
+      "repair": true,
+      "sha256": "5607d2184774e77258bc089e45a6f0d73c76680c6dd58402d4d5d4dc1cce2c11",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343106/nagriksetu_thapar_demo_v2_5607d2184774e77258bc089e.jpg"
+    },
+    "proof-problem-41": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_b79b474214129b6b3f8f81c9",
+      "repair": true,
+      "sha256": "b79b474214129b6b3f8f81c9e041932b953a3f0d692702ccb17aebbe0d4de88f",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343106/nagriksetu_thapar_demo_v2_b79b474214129b6b3f8f81c9.jpg"
+    },
+    "report-001": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_cc26be5b37d7df74601c89da",
+      "repair": false,
+      "sha256": "cc26be5b37d7df74601c89da1a867fb10ec3fded5fac391ea1d99e0d44381c16",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343052/nagriksetu_thapar_demo_v2_cc26be5b37d7df74601c89da.jpg"
+    },
+    "report-002": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_108b4b6a24affd2c880e47b2",
+      "repair": false,
+      "sha256": "108b4b6a24affd2c880e47b28e1ffe5bc47ca9d854679f167fe15d723f2c29fc",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343052/nagriksetu_thapar_demo_v2_108b4b6a24affd2c880e47b2.jpg"
+    },
+    "report-003": {
+      "category": "OPEN_MANHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_443585983a3cf2fe3580607a",
+      "repair": false,
+      "sha256": "443585983a3cf2fe3580607aa2d04552b5f48ee564608764731be8b8fba7fdfd",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343052/nagriksetu_thapar_demo_v2_443585983a3cf2fe3580607a.jpg"
+    },
+    "report-004": {
+      "category": "OPEN_MANHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_fda82d30e0400870f68c40ca",
+      "repair": false,
+      "sha256": "fda82d30e0400870f68c40cac23a46357b4ca504761ee7970a9d0aa62670e03b",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343052/nagriksetu_thapar_demo_v2_fda82d30e0400870f68c40ca.jpg"
+    },
+    "report-005": {
+      "category": "ROAD_DAMAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_ca1b255d2961810c1172d752",
+      "repair": false,
+      "sha256": "ca1b255d2961810c1172d752db82e74b74700316372822ae2cb0d4347df371c4",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343054/nagriksetu_thapar_demo_v2_ca1b255d2961810c1172d752.jpg"
+    },
+    "report-006": {
+      "category": "ROAD_DAMAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_ceea511864bccc3076867172",
+      "repair": false,
+      "sha256": "ceea511864bccc3076867172d42f49cbf487e8c453501ca22e375788b4d02691",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343054/nagriksetu_thapar_demo_v2_ceea511864bccc3076867172.jpg"
+    },
+    "report-007": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_1f3b79defeb9504c3225523b",
+      "repair": false,
+      "sha256": "1f3b79defeb9504c3225523b56fbf997739a1723253f55ac35462a851b68c341",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343054/nagriksetu_thapar_demo_v2_1f3b79defeb9504c3225523b.jpg"
+    },
+    "report-008": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_bea73a7cf26c6d586dee3b83",
+      "repair": false,
+      "sha256": "bea73a7cf26c6d586dee3b83b312c834a92fbb5960b98d33462e26f7f9b8cbdf",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343054/nagriksetu_thapar_demo_v2_bea73a7cf26c6d586dee3b83.jpg"
+    },
+    "report-009": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_be566eae757fd5d77d87536d",
+      "repair": false,
+      "sha256": "be566eae757fd5d77d87536df13bc6b360157968813900f949997e8c8e1f069b",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343056/nagriksetu_thapar_demo_v2_be566eae757fd5d77d87536d.jpg"
+    },
+    "report-010": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_4bac616f03ef51c51dada972",
+      "repair": false,
+      "sha256": "4bac616f03ef51c51dada9720a56f0ed621defeddd8cb8269c3d36ddc98dd850",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343056/nagriksetu_thapar_demo_v2_4bac616f03ef51c51dada972.jpg"
+    },
+    "report-011": {
+      "category": "ILLEGAL_DUMPING",
+      "publicId": "nagriksetu_thapar_demo_v2_9527e7247b4978acf63e56f2",
+      "repair": false,
+      "sha256": "9527e7247b4978acf63e56f2749a742d33e8e4c52f84dd38be86839b3721f6cc",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343057/nagriksetu_thapar_demo_v2_9527e7247b4978acf63e56f2.jpg"
+    },
+    "report-012": {
+      "category": "ILLEGAL_DUMPING",
+      "publicId": "nagriksetu_thapar_demo_v2_c43d093cdcfd49bdf5f05fb2",
+      "repair": false,
+      "sha256": "c43d093cdcfd49bdf5f05fb2b09f784dbd69c10af59f4346d297a1268bdfd04b",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343057/nagriksetu_thapar_demo_v2_c43d093cdcfd49bdf5f05fb2.jpg"
+    },
+    "report-013": {
+      "category": "ILLEGAL_DUMPING",
+      "publicId": "nagriksetu_thapar_demo_v2_5c1ef376382792e0aaaf312c",
+      "repair": false,
+      "sha256": "5c1ef376382792e0aaaf312cf4ab98f4cc3b416387bc621de943af5646f6bddd",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343059/nagriksetu_thapar_demo_v2_5c1ef376382792e0aaaf312c.jpg"
+    },
+    "report-014": {
+      "category": "ILLEGAL_DUMPING",
+      "publicId": "nagriksetu_thapar_demo_v2_ae2d1537420edf743bd95752",
+      "repair": false,
+      "sha256": "ae2d1537420edf743bd95752b1a99bc8ca027042b422aef0e973696e7cfa398f",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343059/nagriksetu_thapar_demo_v2_ae2d1537420edf743bd95752.jpg"
+    },
+    "report-015": {
+      "category": "ILLEGAL_DUMPING",
+      "publicId": "nagriksetu_thapar_demo_v2_8e696c9151e6995fe1dd0feb",
+      "repair": false,
+      "sha256": "8e696c9151e6995fe1dd0feb002896cdcee2a50d4ede270e942ef3755f2a7b87",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343059/nagriksetu_thapar_demo_v2_8e696c9151e6995fe1dd0feb.jpg"
+    },
+    "report-016": {
+      "category": "STRAY_ANIMAL",
+      "publicId": "nagriksetu_thapar_demo_v2_8870ee881d247afa461b98f8",
+      "repair": false,
+      "sha256": "8870ee881d247afa461b98f83d828b97d9c3af17f8dd23825fc3361d6ab4b5d4",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343059/nagriksetu_thapar_demo_v2_8870ee881d247afa461b98f8.jpg"
+    },
+    "report-017": {
+      "category": "ILLEGAL_DUMPING",
+      "publicId": "nagriksetu_thapar_demo_v2_43a1920baf9b219e078c1f93",
+      "repair": false,
+      "sha256": "43a1920baf9b219e078c1f93d3e0108227b226d17f40dd3be43635d0cbd5c023",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343061/nagriksetu_thapar_demo_v2_43a1920baf9b219e078c1f93.jpg"
+    },
+    "report-018": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_2d798f04f18b2e5774a8776f",
+      "repair": false,
+      "sha256": "2d798f04f18b2e5774a8776fc8d5efef4546de7473292c44dd3b2e10ab749b5c",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343061/nagriksetu_thapar_demo_v2_2d798f04f18b2e5774a8776f.jpg"
+    },
+    "report-019": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_40b33f7510d70ec9df105e34",
+      "repair": false,
+      "sha256": "40b33f7510d70ec9df105e344fa1a66128c25075e3622c56734c4f0ee1900e3a",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343061/nagriksetu_thapar_demo_v2_40b33f7510d70ec9df105e34.jpg"
+    },
+    "report-020": {
+      "category": "ROAD_DAMAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_82202ed09538a57e2799a577",
+      "repair": false,
+      "sha256": "82202ed09538a57e2799a5771f8635f9aa55a692ba9ccfe7454ca83443c5ba8f",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343062/nagriksetu_thapar_demo_v2_82202ed09538a57e2799a577.jpg"
+    },
+    "report-021": {
+      "category": "ROAD_DAMAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_d2ca04cff850756b2bfc2816",
+      "repair": false,
+      "sha256": "d2ca04cff850756b2bfc28161e07e169a6a623675906a4d6a5134d4a0b967f59",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343063/nagriksetu_thapar_demo_v2_d2ca04cff850756b2bfc2816.jpg"
+    },
+    "report-022": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_afed0320a374dfbe1f292ffa",
+      "repair": false,
+      "sha256": "afed0320a374dfbe1f292ffa1516f08bae772bf5aed4376b5e7b228b322e6929",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343064/nagriksetu_thapar_demo_v2_afed0320a374dfbe1f292ffa.jpg"
+    },
+    "report-023": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_c7866fde631bebf8e8f2a78d",
+      "repair": false,
+      "sha256": "c7866fde631bebf8e8f2a78dc1e6975286ede96e578048a24e360411c0fefa2f",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343064/nagriksetu_thapar_demo_v2_c7866fde631bebf8e8f2a78d.jpg"
+    },
+    "report-024": {
+      "category": "SIGNAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_719d4fb0c20205ed31dcf74f",
+      "repair": false,
+      "sha256": "719d4fb0c20205ed31dcf74fd64cf0d9739cba875061c92db34df334ac4f3427",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343064/nagriksetu_thapar_demo_v2_719d4fb0c20205ed31dcf74f.jpg"
+    },
+    "report-025": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_fd175761d65188d92eb6a5f6",
+      "repair": false,
+      "sha256": "fd175761d65188d92eb6a5f61ef20483f3a3d95dc91386bfb21b793f1ca66ee6",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343066/nagriksetu_thapar_demo_v2_fd175761d65188d92eb6a5f6.jpg"
+    },
+    "report-026": {
+      "category": "OPEN_MANHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_6fd896567f9590da4f37e9d4",
+      "repair": false,
+      "sha256": "6fd896567f9590da4f37e9d497ea07fd79bc82b20594ca8fb498521bbea366ef",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343066/nagriksetu_thapar_demo_v2_6fd896567f9590da4f37e9d4.jpg"
+    },
+    "report-027": {
+      "category": "OPEN_MANHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_2a9b4c5153b5b0de566053dc",
+      "repair": false,
+      "sha256": "2a9b4c5153b5b0de566053dc38ff51c31a68d1b89aadfcf5d6f50648308712c2",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343066/nagriksetu_thapar_demo_v2_2a9b4c5153b5b0de566053dc.jpg"
+    },
+    "report-028": {
+      "category": "OPEN_MANHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_fe09454d80a851ec9cfe95d7",
+      "repair": false,
+      "sha256": "fe09454d80a851ec9cfe95d72a9e7f042cda6166264b15499d7f9cdee9f46762",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343067/nagriksetu_thapar_demo_v2_fe09454d80a851ec9cfe95d7.jpg"
+    },
+    "report-029": {
+      "category": "OPEN_MANHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_53f02351bd4849bb96d0067d",
+      "repair": false,
+      "sha256": "53f02351bd4849bb96d0067db303d26a4992a80dc837acf49fce672bc7272da9",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343068/nagriksetu_thapar_demo_v2_53f02351bd4849bb96d0067d.jpg"
+    },
+    "report-030": {
+      "category": "WATER_LEAK",
+      "publicId": "nagriksetu_thapar_demo_v2_a0d474d0b903832871ba325f",
+      "repair": false,
+      "sha256": "a0d474d0b903832871ba325fb67b620f2dfd2f9c85335fd11689af11e91732c4",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343068/nagriksetu_thapar_demo_v2_a0d474d0b903832871ba325f.jpg"
+    },
+    "report-031": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_89d346378708c3ff51279938",
+      "repair": false,
+      "sha256": "89d346378708c3ff5127993824664c8e65829f10e7fe7dba2a91a60e81b7d574",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343068/nagriksetu_thapar_demo_v2_89d346378708c3ff51279938.jpg"
+    },
+    "report-032": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_50ccd35864604685908d8f8a",
+      "repair": false,
+      "sha256": "50ccd35864604685908d8f8a2d376111a845d4dd5d2e22d33d43cd20a01c54c8",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343070/nagriksetu_thapar_demo_v2_50ccd35864604685908d8f8a.jpg"
+    },
+    "report-033": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_cc4903e10f2b28dcc45aeed0",
+      "repair": false,
+      "sha256": "cc4903e10f2b28dcc45aeed027065ce94f642f11f353883d10d972f5fd3c7047",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343070/nagriksetu_thapar_demo_v2_cc4903e10f2b28dcc45aeed0.jpg"
+    },
+    "report-034": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_944786dfc48659276c838fe0",
+      "repair": false,
+      "sha256": "944786dfc48659276c838fe02dbc58ccc2422f7972abb8a21136e486f2d9279f",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343070/nagriksetu_thapar_demo_v2_944786dfc48659276c838fe0.jpg"
+    },
+    "report-035": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_b6133145ecf6b732024d1adc",
+      "repair": false,
+      "sha256": "b6133145ecf6b732024d1adc99d41b52d58e5c2d46705968257cf22f03ff8e8b",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343071/nagriksetu_thapar_demo_v2_b6133145ecf6b732024d1adc.jpg"
+    },
+    "report-036": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_327ad6433f6856b8812c863f",
+      "repair": false,
+      "sha256": "327ad6433f6856b8812c863f38fde001efb6a86582b7eb5d0c51db9902d80340",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343072/nagriksetu_thapar_demo_v2_327ad6433f6856b8812c863f.jpg"
+    },
+    "report-037": {
+      "category": "WATER_LEAK",
+      "publicId": "nagriksetu_thapar_demo_v2_c9749a087ba124219115a06b",
+      "repair": false,
+      "sha256": "c9749a087ba124219115a06b7aacb084fc016ba346ea51df5a1f4894bc54534d",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343073/nagriksetu_thapar_demo_v2_c9749a087ba124219115a06b.jpg"
+    },
+    "report-038": {
+      "category": "WATER_LEAK",
+      "publicId": "nagriksetu_thapar_demo_v2_7fb6479210c71d18ce89b5c6",
+      "repair": false,
+      "sha256": "7fb6479210c71d18ce89b5c6032f08cc577bd5e8ea328dd21c0d36283d8237c2",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343073/nagriksetu_thapar_demo_v2_7fb6479210c71d18ce89b5c6.jpg"
+    },
+    "report-039": {
+      "category": "STRAY_ANIMAL",
+      "publicId": "nagriksetu_thapar_demo_v2_4b05c3344fe0dfbda472ddaa",
+      "repair": false,
+      "sha256": "4b05c3344fe0dfbda472ddaa378a5a55ba10ccc36766c52c7347e1c310d8b9e3",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343073/nagriksetu_thapar_demo_v2_4b05c3344fe0dfbda472ddaa.jpg"
+    },
+    "report-040": {
+      "category": "WATER_LEAK",
+      "publicId": "nagriksetu_thapar_demo_v2_9ce2c9de8e32dd6bdbd4087e",
+      "repair": false,
+      "sha256": "9ce2c9de8e32dd6bdbd4087e0b7609dc5dd5cbffb37faa856745f4d5f2260d1a",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343074/nagriksetu_thapar_demo_v2_9ce2c9de8e32dd6bdbd4087e.jpg"
+    },
+    "report-041": {
+      "category": "WATER_LEAK",
+      "publicId": "nagriksetu_thapar_demo_v2_31bcd26405926c22eae6da37",
+      "repair": false,
+      "sha256": "31bcd26405926c22eae6da3780051695d14e8ce49db5fd5ac0a691b898d7474f",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343075/nagriksetu_thapar_demo_v2_31bcd26405926c22eae6da37.jpg"
+    },
+    "report-042": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_bc391604716ba745772a1eb7",
+      "repair": false,
+      "sha256": "bc391604716ba745772a1eb760bbe7633b9a0590fd059d6e01e08aacd4125228",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343075/nagriksetu_thapar_demo_v2_bc391604716ba745772a1eb7.jpg"
+    },
+    "report-043": {
+      "category": "OPEN_MANHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_1e353a081df12616b87b8fa0",
+      "repair": false,
+      "sha256": "1e353a081df12616b87b8fa0cded70c323c76a36bfb0ed04270a62ddea91b4dd",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343075/nagriksetu_thapar_demo_v2_1e353a081df12616b87b8fa0.jpg"
+    },
+    "report-044": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_1d29d2b95c21e8a9431d8008",
+      "repair": false,
+      "sha256": "1d29d2b95c21e8a9431d8008e678239da3eec5b26c36deff89ada9cee8eeef60",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343077/nagriksetu_thapar_demo_v2_1d29d2b95c21e8a9431d8008.jpg"
+    },
+    "report-045": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_81cf91fbefd92443068fc00c",
+      "repair": false,
+      "sha256": "81cf91fbefd92443068fc00c9b4260ad931b7f1c0d012b463388cbb5303ac6f8",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343077/nagriksetu_thapar_demo_v2_81cf91fbefd92443068fc00c.jpg"
+    },
+    "report-046": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_55ca7a679cb34de625ca8f87",
+      "repair": false,
+      "sha256": "55ca7a679cb34de625ca8f87a311a3479dc0e65750a2adf50d7f78ea45b2a5f4",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343078/nagriksetu_thapar_demo_v2_55ca7a679cb34de625ca8f87.jpg"
+    },
+    "report-047": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_67f701f3b29822054c971818",
+      "repair": false,
+      "sha256": "67f701f3b29822054c97181883ad1b8b936adaaab1da95dc3e38b65ead34e7ff",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343078/nagriksetu_thapar_demo_v2_67f701f3b29822054c971818.jpg"
+    },
+    "report-048": {
+      "category": "ROAD_DAMAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_e619acf348f151517361a701",
+      "repair": false,
+      "sha256": "e619acf348f151517361a70127785b8c5fbb2630ff033d9443428af7b91fa66e",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343079/nagriksetu_thapar_demo_v2_e619acf348f151517361a701.jpg"
+    },
+    "report-049": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_5cd15125d1b910ef1ce86542",
+      "repair": false,
+      "sha256": "5cd15125d1b910ef1ce865426044d8db17010256f3a023cc5501e0c20b60e137",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343080/nagriksetu_thapar_demo_v2_5cd15125d1b910ef1ce86542.jpg"
+    },
+    "report-050": {
+      "category": "WATER_LEAK",
+      "publicId": "nagriksetu_thapar_demo_v2_0c01479f902137c58a1074b8",
+      "repair": false,
+      "sha256": "0c01479f902137c58a1074b8c44b5646399e7fbf9010698eacdbe844105f4257",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343080/nagriksetu_thapar_demo_v2_0c01479f902137c58a1074b8.jpg"
+    },
+    "report-051": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_c429d382d6d174934ec6081d",
+      "repair": false,
+      "sha256": "c429d382d6d174934ec6081d2c389ee9e374ef6d51f238da86e1857ac0a1be23",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343080/nagriksetu_thapar_demo_v2_c429d382d6d174934ec6081d.jpg"
+    },
+    "report-052": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_98d8c93d870c7670f11f6e88",
+      "repair": false,
+      "sha256": "98d8c93d870c7670f11f6e8886290c153ace69052349ce4c0f8c371ccf726bcf",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343081/nagriksetu_thapar_demo_v2_98d8c93d870c7670f11f6e88.jpg"
+    },
+    "report-053": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_04d01f93dd9cd27ba29c1a99",
+      "repair": false,
+      "sha256": "04d01f93dd9cd27ba29c1a99bf0b1dcaa9adf47e12abe51227f9d37edfdb5537",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343082/nagriksetu_thapar_demo_v2_04d01f93dd9cd27ba29c1a99.jpg"
+    },
+    "report-054": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_cedafbbda5371ad9f4bf2f93",
+      "repair": false,
+      "sha256": "cedafbbda5371ad9f4bf2f938ffc0c96635bf87eb31ee0b9cd88a63f89351fbd",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343083/nagriksetu_thapar_demo_v2_cedafbbda5371ad9f4bf2f93.jpg"
+    },
+    "report-055": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_41d11fbe37b4ec1fa41726e6",
+      "repair": false,
+      "sha256": "41d11fbe37b4ec1fa41726e674254465471e0c1e232b9651e6376356a890d876",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343083/nagriksetu_thapar_demo_v2_41d11fbe37b4ec1fa41726e6.jpg"
+    },
+    "report-056": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_30f2f51037fadf587de276c9",
+      "repair": false,
+      "sha256": "30f2f51037fadf587de276c950be13c0ae46b1da55c01bdc09034fc07e17edfc",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343084/nagriksetu_thapar_demo_v2_30f2f51037fadf587de276c9.jpg"
+    },
+    "report-057": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_54aea45d79d908de1a98a50c",
+      "repair": false,
+      "sha256": "54aea45d79d908de1a98a50c33fc1b20d268f17702c6c4177fa42ce479ac45fc",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343084/nagriksetu_thapar_demo_v2_54aea45d79d908de1a98a50c.jpg"
+    },
+    "report-058": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_1c96fb5901a5f9546bb7ca9b",
+      "repair": false,
+      "sha256": "1c96fb5901a5f9546bb7ca9b6e72abee87588ea5556a3982104d9deb41cf0e40",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343085/nagriksetu_thapar_demo_v2_1c96fb5901a5f9546bb7ca9b.jpg"
+    },
+    "report-059": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_24b74199cd927c8881869bc3",
+      "repair": false,
+      "sha256": "24b74199cd927c8881869bc3536f8935afe38c6fcaa846e547a6d4b2ba6b65df",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343085/nagriksetu_thapar_demo_v2_24b74199cd927c8881869bc3.jpg"
+    },
+    "report-060": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_1ff7d79eff61c02e1d973990",
+      "repair": false,
+      "sha256": "1ff7d79eff61c02e1d97399090e8c2027736c6aecd823f65e347ed710efd71d7",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343086/nagriksetu_thapar_demo_v2_1ff7d79eff61c02e1d973990.jpg"
+    },
+    "report-061": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_57893e24d935e18072999484",
+      "repair": false,
+      "sha256": "57893e24d935e18072999484b8b8eab443ac07cce248730461e42b4cb77f5127",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343087/nagriksetu_thapar_demo_v2_57893e24d935e18072999484.jpg"
+    },
+    "report-062": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_fd9f3fc8fbe1d4ee7415cf85",
+      "repair": false,
+      "sha256": "fd9f3fc8fbe1d4ee7415cf854f422a0b44f93f555b689a004a32e4892f27df16",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343087/nagriksetu_thapar_demo_v2_fd9f3fc8fbe1d4ee7415cf85.jpg"
+    },
+    "report-063": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_7ec9d66ba58ec3ad563e747b",
+      "repair": false,
+      "sha256": "7ec9d66ba58ec3ad563e747b731051bdc35fbd80aedda759862b33199c6fd717",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343088/nagriksetu_thapar_demo_v2_7ec9d66ba58ec3ad563e747b.jpg"
+    },
+    "report-064": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_9c92f57fc3f60df3fa3ba220",
+      "repair": false,
+      "sha256": "9c92f57fc3f60df3fa3ba2209c1373ef23860d194d96310ff733861268b38c0b",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343088/nagriksetu_thapar_demo_v2_9c92f57fc3f60df3fa3ba220.jpg"
+    },
+    "report-065": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_543c151a62270c523be2e88a",
+      "repair": false,
+      "sha256": "543c151a62270c523be2e88a01fc974c9fa3efc941bc1c5455772a1cbcdd8f58",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343089/nagriksetu_thapar_demo_v2_543c151a62270c523be2e88a.jpg"
+    },
+    "report-066": {
+      "category": "ROAD_DAMAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_4475f0c219d181767949b97d",
+      "repair": false,
+      "sha256": "4475f0c219d181767949b97d0290a7327d08b1a404a8aca1cab9610ab4d49208",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343089/nagriksetu_thapar_demo_v2_4475f0c219d181767949b97d.jpg"
+    },
+    "report-067": {
+      "category": "SIGNAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_33686902488da1901ea82312",
+      "repair": false,
+      "sha256": "33686902488da1901ea823125f1b5fccf61286d3a55fb6c81cf1b504b036f856",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343090/nagriksetu_thapar_demo_v2_33686902488da1901ea82312.jpg"
+    },
+    "report-068": {
+      "category": "SIGNAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_d4f1ef4ce80b20b06c60fd63",
+      "repair": false,
+      "sha256": "d4f1ef4ce80b20b06c60fd6335f42adb93f3c22254d08915a0ec9385ca9f76e1",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343091/nagriksetu_thapar_demo_v2_d4f1ef4ce80b20b06c60fd63.jpg"
+    },
+    "report-069": {
+      "category": "SIGNAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_9af116f12adbc3107a4ea5d1",
+      "repair": false,
+      "sha256": "9af116f12adbc3107a4ea5d19b048b4f52997dd606209ab7db38ffcdf110b7cc",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343091/nagriksetu_thapar_demo_v2_9af116f12adbc3107a4ea5d1.jpg"
+    },
+    "report-070": {
+      "category": "SIGNAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_1587ad0b7a7fc72a67b1b9a7",
+      "repair": false,
+      "sha256": "1587ad0b7a7fc72a67b1b9a78d74687c9707bcacc18c34d72022fd3ca5c9cbec",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343092/nagriksetu_thapar_demo_v2_1587ad0b7a7fc72a67b1b9a7.jpg"
+    },
+    "report-071": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_7c85be9a269e1cea239bf6c2",
+      "repair": false,
+      "sha256": "7c85be9a269e1cea239bf6c2d2d5b385b6da65d66d6646a2cb0d60fe06ff0815",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343092/nagriksetu_thapar_demo_v2_7c85be9a269e1cea239bf6c2.jpg"
+    },
+    "report-072": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_0fb9f4a34d9889fa7512fa3c",
+      "repair": false,
+      "sha256": "0fb9f4a34d9889fa7512fa3caaeebc4bc1dde7a3f37f521fbf7ebc2c6339f907",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343093/nagriksetu_thapar_demo_v2_0fb9f4a34d9889fa7512fa3c.jpg"
+    },
+    "report-073": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_347ec4ed7c558e1861af369e",
+      "repair": false,
+      "sha256": "347ec4ed7c558e1861af369e0713aad4f756e22bf59bda5b375b101a599633aa",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343093/nagriksetu_thapar_demo_v2_347ec4ed7c558e1861af369e.jpg"
+    },
+    "report-074": {
+      "category": "STREETLIGHT",
+      "publicId": "nagriksetu_thapar_demo_v2_879b9582519922b157af72a3",
+      "repair": false,
+      "sha256": "879b9582519922b157af72a3630c70a364a8499e90558158568eee3422002b29",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343094/nagriksetu_thapar_demo_v2_879b9582519922b157af72a3.jpg"
+    },
+    "report-075": {
+      "category": "POTHOLE",
+      "publicId": "nagriksetu_thapar_demo_v2_f6ebf8c3c6de72fb3210300c",
+      "repair": false,
+      "sha256": "f6ebf8c3c6de72fb3210300c59e9e5655b702d400c2cc1ce28d9d105b8af8efe",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343095/nagriksetu_thapar_demo_v2_f6ebf8c3c6de72fb3210300c.jpg"
+    },
+    "report-076": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_3625395eaf81e4e730f4c562",
+      "repair": false,
+      "sha256": "3625395eaf81e4e730f4c5623d286d4b99d25560f0bf77e061265ec17800a2dd",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343096/nagriksetu_thapar_demo_v2_3625395eaf81e4e730f4c562.jpg"
+    },
+    "report-077": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_3a16b81ed769a0eb6f0ea473",
+      "repair": false,
+      "sha256": "3a16b81ed769a0eb6f0ea473967cb8fd2de699c50ff8343a421e916d92666f0d",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343096/nagriksetu_thapar_demo_v2_3a16b81ed769a0eb6f0ea473.jpg"
+    },
+    "report-078": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_d5e0015b3ac3ab5169d00d1c",
+      "repair": false,
+      "sha256": "d5e0015b3ac3ab5169d00d1c18841ac730276561324ef349c0273641537dd4aa",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343096/nagriksetu_thapar_demo_v2_d5e0015b3ac3ab5169d00d1c.jpg"
+    },
+    "report-079": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_12790216ecd57091e8418c3e",
+      "repair": false,
+      "sha256": "12790216ecd57091e8418c3e35bd7bb16b51eba11d013287fe4fb8c175eff4a8",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343097/nagriksetu_thapar_demo_v2_12790216ecd57091e8418c3e.jpg"
+    },
+    "report-080": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_fa5f1c11be4e3f5b15b1159d",
+      "repair": false,
+      "sha256": "fa5f1c11be4e3f5b15b1159d5be63e3b2c5913c6e6fefdcb6d3c9330e25eff95",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343099/nagriksetu_thapar_demo_v2_fa5f1c11be4e3f5b15b1159d.jpg"
+    },
+    "report-081": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_97ed7e8b7a5e06881be0cd12",
+      "repair": false,
+      "sha256": "97ed7e8b7a5e06881be0cd120e21f18e7fbe207579d438a17cd50f022f565949",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343098/nagriksetu_thapar_demo_v2_97ed7e8b7a5e06881be0cd12.jpg"
+    },
+    "report-082": {
+      "category": "ROAD_DAMAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_51278cdca3313bdb838ad042",
+      "repair": false,
+      "sha256": "51278cdca3313bdb838ad0429499739da59dbdcbeec5b3fe72ba9e6ee769d212",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343099/nagriksetu_thapar_demo_v2_51278cdca3313bdb838ad042.jpg"
+    },
+    "report-083": {
+      "category": "ILLEGAL_DUMPING",
+      "publicId": "nagriksetu_thapar_demo_v2_005d995b2e9a7036efeeb585",
+      "repair": false,
+      "sha256": "005d995b2e9a7036efeeb58569343b7810cd1626200975865116aa0933a81358",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343099/nagriksetu_thapar_demo_v2_005d995b2e9a7036efeeb585.jpg"
+    },
+    "report-084": {
+      "category": "SIGNAGE",
+      "publicId": "nagriksetu_thapar_demo_v2_1314bf840bfce1cc76877aa5",
+      "repair": false,
+      "sha256": "1314bf840bfce1cc76877aa56595c85db612df9c968682f7474d15de9f0d0a4e",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343101/nagriksetu_thapar_demo_v2_1314bf840bfce1cc76877aa5.jpg"
+    },
+    "report-085": {
+      "category": "GARBAGE_DUMP",
+      "publicId": "nagriksetu_thapar_demo_v2_00dbd13c49f9857709a25ef3",
+      "repair": false,
+      "sha256": "00dbd13c49f9857709a25ef38de0b143e562261e868fb6f4cd4e84d8888ed5f5",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343101/nagriksetu_thapar_demo_v2_00dbd13c49f9857709a25ef3.jpg"
+    },
+    "report-086": {
+      "category": "DRAINAGE_BLOCK",
+      "publicId": "nagriksetu_thapar_demo_v2_5f48e12f75af1bb157899b05",
+      "repair": false,
+      "sha256": "5f48e12f75af1bb157899b051ca15366f64df2cce650edb180e029d048811523",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343101/nagriksetu_thapar_demo_v2_5f48e12f75af1bb157899b05.jpg"
+    },
+    "report-087": {
+      "category": "STRAY_ANIMAL",
+      "publicId": "nagriksetu_thapar_demo_v2_3f986e5cfbacdb6f3765b4e0",
+      "repair": false,
+      "sha256": "3f986e5cfbacdb6f3765b4e00976ed5fcdd785a8bac9f2a1623f0250bde7ed21",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343102/nagriksetu_thapar_demo_v2_3f986e5cfbacdb6f3765b4e0.jpg"
+    },
+    "report-088": {
+      "category": "STRAY_ANIMAL",
+      "publicId": "nagriksetu_thapar_demo_v2_6500e3f27f07ae3c7ae379c2",
+      "repair": false,
+      "sha256": "6500e3f27f07ae3c7ae379c2a84164afcefc5a477dd14c802a56397cff5d9964",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343103/nagriksetu_thapar_demo_v2_6500e3f27f07ae3c7ae379c2.jpg"
+    },
+    "report-089": {
+      "category": "STRAY_ANIMAL",
+      "publicId": "nagriksetu_thapar_demo_v2_97b0ad5896a475437cccd3eb",
+      "repair": false,
+      "sha256": "97b0ad5896a475437cccd3eb9693fab7c97429a44bd182cea19e9609551e76cd",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343104/nagriksetu_thapar_demo_v2_97b0ad5896a475437cccd3eb.jpg"
+    },
+    "report-090": {
+      "category": "STRAY_ANIMAL",
+      "publicId": "nagriksetu_thapar_demo_v2_736de6e67a2734c1b06c3888",
+      "repair": false,
+      "sha256": "736de6e67a2734c1b06c3888e3600d70d9c1b4c39ba97eaf3bba82d81523f474",
+      "synthetic": true,
+      "url": "https://res.cloudinary.com/fjavyddc/image/upload/v1794343104/nagriksetu_thapar_demo_v2_736de6e67a2734c1b06c3888.jpg"
+    }
+  },
+  "cloud": "fjavyddc",
+  "version": "thapar-demo-v2"
+}

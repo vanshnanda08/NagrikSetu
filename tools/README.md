@@ -1,5 +1,33 @@
 # Verification harnesses
 
+## Thapar dataset deployed checks
+
+`thapar-dataset-check.mjs` reviews the deployed Thapar v2 dataset without business
+writes: all 50 references/90 reports, category filters/map, histories/tracking,
+citizen eligibility/private messages, staff/supervisor scopes, saved moderation,
+stateless split preview, dashboards and administrator audit CSV. Normal password
+authentication/refresh/logout and preview POSTs are allowed; other writes are
+blocked. Do not use the older mutating lifecycle harnesses on production.
+
+Provide a mode-0600 JSON configuration outside Git containing the approved app/API
+URLs, citizen/municipal test credentials and generated scenario IDs. The harness
+also retains private browser session files alongside that configuration. Its
+required fields are explicit in the script; no credentials are committed.
+
+```bash
+THAPAR_DATASET_CHECK_CONFIG=/private/path/live-check.json \
+  THAPAR_DATASET_CHECK_OUTPUT=artifacts/thapar-review \
+  node tools/thapar-dataset-check.mjs
+# Set THAPAR_DATASET_LAYOUTS_ONLY=1 to repeat only the 30 layouts and logout.
+```
+
+The six sizes cover four desktop viewports plus 390px and 768px widths. Waits
+include actual map markers, decoded evidence and queue data before screenshots.
+[The dataset report](../docs/THAPAR_DATASET.md) records the exact executed checks,
+backups, distributions, generation/atomic-refresh tooling and current limits.
+
+## Existing application checks
+
 Current authentication is password-only for every role; authenticator setup is
 retired. Security fixtures and active audit steps now check password/session
 controls and refusal of retired enrollment paths. Earlier dated MFA results below

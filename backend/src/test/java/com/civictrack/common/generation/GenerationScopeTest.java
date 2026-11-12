@@ -4,36 +4,29 @@ import org.junit.jupiter.api.Test;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class GenerationScopeTest {
-    private final Instant normal = Instant.parse("2027-01-01T00:00:00Z");
-    private final Instant seed = Instant.parse("2026-10-01T00:00:00Z");
-    private final Clock clock = GenerationScope.clock(Clock.fixed(normal, ZoneOffset.UTC));
-
-    @Test
-    void seedScopeDoesNotAffectOtherThreadsOrSubsequentRequests() throws Exception {
-        try (GenerationScope ignored = GenerationScope.open(42, seed)) {
-            assertThat(clock.instant()).isEqualTo(seed);
-            assertThat(GenerationScope.nextUuid().version()).isEqualTo(3);
-            assertThat(CompletableFuture.supplyAsync(clock::instant).get()).isEqualTo(normal);
-            assertThat(CompletableFuture.supplyAsync(GenerationScope::nextUuid).get().version()).isEqualTo(4);
+    @Test void existingEvaluationIdentitiesAndReferencesStayCompatible() {
+        try(var scope=GenerationScope.open(42,Instant.parse("2026-10-01T00:00:00Z"))) {
+            assertThat(GenerationScope.nextUuid()).isEqualTo(UUID.fromString("0ef95cb8-5082-3d5d-87d4-01245b656715"));
+            assertThat(GenerationScope.publicRef(()->"ordinary")).isEqualTo("CT-2026-S000001");
+        }
+    }
+    @Test void datedRefreshKeepsIdentitiesAndDoesNotMoveAnotherThreadsClock() {
+        Instant normal=Instant.parse("2020-01-01T00:00:00Z");Clock clock=GenerationScope.clock(Clock.fixed(normal,ZoneOffset.UTC));UUID first;
+        try(var scope=GenerationScope.dataset("thapar-demo-v2",731109,Instant.parse("2026-11-10T20:00:00Z"))) {
+            first=GenerationScope.nextUuid();scope.at(Instant.parse("2026-08-13T10:17:00Z"));
+            assertThat(clock.instant()).isEqualTo(Instant.parse("2026-08-13T10:17:00Z"));
+            assertThat(CompletableFuture.supplyAsync(clock::instant).join()).isEqualTo(normal);
+            assertThat(GenerationScope.publicRef(()->"ordinary")).isEqualTo("CT-2026-D000001");
         }
         assertThat(clock.instant()).isEqualTo(normal);
-        assertThat(GenerationScope.nextUuid().version()).isEqualTo(4);
-        assertThat(GenerationScope.publicRef(() -> "ordinary-ticket")).isEqualTo("ordinary-ticket");
-    }
-
-    @Test
-    void failedSeedRunRestoresNormalClockAndIdentityGeneration() {
-        assertThatThrownBy(() -> {
-            try (GenerationScope ignored = GenerationScope.open(42, seed)) {
-                throw new IllegalStateException("simulated ingest failure");
-            }
-        }).isInstanceOf(IllegalStateException.class);
-        assertThat(clock.instant()).isEqualTo(normal);
-        assertThat(GenerationScope.nextUuid().version()).isEqualTo(4);
+        try(var scope=GenerationScope.dataset("thapar-demo-v2",731109,Instant.parse("2026-11-14T20:00:00Z"))) {
+            assertThat(GenerationScope.nextUuid()).isEqualTo(first);
+        }
+        assertThat(GenerationScope.publicRef(()->"ordinary")).isEqualTo("ordinary");
     }
 }

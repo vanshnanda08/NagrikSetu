@@ -58,6 +58,7 @@ public class IssueStatusHistory {
         h.actorRole = actorRole;
         h.actorId = actorId;
         h.note = note;
+        h.createdAt = issue.getUpdatedAt();
         return h;
     }
 }

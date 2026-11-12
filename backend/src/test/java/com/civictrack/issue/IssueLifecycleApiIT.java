@@ -46,6 +46,8 @@ class IssueLifecycleApiIT extends IntegrationTestBase {
     @Autowired private IssueRepository issues;
     @Autowired private Fixtures fixtures;
     @Autowired private MutableClock clock;
+    @Autowired private IssueLifecycleService lifecycle;
+    @Autowired private org.springframework.jdbc.core.JdbcTemplate jdbc;
 
     private Instant now;
     private UUID roads;
@@ -73,6 +75,24 @@ class IssueLifecycleApiIT extends IntegrationTestBase {
     @AfterEach
     void restoreClock() {
         clock.reset();
+    }
+
+    @Test
+    @DisplayName("historical workflow actions retain the injected clock in their public audit trail")
+    void historicalWorkflowClockAndHistoryAgree() {
+        Issue issue=pothole();
+        Instant acknowledged=now.plusSeconds(17*60);
+        clock.set(acknowledged);
+        lifecycle.acknowledge(issue.getId(),roadsCrew.toActor(),"Historical synthetic departmental review");
+        Instant assigned=acknowledged.plusSeconds(2*3600+43);
+        clock.set(assigned);
+        lifecycle.assign(issue.getId(),roadsSupervisor.toActor(),roadsCrew.getId(),"Historical synthetic crew assignment");
+        var history=jdbc.query("SELECT created_at FROM issue_status_history WHERE issue_id=? ORDER BY created_at,id",
+                (rs,n)->rs.getTimestamp(1).toInstant(),issue.getId());
+        assertThat(history).containsExactly(acknowledged,assigned);
+        Issue stored=issues.findById(issue.getId()).orElseThrow();
+        assertThat(stored.getAcknowledgedAt()).isEqualTo(acknowledged);
+        assertThat(stored.getAssignedAt()).isEqualTo(assigned);
     }
 
     // ------------------------------------------------------------------
