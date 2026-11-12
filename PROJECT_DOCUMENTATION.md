@@ -1221,7 +1221,7 @@ The application release baseline is `a728d3500383e602fd064a284c2405a31851516f`; 
 
 ### Current progress
 
-The reviewed application changes are released at `a728d35`, with green CI and a successful real deployed photo/report journey. Email delivery and email-based password recovery are deferred. Browser-only use is the agreed scope; native installation is excluded. Physical-phone browser checks and other dated operational/accessibility limits remain follow-ups. Destructive media cleanup is still opt-in.
+The reviewed application changes are released at `482e3be`, with green CI, the exact live Render revision observed, a real deployed offline photo/report delivered once, and a fresh encrypted GitHub backup restored and round-trip verified. See [the current closeout record](docs/NON_PHONE_CLOSEOUT.md) for evidence, counts and backup details. Email delivery and email-based password recovery are deferred. Browser-only use is the agreed scope; native installation is excluded. Physical-phone checks are postponed and manual spoken screen-reader review remains unverified. Destructive media cleanup is still scoped and opt-in.
 
 ### Most important remaining tasks
 

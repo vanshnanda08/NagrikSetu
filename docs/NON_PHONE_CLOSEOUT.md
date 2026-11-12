@@ -19,8 +19,9 @@ deferred, authenticator support is retired, and native installation is excluded.
 
 ## Deployment policy
 
-Render's current deployment page was read directly: `6b94dda` was live and its
-trigger was **Auto-Deploy**. The repository variable `RENDER_DEPLOY_MODE` is now
+Render's deployment page was read directly after release: `482e3be` was live
+as deployment `dep-dbqt5hh7lnhs73a2m6tg`, triggered by **Auto-Deploy**. The
+repository variable `RENDER_DEPLOY_MODE` is now
 explicitly `external`, retaining that existing deployment method. CI validates
 backend/frontend/browser gates and truthfully reports that it did not deploy.
 Vercel retains its own Git integration. This is not a claim that host-managed
@@ -44,8 +45,11 @@ checks passed. Workflow context usage follows the
 - `tools/nonphone-closeout.mjs` runs on owned loopback app/API URLs. It checks
   mixed bulk acknowledgement, unsupported SSE polling and reconnect events,
   permanent outbox failures, Retry-After timing, successful payload clearing,
-  offline confirmation/photo preservation, keyboard focus and **18 axe scans**
-  across public/citizen/staff/supervisor/admin surfaces at 1280×600 and 390×844.
+  offline confirmation/photo preservation, keyboard focus and **19 axe scans**:
+  18 public/citizen/staff/supervisor/admin page scans at 1280×600 and 390×844,
+  plus the saved offline confirmation. All six check groups passed without
+  application runtime errors or reported axe violations. Desktop outer-page
+  and horizontal overflow checks passed; mobile pages retain natural scrolling.
   Transport/concurrent-status examples are explicitly browser fixtures; ordinary
   role sign-in and initial data use the real isolated API.
 - The broader earlier six-size layouts and live citizen→supervisor→staff→citizen
@@ -63,7 +67,7 @@ requests and read current production photo references in a read-only database
 transaction. For the owned prefix `nagriksetu_thapar_demo_v2_`: **109 scanned,
 109 protected, zero candidates, zero missing catalogue assets, zero deleted**.
 The key/secret stay in the ignored mode-0600 file `backups/media-review.env`;
-they are not uploaded, displayed or added to frontend variables.
+they are not published, displayed or added to frontend variables or Git.
 
 Keep `CLOUDINARY_DRY_RUN=true`. `CLOUDINARY_CLEANUP_PREFIX` must be a reviewed
 application-owned prefix of at least six characters. No prefix means no sweep.
@@ -80,9 +84,8 @@ must not be removed merely to empty the account.
 
 ### Backup and restore
 
-The latest successful weekly backup preceded the Thapar refresh. The new manual
-backup run `43234019700` reproduced the readiness race; no deployed data was
-changed. A fresh private public-schema dump of the current database was then
+The initial manual backup run `43234019700` reproduced the readiness race; no
+deployed data was changed. A fresh private public-schema dump was then
 restored successfully: **52 issues / 92 reports / 31 users / 4 wards / 10
 categories / 7 departments / 11 Flyway migrations**. The actual backend also
 started and validated that restored schema in a separate task-owned clone.
@@ -92,7 +95,8 @@ deployed accounts/passwords were untouched.
 The GitHub backup workflow now also decrypts its newly encrypted dump and compares
 it byte-for-byte before uploading the encrypted artifact. Temporary plaintext
 and the round-trip file are removed by the existing unconditional cleanup step.
-The off-device result is recorded below after the corrected workflow runs.
+The corrected off-device backup and its restore passed; the final result is
+recorded below.
 
 ## Previous audit items reconciled
 
@@ -117,7 +121,79 @@ future large-scale deployment work.
 
 ## Release and deployed smoke
 
-Publication, final CI, deployed offline ticket and encrypted off-device backup
-evidence will be appended here after execution. The existing 50-issue/90-report
-sample dataset is preserved; any separately labelled QA ticket is counted apart
-from those samples.
+Application fixes are published at
+[`482e3be01d39fd8f8f21f4e7645e79ebdf027115`](https://github.com/vanshnanda08/NagrikSetu/commit/482e3be01d39fd8f8f21f4e7645e79ebdf027115).
+[CI run 43241803715](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43241803715)
+passed every job: backend (390 passed, two optional skips), frontend (115 tests,
+lint, types and production build), API/transition/action/all-role route checks,
+and Firefox/WebKit responsive and keyboard checks (10 routes per engine).
+Vercel's status succeeded. Render's exact live revision was observed directly,
+separately from the deployment-policy job.
+
+### Real deployed offline delivery
+
+One clearly labelled **SYNTHETIC NON-PHONE QA OFFLINE-20261112** complaint was
+submitted with the existing synthetic registered citizen account through the
+deployed desktop browser. No new citizen or municipal permissions were created.
+
+- Saved the actual JPEG, location and description while offline; the loaded
+  confirmation remained usable and repeat submission was disabled.
+- Reconnected: the real worker uploaded the image to Cloudinary (HTTP 200) and
+  created **CT-2026-000920** through the account-bound proxy (HTTP 201).
+- Replayed the same idempotency key/body: HTTP 201 returned the same reference.
+  Independent read-only SQL found exactly **one report**, the correct registered
+  owner and a server-verified photo hash. Local sent photo/location payloads
+  were cleared.
+- Reloaded the sent receipt twice with authentication settled, opened the
+  success and complaint screens, verified the evidence image loaded, and signed
+  out to the general dashboard. The completed run recorded no application
+  runtime errors. Interrupted exploratory attempts and corrected test selectors
+  remain in local evidence; the same persistent job was resumed throughout.
+
+The ticket is NEW, explicitly says **no municipal action required**, and is a
+separate QA record rather than a real civic complaint. Its issue ID is
+`dcea29d4-2237-4a71-bdda-b66a23c806e3`.
+[Open the QA complaint](https://nagrik-setu-vn.vercel.app/issues/dcea29d4-2237-4a71-bdda-b66a23c806e3).
+The Thapar dataset remains **50 sample issues / 90 sample reports**; totals
+including three separate QA records are **53 issues / 93 reports / 31 users**.
+This check did not repeat the already recorded municipal handoff/closure of
+CT-2026-000919 or alter sample histories.
+
+The older daily-journey harness now expects the saved confirmation while offline
+and waits for outbox navigation after reconnection. Its JavaScript syntax check
+passed; its entire multi-role journey was not rerun for that assertion-only
+update. The new expected behaviour was exercised locally and on the deployed
+site as described above.
+
+### Verified encrypted off-device backup
+
+[Backup run 43256071746](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43256071746)
+passed using application commit `482e3be`. It created a current dump, restored
+into a disposable PostGIS database, encrypted it, decrypted the encrypted output,
+compared it byte-for-byte, uploaded only the encrypted artifact and successfully
+removed runner plaintext. Restored counts: **53 issues, 93 reports, 31 users,
+four wards, 10 categories, seven departments and 11 migrations**.
+
+- Artifact: `database-backup-43256071746`, ID `13960679493`, 56-day retention;
+  expires **7 January 2027 at 16:13 UTC**. Download/archive digest was verified
+  against GitHub's SHA-256 metadata.
+- Private local encrypted copy:
+  `backups/current-closeout-20261112/civictrack-2026-11-12-161221.dump.gz.gpg`
+  (84,941 bytes, mode 0600; ignored by Git).
+- Encrypted file SHA-256:
+  `38765bd2e13f2d69a0d90f664043354cb34ebdbe447696ddf530b2150baab512`.
+
+The backup passphrase remains in existing GitHub secrets; it was not retrieved
+or published. Downloaded backup evidence is in `backup-final.json` and
+`backup-final.log` inside the ignored closeout artifact directory. The successful
+fresh backup replaces the older pre-refresh snapshot as the latest verified
+off-device copy; artifact retention is finite, not permanent archival storage.
+
+## Remaining boundaries
+
+No confirmed defect from this closeout remains unresolved. Physical-phone
+camera/GPS/permission/offline testing is postponed. The requested manual spoken
+screen-reader review could not be performed and remains unverified. Native
+installation is excluded, and email delivery/password recovery are deferred.
+Loaded-tab offline delivery passed; cold offline reopening and delivery while
+the browser is closed remain outside the supported guarantee.
