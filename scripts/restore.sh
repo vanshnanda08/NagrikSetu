@@ -82,7 +82,10 @@ if [ "${1:-}" = "--self-test" ]; then
 
   printf 'Waiting for the container'
   ATTEMPTS=0
-  until docker exec "$CONTAINER" pg_isready -U selftest -d postgres >/dev/null 2>&1; do
+  # The image's initialization server accepts Unix-socket connections, then
+  # shuts down before the real server starts. Only the final server listens on
+  # TCP; accepting the temporary socket caused intermittent CI restore failures.
+  until docker exec "$CONTAINER" pg_isready -h 127.0.0.1 -U selftest -d postgres >/dev/null 2>&1; do
     ATTEMPTS=$((ATTEMPTS + 1))
     [ "$ATTEMPTS" -le 60 ] || { echo ' Database startup timed out.' >&2; exit 1; }
     printf '.'; sleep 2

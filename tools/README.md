@@ -1,5 +1,27 @@
 # Verification harnesses
 
+## Current non-phone failure and accessibility checks
+
+`nonphone-closeout.mjs` requires `CLOSEOUT_SCRATCH=1`, loopback app/API URLs and
+`CLOSEOUT_CONFIG` pointing to private JSON containing `app`, `api`, `password`
+(scratch municipal bootstrap only), `citizenEmail`, `citizenPassword`,
+`pendingIssue`, `staffIssue` and `evidenceUrl`. Optional `sessionDir` must be a
+private directory outside Git; it stores mode-0600 test refresh cookies to avoid
+repeated login throttles. `CLOSEOUT_OUTPUT` chooses the evidence directory.
+`CLOSEOUT_ONLY` selects a check-name prefix for targeted reproduction.
+
+```bash
+CLOSEOUT_SCRATCH=1 CLOSEOUT_CONFIG=/private/path/browser-config.json \
+  CLOSEOUT_OUTPUT=artifacts/nonphone-closeout node tools/nonphone-closeout.mjs
+```
+
+It uses real local role authentication/data and explicitly fulfilled browser
+fixtures for success/409/503 bulk responses, SSE transport state and
+400/429/success outbox responses. It also queues a real local offline form
+without submitting it to a service, checks 18 desktop/mobile axe scans and
+keyboard focus. It does not certify heard screen-reader speech or physical
+phone behaviour. See [the closeout report](../docs/NON_PHONE_CLOSEOUT.md).
+
 ## Thapar dataset deployed checks
 
 `thapar-dataset-check.mjs` reviews the deployed Thapar v2 dataset without business
@@ -113,7 +135,7 @@ Restart the frontend after building so it serves matching chunks.
 | `uiwalk.mjs` | Exact actions offered at those five states, successful transition responses and no browser runtime errors. |
 | `complaint-tracking.mjs` | Read-only anonymous dashboard lookup against a real public complaint, normalised numbers, inline results, repeat lookup, blank input, missing numbers, loading/service failures, retry, merged complaints, public history links, five viewport sizes and an axe scan. Requires at least one complaint in the local demo API; run `node tools/complaint-tracking.mjs` from the repository root. Failure and merge cases use browser fixtures. |
 | `public-audit.mjs` | General public dashboard, list/map, report, ward/grouping/outbox and authentication entry layouts at six sizes; filters/paging, keyboard/mobile navigation, category retry, empty map, photo preparation, draft recovery, keyboard pin, intercepted submit/recovery, idempotent retry, receipt errors and durable offline saving. Uses production frontend port 3003 (`SCREENS_APP` override) and a read-only API bridge. Civic writes, uploads and recovery use fixtures; background wake is simulated. Evidence: `artifacts/public-audit/`; scope/limits: `frontend/PUBLIC_VERIFICATION.md`. |
-| `citizen-api-dryrun.mjs` | Local API and frontend auth-proxy checks for citizen ownership/role guards, reports/notifications paging, profile/preferences, password/session revocation, TOTP/recovery and static offline assets. Creates one isolated QA account per run; never submits complaints or writes messages/votes. Result: `artifacts/citizen-review/api-results.json`. |
+| `citizen-api-dryrun.mjs` | Local API and frontend auth-proxy checks for citizen ownership/role guards, reports/notifications paging, profile/preferences, password/session revocation, retired-authenticator refusal and static offline assets. Creates one isolated QA account per run; never submits complaints or writes messages/votes. Result: `artifacts/citizen-review/api-results.json`. |
 | `citizen-ui-fixtures.mjs` | In-memory loopback API on port 8081 with 125 reports/notifications, verification, messages, profile/security and controllable failures. It never forwards authenticated requests or writes to the real API. Setup, cookie isolation, ordinary-build restoration, browser results and limits: `frontend/CITIZEN_VERIFICATION.md`. |
 | `screen-consolidation.mjs` | Current grouped screens across five access contexts, responsive layouts, role navigation, list/map filter retention, seven legacy redirects, settings form payload/validation fixtures, permissions, internal scrolling, keyboard menus and accessibility. Uses the production frontend on port 3003 (`SCREENS_APP` overrides it), a browser-only CORS bridge to the demo API, and a fresh citizen account. Civic records are read-only; password/profile/MFA writes are browser fixtures. |
 | `unified-workspace.mjs` | Current shared staff/supervisor `/work` screen at six desktop/tablet/mobile sizes, role-specific views, queue/detail focus and filters, legacy work deep links, proof validation/upload and assignment/transition fixtures, queue refresh, administrator CSV export, axe scans and real-demo screenshots. Uses production frontend port 3003 (`SCREENS_APP` override) with a browser-only CORS bridge. Civic writes and uploads are fixtures. Evidence is in `artifacts/unified-workspace/`. Both grouped-screen harnesses use `qa-session.mjs` to honor existing login Retry-After responses; backend limits remain unchanged. |

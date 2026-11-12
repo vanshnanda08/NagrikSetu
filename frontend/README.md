@@ -1,5 +1,11 @@
 # NagrikSetu frontend
 
+Current completion and exact remaining boundaries are tracked in
+[the non-phone closeout](../docs/NON_PHONE_CLOSEOUT.md). The 12 November follow-up
+fixes stale bulk-retry selection, offline navigation after queuing and citizen
+verification link target sizing. Earlier dated screen reports remain historical
+evidence; they are not fresh claims of speech/physical-device coverage.
+
 **Live browser verification — 11 November:** application `6846b1b` has
 [green CI](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244) and a successful Vercel deployment. Password-only access was
 verified for citizen/staff/supervisor/admin. The real photo-to-closure journey

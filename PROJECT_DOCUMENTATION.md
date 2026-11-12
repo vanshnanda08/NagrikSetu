@@ -1,5 +1,12 @@
 # NagrikSetu — Complete Project Documentation
 
+**Current completion record — 12 November:** read
+[NON_PHONE_CLOSEOUT.md](docs/NON_PHONE_CLOSEOUT.md) for the latest defects fixed,
+tests, deployment policy, current-data backup and Cloudinary ownership review.
+It supersedes older unresolved-work lists below where the corresponding check
+is explicitly mapped to later evidence. Physical-phone testing is postponed;
+spoken screen-reader review remains unverified; email/reset delivery is deferred.
+
 **Release follow-up — 12 November:** dataset/generator changes are pushed as
 `6b94dda832ca6faeba0f242df1a3b25d6215a382`.
 [CI passed](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43229835855):
@@ -1218,15 +1225,14 @@ The reviewed application changes are released at `a728d35`, with green CI and a 
 
 ### Most important remaining tasks
 
-The deadline, owner/queue scope, assignee eligibility and online renewal tasks above are now completed locally. Remaining work includes:
-
-- Complete the remaining physical-device/browser and operational restore checks;
-  real photo upload and the principal cross-role journey now have end-to-end evidence.
-- Strengthen experiment provenance and fail-on-error evaluation gates.
-
-**Next verification work:** complete the blocked/untested browser and physical-device
-checks in [the end-to-end report](docs/END_TO_END_TEST_REPORT.md). Its five confirmed
-defects are addressed in [AUDIT_FIXES.md](docs/AUDIT_FIXES.md). Email/password-recovery work is deferred. The previously proposed escalation/assignment/report-renewal fixes are recorded in [WORKFLOW_FIXES.md](docs/WORKFLOW_FIXES.md).
+The deadline, owner/queue scope, assignee eligibility and online renewal fixes,
+the principal deployed role journey and the five D01–D05 audit defects are
+complete. Use the [current closeout record](docs/NON_PHONE_CLOSEOUT.md) for
+non-phone follow-up results and precise remaining boundaries. Physical-phone
+testing is postponed; a full spoken screen-reader traversal remains unverified.
+Email/password recovery remains deferred and installation excluded. Stronger
+experimental provenance is optional research work, not an unfinished complaint
+feature or a reason to replace the retained evaluation corpus with demo data.
 
 Repository cleanup on 8 November 2026 removed the unused `CategoryPicker` and
 its obsolete CSS, while retaining the active report category select. 132

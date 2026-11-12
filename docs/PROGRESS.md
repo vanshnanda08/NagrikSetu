@@ -1,5 +1,11 @@
 # NagrikSetu — current progress
 
+Current non-phone completion: [NON_PHONE_CLOSEOUT.md](NON_PHONE_CLOSEOUT.md)
+records the 12 November fixes and verification. Its mapped results supersede
+older operational/test lists below. Current local gates: 392 backend tests total
+(390 passed, 2 optional skips), 115 frontend passes, lint/types/production build.
+Physical-phone testing is postponed; spoken screen-reader review is unverified.
+
 Release follow-up, 12 November: `6b94dda` is pushed and
 [CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43229835855),
 including 387 backend passes/2 skips, 115 frontend tests, lint/types/build,
@@ -166,16 +172,15 @@ Render health endpoint returned `UP` and the Vercel dashboard returned HTTP 200.
 The scheduled backup rerun passed restore verification and encrypted upload; the
 downloaded artifact subsequently decrypted with GPG exit code 0.
 
-- Follow up physical-phone browser checks. Native installation is out of scope
-  by user decision on 10 November. Desktop keyboard,
-  basic VoiceOver and API-outage recovery are recorded above; they do not certify
-  full accessibility, cold offline navigation or closed-browser background sync.
-- Complete the explicitly blocked/untested cases in the end-to-end report;
-  its principal role-by-role journey and confirmed-defect fixes are complete.
-- Review the final audit's dependency applicability, key-rotation and rate-limit
-  operating conditions before production sign-off.
-- Verify Cloudinary management credentials and inspect the orphan-cleanup dry run.
-- Record the final demonstration if required for submission.
+- Follow the [current closeout record](NON_PHONE_CLOSEOUT.md) for completed
+  backup/media/browser checks and exact remaining boundaries. Do not treat the
+  original end-to-end matrix's superseded gaps as newly discovered defects.
+- Phone testing is postponed. Full spoken screen-reader traversal remains
+  unverified; installation is excluded. Cold offline reopening/closed-browser
+  execution remain documented platform limits.
+- Dependency/key-rotation/rate-limit operating conditions and an optional final
+  demonstration remain ongoing operator/submission responsibilities, not missing
+  civic workflow screens.
 
 ## Deferred future update
 

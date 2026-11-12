@@ -1,5 +1,9 @@
 # Release verification
 
+The latest non-phone completion review and backup/media/browser failure checks
+are in [NON_PHONE_CLOSEOUT.md](NON_PHONE_CLOSEOUT.md). Use that record for current
+status; older release snapshots below retain their dated scope.
+
 ## Dataset release — 12 November 2026
 
 Application/tool changes are pushed as

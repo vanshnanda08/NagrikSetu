@@ -207,6 +207,9 @@ civictrack:
     api-key: ${CLOUDINARY_API_KEY:}
     api-secret: ${CLOUDINARY_API_SECRET:}
     dry-run: ${CLOUDINARY_DRY_RUN:true}
+    # No ownership inference from missing rows: unscoped cleanup is disabled.
+    # Use a reviewed application-specific public-ID prefix, never an account-wide value.
+    cleanup-prefix: ${CLOUDINARY_CLEANUP_PREFIX:}
     min-age: PT24H
     max-deletions: 200
     cron: "0 30 3 * * *"

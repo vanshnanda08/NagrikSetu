@@ -10,8 +10,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests the orphan QUERY, which is the part that decides what gets deleted.
@@ -131,5 +136,61 @@ class CloudinaryOrphanSweepIT extends IntegrationTestBase {
         CloudinaryOrphanSweep.Result r = sweep.sweep();
         assertThat(r.scanned()).isZero();
         assertThat(r.deleted()).isZero();
+    }
+
+    @Test
+    void configuredCredentialsWithoutOwnershipScopeNeverListOrDelete() {
+        CloudinaryAdminClient client = mock(CloudinaryAdminClient.class);
+        var guarded = new CloudinaryOrphanSweep(new CloudinaryProperties(
+                "test-cloud", "test-key", "test-secret", false, Duration.ofHours(24), 200, ""),
+                client, jdbc, Clock.systemUTC());
+        assertThat(guarded.sweep().planned()).isZero();
+        verifyNoInteractions(client);
+    }
+
+    @Test
+    void dryRunRetainsLiveEvidenceAndOtherApplicationsAssets() {
+        Instant now = Instant.parse("2026-11-12T10:00:00Z");
+        CloudinaryAdminClient client = mock(CloudinaryAdminClient.class);
+        reportWithPhoto("https://res.cloudinary.com/test/image/upload/v1/nagriksetu/alive.jpg");
+        jdbc.update("UPDATE issues SET resolution_photo_url=?",
+                "https://res.cloudinary.com/test/image/upload/v1/nagriksetu/proof.jpg");
+        when(client.listImages(null)).thenReturn(new CloudinaryAdminClient.Page(List.of(
+                new CloudinaryAdminClient.Asset("nagriksetu/alive", now.minusSeconds(172800)),
+                new CloudinaryAdminClient.Asset("nagriksetu/proof", now.minusSeconds(172800)),
+                new CloudinaryAdminClient.Asset("nagriksetu/abandoned", now.minusSeconds(172800)),
+                new CloudinaryAdminClient.Asset("nagriksetu/still-uploading", now.minusSeconds(60)),
+                new CloudinaryAdminClient.Asset("another-app/private-photo", now.minusSeconds(172800))), null));
+        var guarded = new CloudinaryOrphanSweep(new CloudinaryProperties(
+                "test-cloud", "test-key", "test-secret", true, Duration.ofHours(24), 200, "nagriksetu/"),
+                client, jdbc, Clock.fixed(now, ZoneOffset.UTC));
+        var result = guarded.sweep();
+        assertThat(result.scanned()).isEqualTo(5);
+        assertThat(result.orphans()).isEqualTo(1);
+        assertThat(result.planned()).isEqualTo(1);
+        assertThat(result.deleted()).isZero();
+        assertThat(result.failed()).isZero();
+        verify(client, never()).delete(anyString());
+    }
+
+    @Test
+    void unsuccessfulDeletionIsNotReportedAsSuccessAndAttemptsAreBounded() {
+        Instant now = Instant.parse("2026-11-12T10:00:00Z");
+        CloudinaryAdminClient client = mock(CloudinaryAdminClient.class);
+        when(client.listImages(null)).thenReturn(new CloudinaryAdminClient.Page(List.of(
+                new CloudinaryAdminClient.Asset("nagriksetu/one", now.minusSeconds(172800)),
+                new CloudinaryAdminClient.Asset("nagriksetu/two", now.minusSeconds(172800)),
+                new CloudinaryAdminClient.Asset("nagriksetu/three", now.minusSeconds(172800))), "next-page"));
+        when(client.delete("nagriksetu/one")).thenReturn(false);
+        when(client.delete("nagriksetu/two")).thenReturn(true);
+        var guarded = new CloudinaryOrphanSweep(new CloudinaryProperties(
+                "test-cloud", "test-key", "test-secret", false, Duration.ofHours(24), 2, "nagriksetu/"),
+                client, jdbc, Clock.fixed(now, ZoneOffset.UTC));
+        var result = guarded.sweep();
+        assertThat(result.planned()).isEqualTo(2);
+        assertThat(result.deleted()).isEqualTo(1);
+        assertThat(result.failed()).isEqualTo(1);
+        verify(client, never()).delete("nagriksetu/three");
+        verify(client, never()).listImages("next-page");
     }
 }

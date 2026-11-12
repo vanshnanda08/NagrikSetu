@@ -54,9 +54,9 @@ public class CloudinaryOrphanSweep {
     private final JdbcTemplate jdbc;
     private final Clock clock;
 
-    public record Result(int scanned, int orphans, int deleted, boolean dryRun) {
+    public record Result(int scanned, int orphans, int planned, int deleted, int failed, boolean dryRun) {
         public static Result skipped() {
-            return new Result(0, 0, 0, true);
+            return new Result(0, 0, 0, 0, 0, true);
         }
     }
 
@@ -65,11 +65,18 @@ public class CloudinaryOrphanSweep {
             log.debug("Cloudinary orphan sweep skipped: no Admin API credentials configured.");
             return Result.skipped();
         }
+        if (!props.cleanupScoped()) {
+            log.info("Cloudinary orphan sweep skipped: an explicit application-owned cleanup prefix is required.");
+            return Result.skipped();
+        }
 
         Instant cutoff = clock.instant().minus(props.minAge());
+        String prefix = props.cleanupPrefix().trim();
         int scanned = 0;
         int orphanCount = 0;
+        int planned = 0;
         int deleted = 0;
+        int failed = 0;
         String cursor = null;
 
         do {
@@ -79,6 +86,7 @@ public class CloudinaryOrphanSweep {
 
             // Old enough to be judged. Anything newer may simply be mid-flight.
             List<String> candidates = page.assets().stream()
+                    .filter(a -> a.publicId().startsWith(prefix))
                     .filter(a -> a.createdAt().isBefore(cutoff))
                     .map(CloudinaryAdminClient.Asset::publicId)
                     .toList();
@@ -90,7 +98,7 @@ public class CloudinaryOrphanSweep {
             orphanCount += orphans.size();
 
             for (String publicId : orphans) {
-                if (deleted >= props.maxDeletions()) {
+                if (planned >= props.maxDeletions()) {
                     log.warn("Cloudinary orphan sweep hit its per-run cap of {}. "
                              + "Stopping. If this is expected, raise "
                              + "civictrack.cloudinary.max-deletions; if it is not, the "
@@ -102,16 +110,20 @@ public class CloudinaryOrphanSweep {
                 if (props.dryRun()) {
                     log.info("Cloudinary orphan sweep (DRY RUN) would delete {}", publicId);
                 } else {
-                    client.delete(publicId);
-                    log.info("Cloudinary orphan sweep deleted {}", publicId);
+                    if (client.delete(publicId)) {
+                        deleted++;
+                        log.info("Cloudinary orphan sweep deleted {}", publicId);
+                    } else {
+                        failed++;
+                    }
                 }
-                deleted++;
+                planned++;
             }
         } while (cursor != null);
 
-        log.info("Cloudinary orphan sweep complete: {} scanned, {} orphaned, {} {}.",
-                scanned, orphanCount, deleted, props.dryRun() ? "would be deleted (dry run)" : "deleted");
-        return new Result(scanned, orphanCount, deleted, props.dryRun());
+        log.info("Cloudinary orphan sweep complete: {} scanned, {} scoped orphans, {} planned, {} deleted, {} failed; dry-run={}.",
+                scanned, orphanCount, planned, deleted, failed, props.dryRun());
+        return new Result(scanned, orphanCount, planned, deleted, failed, props.dryRun());
     }
 
     /**

@@ -83,7 +83,7 @@ public class CloudinaryAdminClient {
      * abandon the rest of the sweep, and there is nothing for a caller to do
      * about it that waiting until tomorrow does not also do.
      */
-    public void delete(String publicId) {
+    public boolean delete(String publicId) {
         try {
             client().delete()
                     .uri(b -> b.path("/resources/image/upload")
@@ -91,8 +91,10 @@ public class CloudinaryAdminClient {
                               .build())
                     .retrieve()
                     .toBodilessEntity();
+            return true;
         } catch (RuntimeException e) {
             log.warn("Could not delete Cloudinary asset {}: {}", publicId, e.getMessage());
+            return false;
         }
     }
 }

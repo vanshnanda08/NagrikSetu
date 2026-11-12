@@ -128,8 +128,8 @@ export default function MyReportsPageRoute() {
                   landmark={r.landmark}
                 />
                 {awaitingIds.has(r.issue.id) && (
-                  <p className="text-dense -mt-2 mb-3">
-                    <Link href={`/me/verify/${r.issue.id}`} className="underline text-ink font-semibold">
+                  <p className="text-dense mt-1 mb-3">
+                    <Link href={`/me/verify/${r.issue.id}`} className="inline-flex items-center underline text-ink font-semibold" style={{ minHeight: "var(--hit-min)" }}>
                       The department says this is fixed. Is it?
                     </Link>
                   </p>

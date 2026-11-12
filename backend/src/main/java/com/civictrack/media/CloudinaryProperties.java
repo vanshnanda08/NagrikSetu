@@ -38,12 +38,18 @@ public record CloudinaryProperties(
         String apiSecret,
         @DefaultValue("true") boolean dryRun,
         @DefaultValue("PT24H") Duration minAge,
-        @DefaultValue("200") int maxDeletions
+        @DefaultValue("200") int maxDeletions,
+        @DefaultValue("") String cleanupPrefix
 ) {
 
     /** True only when every credential needed to call the Admin API is present. */
     public boolean configured() {
         return notBlank(cloudName) && notBlank(apiKey) && notBlank(apiSecret);
+    }
+
+    /** Cleanup must never infer ownership from the absence of a database row. */
+    public boolean cleanupScoped() {
+        return cleanupPrefix != null && cleanupPrefix.trim().length() >= 6;
     }
 
     private static boolean notBlank(String s) {

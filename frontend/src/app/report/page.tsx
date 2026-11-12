@@ -82,7 +82,9 @@ function ReportComposerForm() {
   useEffect(() => {
     if (session && report.ownerId === undefined) patch({ ownerId: session.userId });
   }, [session, report.ownerId, patch]);
-  useEffect(() => { if (held) router.push("/report/outbox"); }, [held, router]);
+  // The loaded form works offline; a different route may not be cached.
+  // Keep the saved confirmation visible until navigation is possible again.
+  useEffect(() => { if (held && online) router.push("/report/outbox"); }, [held, online, router]);
 
   const form = useForm<ComposerValues>({
     resolver: zodResolver(composerSchema),
@@ -241,6 +243,15 @@ function ReportComposerForm() {
       );
     }
   }
+
+  if (held) return (
+    <PageShell className="report-page">
+      <h1 className="text-display">Report saved on this device</h1>
+      <p className="mt-4 text-body" role="status">Your report is saved in the outbox and will be retried when a connection is available.</p>
+      <p className="mt-3 text-dense text-ink-muted">Your photo, location and details are stored safely. You can review delivery in the outbox when you are back online.</p>
+      <Button disabled className="mt-4">Saved for delivery</Button>
+    </PageShell>
+  );
 
   return (
     <PageShell wide className="report-page">
@@ -425,12 +436,6 @@ function ReportComposerForm() {
             >
               {uploadFraction !== null && (
                 <UploadProgress fraction={uploadFraction} />
-              )}
-
-              {held && !online && (
-                <p className="text-meta" role="status">
-                  Your report is saved in the outbox and will be retried when a connection is available.
-                </p>
               )}
 
               {failed && (

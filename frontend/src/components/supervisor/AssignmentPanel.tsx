@@ -141,6 +141,9 @@ function Board() {
     router.push(workHref(params.toString(), { boardOffset: next ? String(next) : null, issue: null }), { scroll: false });
   };
   const acknowledgeable = rows.filter((b) => b.row.status === "NEW");
+  // A concurrent officer may acknowledge a selected row while this batch runs.
+  // Count and retry only records that are still NEW in the refreshed board.
+  const selectedNewIds = acknowledgeable.filter((b) => selected.has(b.row.id)).map((b) => b.row.id);
   const toggle = (id: string) =>
     setSelected((s) => {
       const next = new Set(s);
@@ -214,13 +217,13 @@ function Board() {
                 </button>
                 <Button
                   variant="secondary"
-                  disabled={selected.size === 0 || bulkAck.isPending}
-                  onClick={() => bulkAck.mutate(acknowledgeable.filter((b) => selected.has(b.row.id)).map((b) => b.row.id))}
+                  disabled={selectedNewIds.length === 0 || bulkAck.isPending}
+                  onClick={() => bulkAck.mutate(selectedNewIds)}
                 >
                   {bulkAck.isPending
                     ? "Acknowledging…"
-                    : selected.size > 0
-                      ? `Acknowledge ${selected.size} selected`
+                    : selectedNewIds.length > 0
+                      ? `Acknowledge ${selectedNewIds.length} selected`
                       : "Acknowledge selected"}
                 </Button>
               </>

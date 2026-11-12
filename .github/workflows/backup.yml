@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Back up and verify restoration
+      - name: Back up, restore and verify encrypted round-trip
         env:
           DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
           DATABASE_USER: ${{ secrets.BACKUP_DATABASE_USER }}
@@ -27,6 +27,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          umask 077
           : "${BACKUP_PASSPHRASE:?Configure BACKUP_PASSPHRASE before activating backups}"
           ./scripts/backup.sh "$RUNNER_TEMP/civictrack-backups"
           dump=$(find "$RUNNER_TEMP/civictrack-backups" -name '*.dump.gz' -type f -print -quit)
@@ -35,6 +36,12 @@ jobs:
           printf '%s' "$BACKUP_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback \
             --passphrase-fd 0 --symmetric --cipher-algo AES256 \
             --output "$RUNNER_TEMP/civictrack-encrypted/$(basename "$dump").gpg" "$dump"
+          printf '%s' "$BACKUP_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback \
+            --passphrase-fd 0 --decrypt \
+            --output "$RUNNER_TEMP/civictrack-backups/roundtrip.dump.gz" \
+            "$RUNNER_TEMP/civictrack-encrypted/$(basename "$dump").gpg"
+          cmp "$dump" "$RUNNER_TEMP/civictrack-backups/roundtrip.dump.gz"
+          echo "Restoration and encrypted-backup round-trip verified."
       - name: Store only the encrypted backup
         uses: actions/upload-artifact@v4
         with:

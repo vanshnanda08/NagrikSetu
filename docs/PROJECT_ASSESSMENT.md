@@ -1,5 +1,10 @@
 # NagrikSetu implementation assessment and cleanup
 
+> Current completion: [NON_PHONE_CLOSEOUT.md](NON_PHONE_CLOSEOUT.md) records later
+> screen consolidation, password-only scope, fixes and executed checks. The
+> recommendations/route descriptions below belong to the dated 6 November
+> assessment and are not a new unfinished-feature list.
+
 > Navigation update (2026-11-07): staff/supervisor work now shares `/work`, with role-based views and a queue/detail layout. Legacy frontend URLs below redirect to the corresponding view. Backend paths and this backend assessment remain unchanged. See [current screens](../frontend/SCREENS.md).
 
 > Quality follow-up (2026-11-08): [fresh verification](../frontend/QUALITY_VERIFICATION.md)

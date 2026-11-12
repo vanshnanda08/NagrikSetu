@@ -2,6 +2,15 @@
 
 See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
 
+**Current non-phone closeout — 12 November:** [the completion record](docs/NON_PHONE_CLOSEOUT.md)
+supersedes older pending-work lists. It records the restore-readiness race,
+supervisor bulk-retry count, warm-offline navigation and verification-link fixes;
+390 backend passes/2 optional skips, 115 frontend passes, lint/types/build and
+focused failure/accessibility checks. Deployment is explicitly host-managed;
+Cloudinary cleanup requires reviewed ownership scope and remains non-destructive.
+Physical-phone testing is postponed; spoken screen-reader review remains
+unverified because the user could not perform it. Email/reset delivery stays deferred.
+
 **Thapar dataset refresh — 11 November:** the deployed database now includes
 **50 synthetic sample issue records / 90 reports**, replacing only the identified
 40-issue/40-report Thapar sample. Two separate QA complaints and all 19 existing
@@ -179,7 +188,7 @@ appearance and uses the consolidated screen structure described above.
 
 | | |
 |---|---|
-| Frontend | https://nagrik-setu-vn.vercel.app (HTTP 200 checked 2026-11-08; replaces the retired civic-track-six alias) |
+| Frontend | https://nagrik-setu-vn.vercel.app (historical 2026-11-08 check; current checks are in the closeout report) |
 | API | https://civictrack-api.onrender.com |
 | API docs (Swagger) | https://civictrack-api.onrender.com/swagger-ui/index.html |
 | Backend tests | **277 total: 275 passed, 2 opt-in evaluation tests skipped, 0 failures/errors**, against real PostGIS via Testcontainers |
@@ -213,12 +222,14 @@ appearance and uses the consolidated screen structure described above.
 
 ### Remaining operator checks
 
-- Review Cloudinary orphan-sweep dry-run output before enabling deletion.
-- Follow up physical-phone browser checks where required; native installation is out of scope.
-  Desktop keyboard, basic VoiceOver and queued-report recovery checks are recorded
-  in [quality verification](frontend/QUALITY_VERIFICATION.md).
-- Complete the final role-by-role browser journey after the other checks.
-- Record the final demo using `docs/DEMO-RUNBOOK.md` if a submission video is required.
+- Use the [current closeout checklist](docs/NON_PHONE_CLOSEOUT.md), including
+  exact backup/deployment evidence and explicit test boundaries. The main
+  deployed role-by-role journey is complete.
+- Physical-phone checks are postponed; a full spoken screen-reader traversal
+  remains unverified. Native installation is out of scope.
+- Keep destructive media cleanup disabled unless a separately reviewed,
+  application-owned scope and retention decision justify enabling it.
+- A demonstration video is optional submission material if requested.
 
 ### Deferred to a future update
 
@@ -431,8 +442,8 @@ in the app to exercise `/me/reports`. Reporting itself needs no account at all.
 ## Testing
 
 ```bash
-cd backend  && mvn clean test    # 277 total: 275 passed, 2 opt-in evaluations skipped
-cd frontend && npm run test      # 82 unit tests
+cd backend  && mvn clean test    # latest local closeout: 390 passed, 2 optional skips
+cd frontend && npm run test      # 115 unit tests
 cd frontend && npm run lint      # includes the Leaflet import boundary rule
 ```
 

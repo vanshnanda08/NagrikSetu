@@ -361,21 +361,31 @@ jobs:
           retention-days: 7
 
   deploy:
-    name: Trigger Render deploy
+    name: Deployment policy
     needs: [backend, frontend, verification]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: Call the Render deploy hook
+      - name: Report external deployment or call the configured hook
         env:
+          DEPLOY_MODE: ${{ vars.RENDER_DEPLOY_MODE || 'external' }}
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
-          if [ -z "${HOOK:-}" ]; then
-            echo "RENDER_DEPLOY_HOOK_URL is not set; skipping deploy." >&2
-            echo "Add it under Settings -> Secrets and variables -> Actions." >&2
-            exit 0
-          fi
-          curl -fsS -X POST "$HOOK" > /dev/null
-          echo "Render deploy triggered."
+          set -euo pipefail
+          case "$DEPLOY_MODE" in
+            external)
+              echo "::notice::Render deployment is managed by its Git integration; CI did not deploy."
+              echo 'Render Git integration manages deployment. This job validates the policy and does not prove rollout. Verify the live revision in Render.' >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            hook)
+              if [ -z "${HOOK:-}" ]; then
+                echo "::error::Hook deployment mode requires RENDER_DEPLOY_HOOK_URL."
+                exit 1
+              fi
+              curl -fsS --connect-timeout 10 --max-time 60 -X POST "$HOOK" > /dev/null
+              echo 'Render deploy hook accepted. Verify rollout and live health separately.' >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            *) echo "::error::RENDER_DEPLOY_MODE must be external or hook."; exit 1 ;;
+          esac
       # Vercel deploys from its own Git integration on push to main, so there
       # is deliberately nothing here for the frontend.

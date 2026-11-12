@@ -1,5 +1,12 @@
 # NagrikSetu — implementation and production-readiness audit
 
+**Current completion record:** [NON_PHONE_CLOSEOUT.md](docs/NON_PHONE_CLOSEOUT.md)
+maps the later release fixes and checks to this audit's historical scope. Its
+current test counts, deployment/backup/media results and remaining boundaries
+supersede older closeout lists below. Authenticator support and native
+installation are no longer completion requirements; email/reset delivery is
+deferred. This dated audit is retained as history, not rewritten as a fresh run.
+
 **Scope update — 7 November 2026:** email notifications and email-based password
 recovery are deferred to a future update. Provider setup and live delivery/reset
 checks are excluded from current completion requirements. Existing code and the
