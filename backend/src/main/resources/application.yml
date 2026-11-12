@@ -179,6 +179,8 @@ civictrack:
       # Development default. Deployment MUST override it: an attacker who knows
       # the signing key can mint an ADMIN token, which is the whole system.
       # TokenService refuses to start on anything shorter than 32 bytes.
+      # DeploySigningKeyGuard also rejects this fallback and public test/seed
+      # keys whenever the deploy profile is active (including mixed profiles).
       secret: ${JWT_SECRET:dev-only-secret-change-me-in-every-real-deployment}
       issuer: civictrack
       access-ttl: PT15M

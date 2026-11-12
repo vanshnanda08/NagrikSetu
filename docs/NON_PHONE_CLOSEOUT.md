@@ -197,3 +197,68 @@ screen-reader review could not be performed and remains unverified. Native
 installation is excluded, and email delivery/password recovery are deferred.
 Loaded-tab offline delivery passed; cold offline reopening and delivery while
 the browser is closed remain outside the supported guarantee.
+
+## Acceptance audit fixes — local verification
+
+The later independent audit's A01 and A02 findings are corrected in the current
+working tree. The published application baseline and original audit observations
+above retain their dated scope. No commit, push, deployment, live credential
+change or production data write was performed during this fix pass.
+
+- **Deploy signing key:** `DeploySigningKeyGuard` refuses absent/blank, known
+  development/test/seed and undersized keys whenever `deploy` is active,
+  including mixed profiles. Ordinary local development retains its fallback.
+  Deployment-profile integration tests use a generated private fixture key.
+- **Closure draft:** Assignments keeps one issue-keyed work pane while the
+  queue loads, becomes empty or refreshes. Loading the queue no longer replaces
+  the administrator form. Selecting a different complaint still changes its
+  work context deliberately.
+- **Regressions:** 11 new real-configuration startup cases passed. Packaged
+  Java 21 starts with a generated key and exits with failure before readiness
+  for missing, public-default and short keys. A default-key-signed role change
+  gets 401; a genuine citizen remains forbidden from administrator audit reads.
+- **Browser:** the regression holds a real local queue response until a reason
+  is entered, then verifies preservation after arrival and cancellation at
+  1280×600 and 390×844. All seven focused browser groups and 19 axe scans passed,
+  along with Firefox/WebKit's ten responsive route checks per engine.
+- **Complete local journey:** eight UI groups completed registration/reporting,
+  assignment, private clarification, failed repair/reopening, a second repair,
+  citizen confirmation, administrator cancel/confirm closure, CSV export,
+  settled reload and logout. The original ticket was resumed for the final
+  reload after an initial test interrupted authentication renewal; one closure
+  was retained, without another complaint submission. Photo upload responses
+  were explicit browser fixtures and evidence verification was disabled only
+  in the disposable API. This is not a new real Cloudinary delivery claim.
+- **Code gates:** 403 backend tests total, **401 passed / two optional skips**,
+  zero failures/errors; **115 frontend tests**, lint, TypeScript and production
+  webpack build passed. No dependency or migration upgrade was made.
+
+Machine-readable evidence is retained locally under
+`artifacts/acceptance-fixes-20261112/verification.json`, with startup logs,
+browser results and screenshots. Temporary services used only the dedicated
+`ns-fixes-20261112` profile and ports 8096/3056/55436. Earlier failed diagnostic
+attempts remain distinct from the final passing results.
+
+The audit's lower-priority dependency/tooling recommendations remain separate
+from these two fixes. Physical-phone and full spoken screen-reader checks are
+still unverified; email recovery remains deferred and native installation
+excluded. A deployed fix must be verified separately after an authorized release.
+
+## Controlled acceptance release — 13 November 2026
+
+The release contains only the deploy signing-key guard, administrator closure
+draft preservation, their regressions and these related notes. Unrelated pending
+documentation cleanup is excluded. Source hashes match the retained local
+verification above.
+
+Before publication, authenticated hosting settings confirmed Render uses the
+`deploy` profile and a private signing key of sufficient length, distinct from
+known development/test/seed defaults. The value was not recorded or changed.
+Both hosts track `main`: Render uses its existing On Commit Git deployment;
+Vercel uses its Next.js integration rooted at `frontend`. No deployment policy
+or credential was changed. CI, rollout and live checks are separate outstanding
+observations until recorded below. The previous observed live backend revision
+is `482e3be01d39fd8f8f21f4e7645e79ebdf027115`.
+
+Release publication, exact deployed revisions, focused live checks and strict
+real-photo integration are pending; this entry does not assert completion.

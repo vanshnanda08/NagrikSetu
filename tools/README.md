@@ -22,6 +22,13 @@ without submitting it to a service, checks 18 desktop/mobile axe scans and
 keyboard focus. It does not certify heard screen-reader speech or physical
 phone behaviour. See [the closeout report](../docs/NON_PHONE_CLOSEOUT.md).
 
+The closure-draft regression holds a real local assignment-queue GET until an
+administrator has entered a reason, then releases the response and checks that
+the draft survives layout changes and dialog cancellation at 1280px and 390px.
+It never submits a closure. `CLOSEOUT_ONLY='Administrator closure'` selects it;
+the existing `pendingIssue` fixture must be a nonterminal complaint.
+
+
 ## Thapar dataset deployed checks
 
 `thapar-dataset-check.mjs` reviews the deployed Thapar v2 dataset without business

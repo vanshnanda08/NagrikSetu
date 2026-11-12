@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import java.time.Duration;
 
@@ -32,6 +34,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 // its scheduled jobs cannot mutate another test's shared PostGIS fixtures.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class DeployProfileIT extends IntegrationTestBase {
+
+    private static final String DEPLOY_SIGNING_KEY = java.util.Base64.getEncoder()
+            .encodeToString(new java.security.SecureRandom().generateSeed(48));
+
+    @DynamicPropertySource
+    static void deploymentSigningKey(DynamicPropertyRegistry registry) {
+        // A deployment must not inherit application-test.yml's public fixture key.
+        registry.add("civictrack.security.jwt.secret", () -> DEPLOY_SIGNING_KEY);
+    }
 
     @Autowired private SlaProperties sla;
     @Autowired private MailProperties mail;

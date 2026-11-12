@@ -544,7 +544,10 @@ Cloudinary's public sample image.
 `JWT_SECRET` **must** be set in any real deployment. The development default in
 `application.yml` is public knowledge, and anybody holding the signing key can
 mint an ADMIN token. The application refuses to start on a key shorter than 32
-bytes.
+bytes. With the `deploy` profile active, startup also rejects missing, blank,
+and known development/test/seed keys, even when other profiles are combined
+with `deploy`. Supply a private generated key through `JWT_SECRET`; do not copy
+a fixture value from source or rotate an existing deployment's key casually.
 
 The refresh token never reaches JavaScript: Next.js route handlers keep it in
 an httpOnly cookie and exchange it server-side. The access token lives only in

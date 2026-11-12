@@ -197,8 +197,6 @@ function Board() {
         )
       )}
 
-      {rows.length === 0 && selectedIssue && <div className="work-master-detail detail-only has-selection"><WorkIssuePanel issueId={selectedIssue} closeHref={workHref(params.toString(), { issue: null })} /></div>}
-
       {rows.length > 0 && (
         <>
           <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -235,8 +233,14 @@ function Board() {
             </p>
           )}
 
-          <div className={`work-master-detail${selectedIssue ? " has-selection" : ""}`}>
-          <div className="work-queue" role="region" aria-label="Assignment queue">
+        </>
+      )}
+
+      {/* Keep one keyed detail pane while the queue loads, empties or refreshes.
+          Moving it between layout branches discards closure/proof drafts. */}
+      {(rows.length > 0 || selectedIssue) && (
+        <div className={`work-master-detail${rows.length === 0 ? " detail-only" : ""}${selectedIssue ? " has-selection" : ""}`}>
+          {rows.length > 0 && <div className="work-queue" role="region" aria-label="Assignment queue">
           <ol key={tab} className="work-list list-none p-0 border-t border-rule" tabIndex={0}>
             {rows.map((b) => (
               <Row
@@ -249,10 +253,9 @@ function Board() {
               />
             ))}
           </ol>
-          </div>
-          {selectedIssue ? <WorkIssuePanel issueId={selectedIssue} closeHref={workHref(params.toString(), { issue: null })} /> : <div className="work-empty-detail"><h2 className="text-heading">Complaint details</h2><p className="text-dense text-ink-muted mt-2">Select a ticket to view its work actions. Assignment and work controls appear beside the selected complaint.</p></div>}
-          </div>
-        </>
+          </div>}
+          {selectedIssue ? <WorkIssuePanel key={selectedIssue} issueId={selectedIssue} closeHref={workHref(params.toString(), { issue: null })} /> : <div className="work-empty-detail"><h2 className="text-heading">Complaint details</h2><p className="text-dense text-ink-muted mt-2">Select a ticket to view its work actions. Assignment and work controls appear beside the selected complaint.</p></div>}
+        </div>
       )}
       {board.data && (hasNext || offset > 0) && (
         <nav className="work-queue-pagination flex items-center justify-between gap-3 border-t border-rule pt-2" aria-label="Assignment queue pages">

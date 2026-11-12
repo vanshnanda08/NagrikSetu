@@ -176,6 +176,38 @@ try {
     await axe(a, 'warm-offline-confirmation');
     await capture(a, 'warm-offline-saved');
   });
+  await check('Administrator closure draft survives queue arrival and cancellation', async () => {
+    for (const [width, height] of [[1280, 600], [390, 844]]) {
+      let releaseQueue;
+      const queueGate = new Promise(resolve => { releaseQueue = resolve; });
+      await admin.context.route(API + '/supervisor/queue?**', async route => {
+        const response = await route.fetch();
+        await queueGate;
+        return route.fulfill({ response });
+      });
+      try {
+        await admin.page.setViewportSize({ width, height }); activePage = admin.page;
+        await admin.page.goto(APP + '/work?view=assignments&tab=all&issue=' + cfg.pendingIssue);
+        const pane = admin.page.getByRole('region', { name: 'Selected complaint', exact: true });
+        const reason = pane.getByRole('textbox', { name: /^Closure reason/ });
+        const draft = 'SYNTHETIC LOCAL QA: closure draft must survive queue arrival.';
+        await reason.fill(draft); await expect(reason).toHaveValue(draft);
+        await expect(admin.page.locator('.work-master-detail')).toHaveClass(/detail-only/);
+        releaseQueue();
+        await expect(admin.page.locator('.work-master-detail')).not.toHaveClass(/detail-only/);
+        await expect(reason).toHaveValue(draft);
+        await pane.getByRole('button', { name: 'Close complaint', exact: true }).click();
+        const dialog = admin.page.getByRole('dialog', { name: /^Close CT-/ });
+        await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+        await expect(dialog).not.toBeVisible(); await expect(reason).toHaveValue(draft);
+        await expect(pane.getByRole('button', { name: 'Close complaint', exact: true })).toBeEnabled();
+        await capture(admin, 'closure-draft-after-queue-' + width);
+      } finally {
+        releaseQueue(); await admin.context.unroute(API + '/supervisor/queue?**');
+      }
+    }
+    result.fixtures.push('Real queue GET held until draft entry, then released; cancel only, no closure POST');
+  });
   await check('Core public, citizen, staff, supervisor and administrator pages pass axe at desktop and mobile widths', async () => {
     const pages = [[guest, '/dashboard', 'dashboard'], [guest, '/report', 'report'], [citizen, '/me/reports', 'my-reports'], [citizen, '/me/verify/' + cfg.pendingIssue, 'verification'], [citizen, '/me/settings?tab=security', 'security'], [staff, '/work?view=mine&tab=all&issue=' + cfg.staffIssue, 'staff-work'], [supervisor, '/work?view=performance', 'performance'], [admin, '/admin', 'configuration'], [admin, '/admin?view=audit', 'audit']];
     for (const [a, path, label] of pages) for (const [width, height] of [[1280, 600], [390, 844]]) {
