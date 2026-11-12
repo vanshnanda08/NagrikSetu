@@ -1,5 +1,44 @@
 # Thapar demonstration dataset — 11 November 2026
 
+## Release follow-up — 12 November
+
+The generator, lifecycle clock correction, tests, guarded refresh tooling and
+documentation are committed and pushed to `main` as
+[`6b94dda832ca6faeba0f242df1a3b25d6215a382`](https://github.com/vanshnanda08/NagrikSetu/commit/6b94dda832ca6faeba0f242df1a3b25d6215a382).
+The user confirmed that exact revision is live in Render Events. Vercel's
+GitHub commit status is successful. No dataset reimport was performed.
+
+The release [CI run](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43229835855)
+completed successfully: backend (389 total, 387 passes, 2 optional skips),
+frontend (115 tests, lint, types and production build), API contracts,
+transition/action checks, all-role route journeys and Firefox/WebKit checks.
+Both cross-browser engines passed ten responsive routes and dialog keyboard/
+Escape checks without runtime errors; the role sweep had zero failing routes.
+The fourth, Render job is green but its log explicitly says the optional
+`RENDER_DEPLOY_HOOK_URL` secret is unset, so it did **not** trigger a deployment.
+The correct Render revision was already live independently of that hook, as
+confirmed by the user. The green hook job alone is not rollout evidence.
+
+Fresh live checks passed six groups: API health; all 50 references/histories and
+90 reports; ten category/map filters and dashboard/ward reads; loaded desktop
+and mobile maps; normal citizen sign-in, own reports and pending verification;
+notifications/private clarification, administrative denial and public-dashboard
+logout. This is a focused release smoke, not a repeat of every earlier municipal
+write scenario. Business data was read-only; normal authentication/session
+requests were allowed. Evidence: `artifacts/thapar-release-20261112/`.
+The six-group smoke was repeated successfully after CI completed; the final
+run ended at 2026-11-12T13:55:15Z with zero browser runtime errors and the same
+50 sample issue records/90 reports. Loaded captures:
+[desktop map](../artifacts/thapar-release-20261112/public-map-1280.png),
+[mobile map](../artifacts/thapar-release-20261112/public-map-390.png) and
+[citizen verification](../artifacts/thapar-release-20261112/citizen-verification-1280.png).
+
+The initial API probes timed out during a cold start; subsequent health/ward and
+functional reads succeeded. The browser access host was unavailable and native
+macOS capture failed, so the exact Render live revision was confirmed by the
+user, not automatically read by this run. Physical-phone and deferred-email
+boundaries remain unchanged.
+
 ## Applied result
 
 The deployed database was refreshed after an application-schema backup, isolated
@@ -237,8 +276,9 @@ Generation exercised real mutating services in isolation. Deployed checks used
 ordinary authentication and read-only business requests/stateless moderation
 previews; they did not vote, reassign or close the freshly imported examples.
 Physical phone camera/GPS, future emails and unrelated stress benchmarks were
-not rerun. Backend source/tool changes remain uncommitted; the validated data is
-already applied to the existing deployed application, without a code deployment.
+not rerun. At the 11 November import, backend source/tool changes were still
+uncommitted and no code deployment was made; the subsequent publication is
+recorded in the 12 November release follow-up above.
 
 Detailed evidence is under `artifacts/thapar-dataset-20261111/` (local, ignored):
 `deployed-replacement.json`, `deployed-verification.json`,

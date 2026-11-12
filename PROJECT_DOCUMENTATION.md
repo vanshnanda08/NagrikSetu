@@ -1,5 +1,14 @@
 # NagrikSetu — Complete Project Documentation
 
+**Release follow-up — 12 November:** dataset/generator changes are pushed as
+`6b94dda832ca6faeba0f242df1a3b25d6215a382`.
+[CI passed](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43229835855):
+387 backend passes/2 optional skips, 115 frontend tests, lint/types/build,
+API/role journeys and Firefox/WebKit. Vercel reports success. The user confirmed
+that revision live in Render; its optional CI deploy hook was skipped because
+the repository secret is unset. Focused deployed public/citizen checks and health
+passed; the dataset was not reimported. See [the release evidence](docs/THAPAR_DATASET.md).
+
 **Deployed sample refresh — 11 November:** [Thapar dataset v2](docs/THAPAR_DATASET.md)
 replaces the 40 identified legacy sample issues/reports with **50 issue records
 containing 90 reports**, including one retained merge redirect. The two other QA
@@ -9,8 +18,9 @@ the sample-only atomic production import. All ten categories, all nine statuses,
 synthetic verified evidence and 89 days of activity are represented. Final
 backend: 387 passes/2 optional skips; deployed review: 15 functional groups and
 30 responsive layouts. Exact counts, backups, reproducibility commands and
-limitations are in the dataset report. The data is live; source additions remain
-uncommitted. Earlier release checks below retain their original dated scope.
+limitations are in the dataset report. The data is live; source additions were
+published on 12 November as `6b94dda832ca6faeba0f242df1a3b25d6215a382`.
+Earlier release checks below retain their original dated scope.
 
 **Deployed follow-up — 11 November:** application `6846b1b6bbb334db3eeec3dc2a40e7ea6a96ec39` is pushed;
 [all CI jobs passed](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244), Vercel reports success, and password-only sign-in

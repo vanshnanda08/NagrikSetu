@@ -1,4 +1,30 @@
-# Release verification — 10 November 2026
+# Release verification
+
+## Dataset release — 12 November 2026
+
+Application/tool changes are pushed as
+[`6b94dda832ca6faeba0f242df1a3b25d6215a382`](https://github.com/vanshnanda08/NagrikSetu/commit/6b94dda832ca6faeba0f242df1a3b25d6215a382).
+[CI run 43229835855](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43229835855)
+passed all jobs: 389 backend tests total (387 passed, 2 optional skips),
+115 frontend tests, lint/types/build, API contracts, transition/action checks,
+all-role routes and Firefox/WebKit responsive/keyboard checks. The route sweep
+had zero failing checks. Vercel's commit status is successful.
+
+The user confirmed this exact commit live in Render Events. The Render CI job
+is green but explicitly skipped its hook because `RENDER_DEPLOY_HOOK_URL` is
+unset; that job is not proof of deployment. Initial API probes timed out during
+a cold start, then health returned 200/UP and Patiala ward/data reads recovered.
+Fresh live public/citizen smoke checks passed, including all 50 sample references
+and 90 reports, filters/maps, dashboards, eligibility, private messages,
+notifications, role denial and logout. The sample dataset was not reimported.
+See [the dataset report](THAPAR_DATASET.md) for evidence and exact boundaries.
+
+No source code was changed after the green application commit; the subsequent
+documentation-only closeout uses CI/Render skip markers. Municipal live write
+journeys retain their earlier dated verification. Physical-phone testing remains
+unavailable and email/password recovery deferred. Browser-only scope remains.
+
+## Earlier release — 10 November 2026
 
 Current password-only follow-up: **`6846b1b6bbb334db3eeec3dc2a40e7ea6a96ec39`**
 is pushed. [CI run 42888337244](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244)

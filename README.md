@@ -11,7 +11,11 @@ with actual clustering, verification, moderation and labelled hosted evidence.
 The [dataset report and repeatable procedure](docs/THAPAR_DATASET.md) records
 distributions, backups, preservation checks, 387 backend passes/2 optional skips,
 15 deployed functional groups and 30 desktop/mobile layouts. Data is applied;
-the generator/tool source changes are not yet committed or pushed.
+the generator/tool changes are published as
+[`6b94dda`](https://github.com/vanshnanda08/NagrikSetu/commit/6b94dda832ca6faeba0f242df1a3b25d6215a382).
+[CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43229835855).
+The 12 November release follow-up in the dataset report distinguishes the
+user-confirmed live Render revision from the skipped optional CI deploy hook.
 
 **Deployed verification — 11 November:** application `6846b1b` is pushed;
 [CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244). The live citizen → supervisor → staff → citizen confirmation
