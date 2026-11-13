@@ -6,6 +6,10 @@ Paths below are relative to the repository root. Historic plans and milestone
 reports were checked against source and current status rather than treated as
 proof of implementation.
 
+Superseded audit/status documents removed during the November documentation
+cleanup remain cited below through immutable Git history links. These are
+historical manuscript sources, not current implementation claims.
+
 ## Reading scope
 
 The review inventoried frontend routes/components/auth/offline boundaries,
@@ -19,8 +23,8 @@ current features. No application code was edited for the paper.
 
 | Manuscript topic | Primary implementation/evidence |
 |---|---|
-| Current completed scope and pending operations | `docs/PROGRESS.md`, `FINAL_AUDIT.md`, `docs/FINAL-PROJECT-REPORT.md` |
-| Core architecture | `docs/ARCHITECTURE.md`, `backend/pom.xml`, `frontend/package.json`, `frontend/README.md`, `backend/src/main/resources/application.yml` |
+| Current completed scope and pending operations | [historical PROGRESS.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/PROGRESS.md), [historical FINAL_AUDIT.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/FINAL_AUDIT.md), `docs/FINAL-PROJECT-REPORT.md` |
+| Core architecture | `PROJECT_DOCUMENTATION.md` sections 2–7, `backend/pom.xml`, `frontend/package.json`, `frontend/README.md`, `backend/src/main/resources/application.yml` |
 | Equations (1)--(3): weighting, adaptive radius, extent bound | `backend/src/main/java/com/civictrack/clustering/CentroidMath.java` |
 | Three bands, nearest candidate, cap refusal, per-report decision evidence | `backend/src/main/java/com/civictrack/clustering/ClusteringService.java` |
 | Grid lock, two-stage candidate read, LIMIT 5, adjacent-cell limitation, reporter counting | `backend/src/main/java/com/civictrack/issue/IssueRepository.java` |
@@ -40,10 +44,10 @@ current features. No application code was edited for the paper.
 | Dashboard metric semantics and small samples | `backend/src/main/java/com/civictrack/dashboard/*`, `docs/DESIGN-DECISIONS.md` DD-064 |
 | Drafts and worker/foreground outbox | `frontend/src/lib/offlineStore.ts`, `frontend/src/components/OutboxSync.tsx`, `frontend/src/app/api/offline-report/route.ts`, `frontend/public/report-worker.js` |
 | Token/cookie boundary and recovery | `frontend/src/lib/auth.tsx`, `frontend/src/app/api/auth/*/route.ts`, `backend/src/main/java/com/civictrack/user/auth/*` |
-| MFA/session/following/message additions | `backend/src/main/java/com/civictrack/user/api/AccountSecurityController.java`, `issue/IssueEngagementService.java`, migration V10, `FINAL_AUDIT.md` |
+| MFA/session/following/message additions | `backend/src/main/java/com/civictrack/user/api/AccountSecurityController.java`, `issue/IssueEngagementService.java`, migration V10, [historical FINAL_AUDIT.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/FINAL_AUDIT.md) |
 | Durable quotas vs local login buckets | `backend/src/main/java/com/civictrack/abuse/RateLimitService.java`, `report/ReportSubmissionService.java` |
 | CI/backup operational support | `.github/workflows/ci.yml`, `.github/workflows/backup.yml`, `scripts/backup.sh`, `scripts/restore.sh` |
-| Latest recorded test totals/browser checks | `docs/PROGRESS.md`, `FINAL_AUDIT.md`, `tools/README.md` (historical audit evidence, not newly rerun) |
+| Latest recorded test totals/browser checks | [historical PROGRESS.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/PROGRESS.md), [historical FINAL_AUDIT.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/FINAL_AUDIT.md), `tools/README.md` (historical audit evidence, not newly rerun) |
 
 ## Retained quantitative evidence
 

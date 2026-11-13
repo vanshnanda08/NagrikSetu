@@ -37,19 +37,12 @@ backups/
 # Historical working documents stay local. Retain the final closeout evidence.
 docs/*
 !docs/DEMO-RUNBOOK.md
-!docs/PROJECT_ASSESSMENT.md
-!docs/PROGRESS.md
 !docs/DESIGN-DECISIONS.md
 !docs/AUDIT_FIXES.md
-!docs/END_TO_END_TEST_REPORT.md
 !docs/DAILY_USAGE_VERIFICATION.md
-!docs/PASSWORD_AUTHENTICATION.md
 !docs/THAPAR_DATASET.md
 !docs/NON_PHONE_CLOSEOUT.md
-!docs/WORKFLOW_FIXES.md
-!docs/RELEASE_READINESS.md
 !docs/FINAL-PROJECT-REPORT.md
-!docs/MONTH-2-WORK-DONE.md
 
 # Local verification screenshots and walk output (large, regenerable). Keep
 # the small, reproducible phase-8 result tables and vector plots.

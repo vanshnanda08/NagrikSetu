@@ -18,7 +18,8 @@ CLOSEOUT_SCRATCH=1 CLOSEOUT_CONFIG=/private/path/browser-config.json \
 It uses real local role authentication/data and explicitly fulfilled browser
 fixtures for success/409/503 bulk responses, SSE transport state and
 400/429/success outbox responses. It also queues a real local offline form
-without submitting it to a service, checks 18 desktop/mobile axe scans and
+without submitting it to a service, checks 18 desktop/mobile page scans plus
+one offline-confirmation axe scan, and tests
 keyboard focus. It does not certify heard screen-reader speech or physical
 phone behaviour. See [the closeout report](../docs/NON_PHONE_CLOSEOUT.md).
 
@@ -27,7 +28,6 @@ administrator has entered a reason, then releases the response and checks that
 the draft survives layout changes and dialog cancellation at 1280px and 390px.
 It never submits a closure. `CLOSEOUT_ONLY='Administrator closure'` selects it;
 the existing `pendingIssue` fixture must be a nonterminal complaint.
-
 
 ## Thapar dataset deployed checks
 
@@ -60,7 +60,7 @@ backups, distributions, generation/atomic-refresh tooling and current limits.
 Current authentication is password-only for every role; authenticator setup is
 retired. Security fixtures and active audit steps now check password/session
 controls and refusal of retired enrollment paths. Earlier dated MFA results below
-are historical. See [password authentication](../docs/PASSWORD_AUTHENTICATION.md).
+are historical. See [password authentication](../docs/NON_PHONE_CLOSEOUT.md).
 The Firefox/WebKit smoke waits for finite API/RSC reads before its next hard
 navigation; the persistent event stream is excluded and page errors still fail.
 
@@ -91,8 +91,8 @@ the original actors; it does not repeat the principal complaint/votes.
 Do not reuse a partially completed *individual* write step without inspecting
 the actual record first. A completed ordinary run refuses another submission.
 
-The 8 November follow-up and exact boundaries are in
-[release readiness](../docs/RELEASE_READINESS.md). `screen-consolidation.mjs` and
+Current follow-up results and exact boundaries are in
+[the completion record](../docs/NON_PHONE_CLOSEOUT.md). `screen-consolidation.mjs` and
 `public-audit.mjs` accept `SCREENS_APP` and `VERIFY_API` for isolated local ports;
 the screen audit covers all six requested viewport sizes. The public audit
 expects deferred email recovery by default. `TEST_EMAIL_RECOVERY=true` is only
@@ -141,9 +141,9 @@ Restart the frontend after building so it serves matching chunks.
 | `table.mjs` | NEW → ACKNOWLEDGED → ASSIGNED → IN_PROGRESS → PENDING_VERIFICATION through the API, asserting successful responses and resulting states. |
 | `uiwalk.mjs` | Exact actions offered at those five states, successful transition responses and no browser runtime errors. |
 | `complaint-tracking.mjs` | Read-only anonymous dashboard lookup against a real public complaint, normalised numbers, inline results, repeat lookup, blank input, missing numbers, loading/service failures, retry, merged complaints, public history links, five viewport sizes and an axe scan. Requires at least one complaint in the local demo API; run `node tools/complaint-tracking.mjs` from the repository root. Failure and merge cases use browser fixtures. |
-| `public-audit.mjs` | General public dashboard, list/map, report, ward/grouping/outbox and authentication entry layouts at six sizes; filters/paging, keyboard/mobile navigation, category retry, empty map, photo preparation, draft recovery, keyboard pin, intercepted submit/recovery, idempotent retry, receipt errors and durable offline saving. Uses production frontend port 3003 (`SCREENS_APP` override) and a read-only API bridge. Civic writes, uploads and recovery use fixtures; background wake is simulated. Evidence: `artifacts/public-audit/`; scope/limits: `frontend/PUBLIC_VERIFICATION.md`. |
+| `public-audit.mjs` | General public dashboard, list/map, report, ward/grouping/outbox and authentication entry layouts at six sizes; filters/paging, keyboard/mobile navigation, category retry, empty map, photo preparation, draft recovery, keyboard pin, intercepted submit/recovery, idempotent retry, receipt errors and durable offline saving. Uses production frontend port 3003 (`SCREENS_APP` override) and a read-only API bridge. Civic writes, uploads and recovery use fixtures; background wake is simulated. Evidence: `artifacts/public-audit/`; scope/limits: [historical PUBLIC_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/PUBLIC_VERIFICATION.md). |
 | `citizen-api-dryrun.mjs` | Local API and frontend auth-proxy checks for citizen ownership/role guards, reports/notifications paging, profile/preferences, password/session revocation, retired-authenticator refusal and static offline assets. Creates one isolated QA account per run; never submits complaints or writes messages/votes. Result: `artifacts/citizen-review/api-results.json`. |
-| `citizen-ui-fixtures.mjs` | In-memory loopback API on port 8081 with 125 reports/notifications, verification, messages, profile/security and controllable failures. It never forwards authenticated requests or writes to the real API. Setup, cookie isolation, ordinary-build restoration, browser results and limits: `frontend/CITIZEN_VERIFICATION.md`. |
+| `citizen-ui-fixtures.mjs` | In-memory loopback API on port 8081 with 125 reports/notifications, verification, messages, profile/security and controllable failures. It never forwards authenticated requests or writes to the real API. Setup, cookie isolation, ordinary-build restoration, browser results and limits: [historical CITIZEN_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/CITIZEN_VERIFICATION.md). |
 | `screen-consolidation.mjs` | Current grouped screens across five access contexts, responsive layouts, role navigation, list/map filter retention, seven legacy redirects, settings form payload/validation fixtures, permissions, internal scrolling, keyboard menus and accessibility. Uses the production frontend on port 3003 (`SCREENS_APP` overrides it), a browser-only CORS bridge to the demo API, and a fresh citizen account. Civic records are read-only; password/profile/MFA writes are browser fixtures. |
 | `unified-workspace.mjs` | Current shared staff/supervisor `/work` screen at six desktop/tablet/mobile sizes, role-specific views, queue/detail focus and filters, legacy work deep links, proof validation/upload and assignment/transition fixtures, queue refresh, administrator CSV export, axe scans and real-demo screenshots. Uses production frontend port 3003 (`SCREENS_APP` override) with a browser-only CORS bridge. Civic writes and uploads are fixtures. Evidence is in `artifacts/unified-workspace/`. Both grouped-screen harnesses use `qa-session.mjs` to honor existing login Retry-After responses; backend limits remain unchanged. |
 | `viewport-layout.mjs` | Six-size complaint-detail sizing, no unnecessary evidence/location scrolling, photo dialog focus, activity-tab keyboard access, complete long history, evidence retry, compact public/municipal/account/admin layouts, visible password fields/action, security views and accessibility. Uses real local demo data with read-only browser fixtures for long/error content. Screenshots/results are in `artifacts/viewport-layout/`. |
@@ -155,10 +155,8 @@ Restart the frontend after building so it serves matching chunks.
 | `theme-states.mjs` | Focused loading/empty/error/validation/success states, narrow/short layouts, menu focus return, internal scrolling, split/merge section geometry, chart/keyboard interactions, map equivalents and fixture-only sensitive write previews. |
 | `browsers.mjs` | Firefox and WebKit public routes at 320/1280px, exactly one visible main heading with the expected route title, keyboard dialog navigation, Escape and runtime errors; attempts both engines and exits nonzero if either fails. `BROWSERS_APP` optionally selects an isolated frontend; the default remains localhost:3000. |
 
-Current committed-light restoration checks are recorded in
-[design restoration](../frontend/DESIGN_RESTORATION.md).
-The newer grouped-screen structure and its checks are recorded in
-[Screens](../frontend/SCREENS.md). Earlier menu-specific theme harnesses describe
+The retained light design and grouped-screen structure are documented in
+[the screen map](../frontend/SCREENS.md). Earlier menu-specific theme harnesses describe
 the previous navigation; use `screen-consolidation.mjs` for the current grouped
 screen and navigation assertions.
 
@@ -168,8 +166,8 @@ as well as the displayed page. Selecting `.first()` would hide a genuine
 duplicate-title defect; two visible headings still fail this check. Secondary
 frontend origins must have matching API/CORS configuration when running locally.
 
-Fresh cleanup checks and their limitations are recorded in the
-[2026-11-06 project assessment](../docs/PROJECT_ASSESSMENT.md).
+Current cleanup checks and their limitations are recorded in the
+[completion record](../docs/NON_PHONE_CLOSEOUT.md).
 
 Recorded on 2026-10-27: contract, transitions, UI walk and sweep passed; the sweep
 completed 190 checks with zero failures. Features and the final Chrome audit
@@ -177,7 +175,7 @@ passed, including 70 layouts and 14 axe scans with no violations. Firefox and
 WebKit each passed 10 route checks and keyboard smoke. On macOS 27 the harness
 automatically gives Firefox an isolated temporary CoreFoundation home to avoid
 the upstream Playwright/Firefox shared-profile access defect.
-See [FINAL_AUDIT.md](../FINAL_AUDIT.md). The lifecycle scripts create demo issues
+See the [current completion record](../docs/NON_PHONE_CLOSEOUT.md). The lifecycle scripts create demo issues
 as they run, so expect the ticket numbers to climb.
 
 Extended checks need a production frontend build pointing at the scratch API.
@@ -216,7 +214,7 @@ The disposable login is `fixture-staff@example.test` / `fixture-pass-1234`.
 `empty` to exercise failures and empty queues. GET returns sanitized captured
 writes and the current fixture IDs. Restarting the process resets all fixtures.
 This fixture exercises UI behavior; real lifecycle and access rules are checked
-by backend integration tests. See [the staff dry run](../frontend/STAFF_VERIFICATION.md).
+by backend integration tests. See [the current staff screen map](../frontend/SCREENS.md).
 
 
 ## Supervisor UI fixtures
@@ -234,7 +232,7 @@ Use a separate frontend copy at `http://127.0.0.1:3003` with both API bases set 
 and empty-state controls are the same as the staff fixture. No authenticated
 request, mail or civic-record mutation is forwarded to the real backend.
 The fixture does not replace real lifecycle/geometry/permission integration tests.
-See [the supervisor dry run](../frontend/SUPERVISOR_VERIFICATION.md).
+See [the current supervisor screen map](../frontend/SCREENS.md).
 
 
 ## Administrator UI fixtures
@@ -256,7 +254,7 @@ captured operations and refresh count. Restarting resets the fixtures.
 
 The fixture tests UI requests/feedback. Real permissions, geometry, lifecycle,
 configuration constraints, evidence/history and CSV escaping are checked by the
-backend integration tests. See [the administrator review](../frontend/ADMIN_VERIFICATION.md).
+backend integration tests. See [the current administrator screen map](../frontend/SCREENS.md).
 
 
 Administrator fixture closure supports every nonterminal state for isolated UI

@@ -1,121 +1,24 @@
 # NagrikSetu — Complete Project Documentation
 
-**Current completion record — 12 November:** read
-[NON_PHONE_CLOSEOUT.md](docs/NON_PHONE_CLOSEOUT.md) for the latest defects fixed,
-tests, deployment policy, current-data backup and Cloudinary ownership review.
-It supersedes older unresolved-work lists below where the corresponding check
-is explicitly mapped to later evidence. Physical-phone testing is postponed;
-spoken screen-reader review remains unverified; email/reset delivery is deferred.
+**Final documentation closeout:** 13 November 2026 (Asia/Kolkata).
+**Verified application:** `0e32539162a33d354924e3b560e18f2688a76208`; Vercel snapshot `4b2a04c1e17a9aa56cab0da795aaeb7163ed2005` contains identical application code with documentation changes.
+[Live demo](https://nagrik-setu-vn.vercel.app/dashboard) · [Repository](https://github.com/vanshnanda08/NagrikSetu) · [Green application CI](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43307995444).
+[Current completion record](docs/NON_PHONE_CLOSEOUT.md) contains the exact CI,
+deployment, offline submission, encrypted backup and Cloudinary review evidence.
+[Daily-use verification](docs/DAILY_USAGE_VERIFICATION.md) records the deployed
+cross-role complaint lifecycle. [Thapar dataset documentation](docs/THAPAR_DATASET.md)
+records the 50-issue/90-report synthetic sample and repeatable refresh procedure.
 
-**Release follow-up — 12 November:** dataset/generator changes are pushed as
-`6b94dda832ca6faeba0f242df1a3b25d6215a382`.
-[CI passed](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43229835855):
-387 backend passes/2 optional skips, 115 frontend tests, lint/types/build,
-API/role journeys and Firefox/WebKit. Vercel reports success. The user confirmed
-that revision live in Render; its optional CI deploy hook was skipped because
-the repository secret is unset. Focused deployed public/citizen checks and health
-passed; the dataset was not reimported. See [the release evidence](docs/THAPAR_DATASET.md).
+Physical-phone testing is postponed; manual spoken screen-reader review remains
+unverified. Email delivery/password recovery is deferred, native installation is
+excluded, and authenticator support is retired. Password/session controls and
+role restrictions remain. Earlier academic measurements retain their dated scope;
+this guide does not claim fresh benchmark or municipal field results.
 
-**Deployed sample refresh — 11 November:** [Thapar dataset v2](docs/THAPAR_DATASET.md)
-replaces the 40 identified legacy sample issues/reports with **50 issue records
-containing 90 reports**, including one retained merge redirect. The two other QA
-complaints, existing accounts, configuration and reference data remain. Actual
-clustering and workflow services ran against isolated restored databases before
-the sample-only atomic production import. All ten categories, all nine statuses,
-synthetic verified evidence and 89 days of activity are represented. Final
-backend: 387 passes/2 optional skips; deployed review: 15 functional groups and
-30 responsive layouts. Exact counts, backups, reproducibility commands and
-limitations are in the dataset report. The data is live; source additions were
-published on 12 November as `6b94dda832ca6faeba0f242df1a3b25d6215a382`.
-Earlier release checks below retain their original dated scope.
-
-**Deployed follow-up — 11 November:** application `6846b1b6bbb334db3eeec3dc2a40e7ea6a96ec39` is pushed;
-[all CI jobs passed](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244), Vercel reports success, and password-only sign-in
-works for all four live roles. [The deployed daily-use report](docs/DAILY_USAGE_VERIFICATION.md)
-records 16 passing workflow groups and 30 layouts. QA complaint CT-2026-000919
-completed real photo reporting, assignment, repair rejection/resubmission, citizen
-confirmation, reasoned administrator closure and audit CSV export. Email recovery
-remains deferred; physical-phone checks remain unavailable.
-
-**Authentication scope, 10 November:** all roles now use password sign-in.
-Authenticator enrollment, code challenges and mandatory MFA are retired by user
-decision. [Local verification](docs/PASSWORD_AUTHENTICATION.md) passed 386 backend
-tests (2 optional skips), 115 frontend tests, lint/types/build and 24 Security layouts.
-Password/session controls and municipal role/scope restrictions remain. Historical
-MFA descriptions in dated evidence are superseded for current implementation.
-
-**Daily-use follow-up — 10 November:** [the latest rehearsal](docs/DAILY_USAGE_VERIFICATION.md)
-records 20 passing workflow/continuity checks and 30 layouts, real hosted photos,
-two citizen verification rounds and administrator closure in a disposable
-environment. Fresh backend/frontend checks passed. A staff singular-count label
-was corrected locally. This does not replace the report's explicit deployed
-WebKit rapid-navigation limitation or physical-device boundaries.
-
-**Last reviewed:** 2026-11-11 (Asia/Kolkata).<br>
-**Repository:** `complaint-system`.  
-**Original guide baseline:** `011ecb5` — “Record final cross-browser CI verification”, dated 2026-10-27.<br>
-**Released application baseline:** `6846b1b6bbb334db3eeec3dc2a40e7ea6a96ec39`.<br>
-**Review scope:** application source, configuration, migrations, tests, tools and dated verification evidence. Older audit/benchmark findings retain their original scope unless explicitly superseded.
-
-**Verified release, 10 November:** the reviewed interface, workflow/audit fixes,
-Patiala V11 and map changes are committed and pushed. Final
-[CI passed all four jobs](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42686876733),
-and Vercel reports success. Live health and all four Patiala ward reads passed.
-The explicitly approved synthetic complaint **CT-2026-000918** completed real
-Cloudinary upload and report submission (201), followed by loaded photo/map,
-desktop/mobile and evidence-dialog checks. Full backend: 381 passed, 2 optional
-skips; frontend: 115 passed, lint, types and production build passed. The deploy
-profile enforces the agreed email deferral. **Browser-only scope, agreed
-10 November:** native Chrome/PWA installation and standalone installed-app checks
-are excluded from completion requirements; previous attempts were unsuccessful.
-Physical-phone browser checks remain unavailable. See
-[release readiness](docs/RELEASE_READINESS.md) for exact evidence and boundaries.
-The following dated pre-release notes record earlier states, not outstanding
-uncommitted application work.
-
-**Hosted recheck, 10 November:** API health returned 200 / UP after a
-152.5-second cold start; subsequent database-backed reads and Vercel CORS passed.
-The live ward names are still Ludhiana, so the local Patiala V11 update remains
-unreleased. An invalid-photo probe confirmed the verification guard, without
-creating a complaint; genuine deployed photo submission remains unverified.
-See [release readiness](docs/RELEASE_READINESS.md) for the dated evidence.
-
-**Latest follow-up, 8 November:** [release readiness](docs/RELEASE_READINESS.md)
-records the local Patiala migration, map zoom/keyboard/detail fixes, explicit
-email-recovery deferral, scheduler-test isolation and fresh checks. Backend:
-379 passed, 2 optional skips. Frontend: 115 passed, lint, TypeScript and build
-passed. Current production API probes time out; local results do not certify
-the hosted service or physical-device behavior. Changes remain uncommitted.
-
-The original guide used source inspection and local documentation checks. Subsequent runtime tests, audit fixes and release verification are linked with their dates and limits. The current release checks do not repeat the earlier academic benchmarks or establish municipal field suitability.
-
-“Confirmed” below means supported by the inspected code or explicitly attributed repository evidence. **Not confirmed** marks something that cannot be established from those sources. Recommendations are suggestions, not promises or approved project plans. No private environment files or secret values are reproduced.
-
-**Local implementation follow-up, 7 November:** escalation deadline/owner scope,
-queue/assignment eligibility and expired-session reporting have since been fixed
-and verified. See [workflow checks](docs/WORKFLOW_FIXES.md). Administrator closure
-is also implemented, including reasoned early closure; see
-[administrator verification](frontend/ADMIN_VERIFICATION.md). These are local
-changes, not a new deployment or cloud-integration claim.
-
-**Quality follow-up, 7–8 November:** [fresh local verification](frontend/QUALITY_VERIFICATION.md)
-records short-message/verification wording fixes, real Cloudinary upload and
-strict server evidence checks, service-worker outbox recovery, keyboard and basic
-VoiceOver checks, and desktop/mobile layouts. The full backend suite passed 332
-tests with two optional evaluations skipped; 115 frontend tests, lint, TypeScript
-and build passed. Chrome's native installation did not complete, and no phone was
-available for physical-device checks. The subsequent full role journey completed
-in [the end-to-end audit](docs/END_TO_END_TEST_REPORT.md). Its five confirmed
-defect categories are corrected in [audit follow-up fixes](docs/AUDIT_FIXES.md),
-verified with 377 passing backend tests (2 optional skips), 115 frontend
-tests, lint, TypeScript and build. Remaining browser/device test boundaries
-are still explicit; no deployment or production sign-off is implied.
-
-**Scope decision, 7 November 2026:** email notifications and email-based password
-recovery are deferred to a future update at the user's request. Provider setup,
-real email/reset-link delivery and associated live checks are excluded from the
-current milestone. Existing code/routes and historical tests remain; in-app
-notifications and signed-in password changes stay in scope.
+Superseded status, planning and individual screen-review notes were removed in
+the documentation cleanup. Their committed versions remain in Git history.
+Current source, the screen map and the completion record are the maintained
+references. No private credentials are reproduced here.
 
 ## Contents
 
@@ -129,7 +32,7 @@ notifications and signed-in password changes stay in scope.
 8. [Features and Functionality](#8-features-and-functionality)
 9. [Complete User Journey](#9-complete-user-journey)
 10. [Current Development Progress](#10-current-development-progress)
-11. [What We Are Currently Working On](#11-what-we-are-currently-working-on)
+11. [Release and Handover History](#11-release-and-handover-history)
 12. [Future Roadmap](#12-future-roadmap)
 13. [Setup and Installation](#13-setup-and-installation)
 14. [Important Technical Decisions](#14-important-technical-decisions)
@@ -185,7 +88,7 @@ flowchart LR
     API -->|Verify uploaded evidence| Photos
     API --> DB[(PostgreSQL and PostGIS)]
     Jobs[Scheduled backend jobs] --> DB
-    Jobs -->|Pending email| Mail[SMTP or Brevo]
+    Jobs -.->|Deferred email delivery| Mail[SMTP or Brevo]
     Jobs -->|Bounded orphan sweep| Photos
     API -->|Dashboard SSE notifications| Web
     Web <--> Local[(Browser IndexedDB drafts and outbox)]
@@ -265,7 +168,13 @@ stateDiagram-v2
     PENDING_VERIFICATION --> RESOLVED: System applies vote or timeout rule
     PENDING_VERIFICATION --> REOPENED: System applies negative vote rule
     RESOLVED --> REOPENED: Eligible new recurrence report
-    RESOLVED --> CLOSED: Automatic quiet-period closure
+    RESOLVED --> CLOSED: Automatic quiet period or reasoned admin closure
+    NEW --> CLOSED: Admin early closure with reason
+    ACKNOWLEDGED --> CLOSED: Admin early closure with reason
+    ASSIGNED --> CLOSED: Admin early closure with reason
+    IN_PROGRESS --> CLOSED: Admin early closure with reason
+    PENDING_VERIFICATION --> CLOSED: Admin early closure with reason
+    REOPENED --> CLOSED: Admin early closure with reason
     NEW --> REJECTED: Supervisor or admin with reason
     ACKNOWLEDGED --> REJECTED: Supervisor or admin with reason
     ASSIGNED --> REJECTED: Supervisor or admin with reason
@@ -274,7 +183,7 @@ stateDiagram-v2
     REOPENED --> REJECTED: Supervisor or admin with reason
 ```
 
-This diagram follows the current `issue/policy/TransitionPolicy.java`. It does not include removed human-close functionality. Staff stop at `PENDING_VERIFICATION`; only the internal system can enter `RESOLVED` or `CLOSED` through this policy. Moderation also uses rejection to preserve a merged-away issue with a link to its surviving ticket.
+This diagram follows `issue/policy/TransitionPolicy.java`. Staff stop at `PENDING_VERIFICATION`; only the internal system can enter `RESOLVED`. Administrators may close nonterminal complaints with a recorded reason, including early closure without claiming a repair. Automatic closure retains its quiet period. Moderation also uses rejection to preserve a merged-away issue with a link to its surviving ticket.
 
 ## 3. Technologies Used
 
@@ -319,7 +228,6 @@ This map covers the application's important source areas and supporting delivera
 complaint-system/
 ├── PROJECT_DOCUMENTATION.md          This guide
 ├── README.md                         Main entry point and running instructions
-├── FINAL_AUDIT.md                     Dated release/security verification
 ├── docker-compose.yml                Local PostGIS service and persistent volume
 ├── .github/workflows/                CI, keep-alive and encrypted backup jobs
 ├── backend/
@@ -340,7 +248,7 @@ complaint-system/
 │   ├── eslint.config.mjs             Lint rules, including the Leaflet import boundary
 │   ├── tsconfig.json, vitest.config.mts, postcss.config.mjs
 │   ├── AGENTS.md, CLAUDE.md           Development guidance; not runtime modules
-│   ├── SCREENS.md, *_VERIFICATION.md, DESIGN_RESTORATION.md
+│   ├── README.md, SCREENS.md          Frontend setup and current screen map
 │   ├── public/
 │   │   ├── report-worker.js           Background report delivery; no app asset cache
 │   │   └── icons/                    Installable-app icons
@@ -352,7 +260,7 @@ complaint-system/
 ├── scripts/                          Remote seed, backup and restore scripts
 ├── evaluation/                       Clustering, concurrency and latency workloads
 ├── artifacts/evaluation/             Retained CSV measurements and PDF charts
-├── docs/                             Decisions, assessment, progress, reports, demo runbook
+├── docs/                             Decisions, completion evidence, dataset, reports, demo runbook
 ├── paper/                            Manuscript source, figures, evidence and QA scripts
 ├── prompts/                          Historical briefs and supplied project documents
 └── MONTH-1-PROJECT-REPORT.pdf          Historical report
@@ -387,9 +295,13 @@ All package names in this table are relative to `backend/src/main/java/com/civic
 
 ### Important supporting files
 
-`docs/DESIGN-DECISIONS.md` explains decisions and past failures. `docs/PROJECT_ASSESSMENT.md` records the November cleanup, reproduced gaps and proposed next work. `docs/PROGRESS.md`, `FINAL_AUDIT.md` and `docs/FINAL-PROJECT-REPORT.md` provide dated progress and results. `docs/DEMO-RUNBOOK.md` explains how to demonstrate the actual role sequence.
-
-`frontend/SCREENS.md` is the current screen map. Citizen, public, staff, staff-overview, team-performance, density and ticket-detail verification notes describe the scope and limits of specific reviews. `frontend/SUPERVISOR_VERIFICATION.md` records the supervisor dry run, including its real-service and isolated-fixture boundaries.
+`docs/DESIGN-DECISIONS.md` explains architectural choices and past failures.
+`docs/NON_PHONE_CLOSEOUT.md` is the maintained completion record;
+`docs/DAILY_USAGE_VERIFICATION.md` records the live role handoff and closure.
+`docs/THAPAR_DATASET.md` covers sample replacement, reproducibility and safeguards.
+`docs/FINAL-PROJECT-REPORT.md` and `docs/DEMO-RUNBOOK.md` support the academic
+submission and demonstration. `frontend/SCREENS.md` defines the current screen
+map; `frontend/README.md` explains frontend setup and implementation boundaries.
 
 Historical specifications in `docs/`, Word documents in `prompts/` and earlier reports describe requested or past work. They do not override current source behavior. `paper/README.md` identifies a manuscript baseline of commit `011ecb5`, so its diagrams and claims should not be treated as a complete description of later local interface changes.
 
@@ -533,7 +445,7 @@ The browser receives refresh credentials only as an HttpOnly, SameSite=Lax cooki
 
 All roles use password authentication. Authenticator enrollment, one-time-code login checks and municipal MFA requirements were removed on 10 November at the user's request. Password hashing, role/department/ward guards, access-token validation, refresh rotation and session revocation remain. Existing enrollment columns and migration V10 are retained as inert historical schema; compatibility status fields report false/zero and retired enrollment routes return 410.
 
-Role checks alone are insufficient. `IssueAccessGuard` allows administrators city scope, supervisors matching department **or** ward scope, and staff matching department plus an optional ward restriction. `Guards.IS_ASSIGNEE` supplies per-transition ownership checks. `REOPENED → IN_PROGRESS` deliberately has no assignee guard in the current transition table. See section 15 for gaps between these rules and queue/escalation/assignment paths.
+Role checks alone are insufficient. `IssueAccessGuard` allows administrators city scope, supervisors matching department **or** ward scope, and staff matching department plus an optional ward restriction. `Guards.IS_ASSIGNEE` supplies per-transition ownership checks. `REOPENED → IN_PROGRESS` deliberately has no assignee guard in the current transition table. Shared scope rules also cover queue/escalation/assignment paths; the dated fixes and limitations are recorded in section 15.
 
 ### Business rules: urgency, deadlines and verification
 
@@ -705,7 +617,7 @@ Database transactions and locks protect multi-record changes. Issue entities als
 |---|---|---|---|
 | Anonymous and signed-in reporting | Lets residents report without registration and optionally link observations to an account | `app/report/page.tsx`; backend `report/api/ReportController.java`, request validation and `ReportSubmissionService.java` | Completed; real-photo setup required |
 | GPS and manual location | Helps crews find problems and recover from poor GPS | `lib/useGeolocation.ts`, `MapCanvas.tsx`, `lib/schemas.ts`; backend ward/accuracy checks | Completed; only configured service area |
-| Photo preparation/upload | Reduces upload size and provides visual evidence | `compressImage.ts`, `exif.ts`, `uploadPhoto.ts`, `PhotoEvidenceService.java` | Completed code; current live integration Unknown |
+| Photo preparation/upload | Reduces upload size and provides visual evidence | `compressImage.ts`, `exif.ts`, `uploadPhoto.ts`, `PhotoEvidenceService.java` | Completed; real hosted uploads and strict disposable-local lifecycle verified in the dated closeout |
 | Safe repeated submission | Avoids a second report when the first succeeded but the reply was lost | Stable UUID in composer/worker; `report_submissions` payload/result record | Completed; same key cannot represent an edited payload |
 | Incremental geographic grouping | Turns nearby same-type observations into one job | `ClusteringService.java`, `CentroidMath.java`, `IssueRepository.java` | Completed; known geographic/order limitations |
 | Review flags and screening | Makes uncertain grouping or suspicious evidence visible to supervisors | `ContentScreeningService.java`, report abuse fields, review queue | Completed rule-based screening; not general AI fraud detection |
@@ -713,13 +625,13 @@ Database transactions and locks protect multi-record changes. Issue entities als
 | Public list/map/detail/history | Lets everyone inspect progress and evidence | `ComplaintViews.tsx`, `components/complaints/`, issue pages, `PublicIssueController.java` | Completed; map cap disclosed |
 | Grouping inspector | Explains which reports joined and why | Public cluster page, stored report decisions, moderation helpers | Completed |
 | Scoped work queue | Helps crews find their work without crossing department boundaries | `WorkQueue.tsx`, `StaffQueueController.java`, `IssueLifecycleService.java` | Completed; current 50-row UI pagination and missing-scope denial |
-| Staff department overview | Separates personal workload from departmental totals | `work/StaffOverview.tsx`, `StaffOverviewService.java`, `/staff/overview` | Completed local implementation; totals are independent of six-row previews |
-| Acknowledgement, assignment and work | Records who accepted and performed a repair | `WorkIssuePanel.tsx`, `AssignmentPanel.tsx`, `IssueController.java`, `TransitionPolicy.java` | Completed; remaining assignment/scope gaps in section 15 |
+| Staff department overview | Separates personal workload from departmental totals | `work/StaffOverview.tsx`, `StaffOverviewService.java`, `/staff/overview` | Completed; scoped overview verified, totals independent of six-row previews |
+| Acknowledgement, assignment and work | Records who accepted and performed a repair | `WorkIssuePanel.tsx`, `AssignmentPanel.tsx`, `IssueController.java`, `TransitionPolicy.java` | Completed; released scope/assignment regressions and dated role checks retained |
 | Repair proof | Requires an uploaded image and at least 20 characters explaining the work | `lib/repairProof.ts`, work panel, `ResolveRequest.java`, `IssueStatusService.java` | Completed; current UI refuses placeholder proof and preserves failed-upload inputs |
-| SLA and priority ageing | Makes neglected or widely reported work more urgent | `PriorityCalculator.java`, `SlaService.java`, `PriorityRecomputer.java`, sweeps | Partially completed end-to-end consistency; rearm gap remains |
+| SLA and priority ageing | Makes neglected or widely reported work more urgent | `PriorityCalculator.java`, `SlaService.java`, `PriorityRecomputer.java`, sweeps | Completed; rearm preservation regressions and subsequent release verified |
 | Automatic escalation | Moves overdue responsibility through the organization | `sla/escalation/`, unique issue/level records and scheduler locking | Local deadline/owner-scope regressions passed; operational scheduler checks remain separate |
 | Citizen repair verification | Lets original citizen reporters challenge a claimed fix | Verification page, `VerificationService.java`, `VerificationTally.java`, V5 | Completed rules; anonymous participation and timeout limitations |
-| Automatic closure and recurrence | Settles quiet resolved work and reopens eligible recurrence | `VerificationSweepService.java`, `ClusteringService.java`, system transitions | Completed; human-close API removed |
+| Automatic closure and recurrence | Settles quiet resolved work and reopens eligible recurrence | `VerificationSweepService.java`, `ClusteringService.java`, system transitions | Completed; SYSTEM quiet-period closure plus reasoned administrator closure |
 | Notifications and preferences | Keeps signed-in reporters/followers informed | Notifications page, `NotificationService.java`, profile/preferences components | Completed; mandatory verification-request behavior is separately enforced |
 | Following | Lets citizens receive updates without submitting another report | `IssueEngagement.tsx`, `IssueEngagementService.java`, `issue_followers` | Completed; does not increase priority or grant a verification vote |
 | Private clarification | Lets original signed-in reporters answer municipal requests for details | `IssueEngagement.tsx`, messages API/table and participant checks | Completed; thread is not part of public report/history DTOs |
@@ -736,7 +648,7 @@ Database transactions and locks protect multi-record changes. Issue entities als
 | Persistent drafts/outbox | Preserves work on weak connections and retries explicit offline submission | `composer.tsx`, `offlineStore.ts`, worker and Next offline route | Completed implementation; full offline navigation Not implemented |
 | Optional installation support | Existing manifest/icons and browser install entry point retained | `app/manifest.ts`, `PwaInstall.tsx`, public icons | Installation/standalone-app verification excluded from browser-only scope by user decision, 10 November |
 | Media orphan cleanup | Finds uploaded images abandoned before report submission | `CloudinaryOrphanSweep.java`, admin client and job | Completed dry-run implementation; enabling deletion is Planned after review |
-| Deployment, CI and backups | Builds releases and preserves database records | Dockerfile, workflows, `scripts/backup.sh`, `restore.sh` | Completed tooling; current hosted state Unknown |
+| Deployment, CI and backups | Builds releases and preserves database records | Dockerfile, workflows, `scripts/backup.sh`, `restore.sh` | Completed; dated live revisions and backup/restore checks in the completion record |
 | Academic evaluation | Measures grouping quality, chain behavior, scale and concurrency | `evaluation/`, opt-in backend tests, retained CSV/PDFs | Completed retained experiments; generalization Not confirmed |
 
 ## 9. Complete User Journey
@@ -784,40 +696,44 @@ The administrator opens `/admin?view=audit`, filters events and exports CSV if n
 
 The repository describes phases 0–9 and extended security/offline/configuration scope as implemented. Source supports a connected intake → grouping → municipal work → verification → public accountability system, plus authentication, moderation, administration and supporting evaluation. The feature table above narrows this broad “done” label where integration or operational checks remain.
 
-The released application includes the consolidated light interface, settings tabs, shared `/work` workspace, updated queue pagination, staff department overview, evidence dialogs and ticket-detail navigation. Final CI and live integration evidence are in the 10 November release record.
+The released application includes the consolidated light interface, settings tabs, shared `/work` workspace, updated queue pagination, staff department overview, evidence dialogs and ticket-detail navigation. Final CI and live integration evidence are in the current completion record.
 
 ### Recorded checks, not new runs
 
 | Evidence | What it records | Boundary |
 |---|---|---|
-| `docs/RELEASE_READINESS.md`, 10 November | Released application `a728d35`, green CI, 381 backend passes/2 skips, 115 frontend passes, real deployed photo/report and Patiala data | Native installation unsuccessful; physical phone unavailable; not a repeat of every live role action or academic benchmark |
-| `README.md`, `FINAL_AUDIT.md` | October release: 277 backend tests total, 275 passing and two opt-in skips; 82 frontend tests; CI/browser closeout | Historical release evidence, before many current local changes |
-| `docs/PROJECT_ASSESSMENT.md` | November 6 cleanup: 282 backend tests, 280 passing, two intentional skips; 82 frontend tests; lint/types/build and 190 route-role checks | Recorded local/scratch checks, not rerun for this document |
-| `frontend/STAFF_OVERVIEW_VERIFICATION.md`, `STAFF_VERIFICATION.md` | Scoped overview, queue paging, upload recovery and staff workflow/layout checks | Feature-specific recorded evidence; distinguish fixture UI writes from real backend tests |
-| `frontend/PUBLIC_VERIFICATION.md`, `CITIZEN_VERIFICATION.md`, other frontend notes | Public/citizen and layout/navigation/failure checks | Synthetic fixtures do not prove current cloud integrations |
+| `docs/NON_PHONE_CLOSEOUT.md`, 13 November acceptance follow-up | Application `0e32539`, Vercel docs snapshot `4b2a04c`: green application CI; 401 backend passes/two skips, 115 frontend passes, lint/types/build, Firefox/WebKit and 19 axe scans retained from 12 November; 18 municipal checks/six layouts and strict local real-photo lifecycle passed during closeout | No production complaint writes; phone/spoken screen-reader unverified, email deferred, installation excluded |
+| `docs/NON_PHONE_CLOSEOUT.md`, 12 November | Application `482e3be`: green CI, 390 backend passes/two skips, 115 frontend passes, live offline photo/report, 19 accessibility scans and verified encrypted backup | Phone postponed; manual spoken screen-reader review unverified; bounded automated/browser coverage |
+| `docs/DAILY_USAGE_VERIFICATION.md`, 11 November follow-up | Real deployed citizen → supervisor → staff → citizen confirmation → administrator closure; 16 workflow groups and 30 layouts | Retains its dated evidence and interruption notes; not a fresh repeat of every role action |
+| `docs/THAPAR_DATASET.md`, 11–12 November | 50 sample issues / 90 reports, scoped replacement, reproducibility and deployed functional/layout checks | Synthetic illustrative locations, not real municipal field validation |
 | `evaluation/README.md`, saved CSVs | Synthetic seed precision 1.000, recall 0.790, F1 0.883; all five retained same-defect concurrency cohorts produced one issue | Saved measurements on bounded experiments, not a fresh capacity or field-quality result |
 | This guide's review | Source/config/history inspection and documentation structure/path checks | No fresh runtime, browser, cloud or benchmark result |
 
 The extent-cap experiment shows a trade-off: removing the cap raised seeded F1 to 0.931, but on the constructed linear chain case reduced F1 from 1.000 to 0.558. These numbers support the measured trade-off, not universal superiority.
 
-### Incomplete, absent, planned and unknown
+### Agreed scope boundaries
 
-| Category | Current assessment |
+| Boundary | Closeout position |
 |---|---|
-| Partially completed | Installed-app/device evidence; deadline, owner-scope and assignment fixes are verified locally |
-| Deferred to future update | Email notifications and email-based password recovery, including provider activation and live delivery/reset checks; code retained |
-| Not implemented | New municipal record provisioning through admin configuration; full service-worker app caching; anonymous verification identity; public arbitrary role registration |
-| Planned for current checks | Review orphan dry runs before deletion; physical-phone browser and screen-reader checks where required; final demo if required; installation excluded |
-| Unknown | Directly observed live mail-worker state, field usage/adoption, actual municipal repair quality, current backup schedule execution and production load capacity; live health/photo flow passed on 10 November |
+| Agreed completion | Verified for academic/demo browser use; the acceptance release and handover are complete |
+| Unverified | Physical-phone camera/GPS/permission/offline behavior; full spoken screen-reader traversal |
+| Deferred | Email delivery and email-based password recovery; retained code is not active delivery evidence |
+| Excluded | Native installation; it is not an outstanding browser-release gate |
+| Outside this scope | Municipal onboarding/provisioning wizard, official ward boundaries, held-out field evaluation, production adoption/capacity, universal accessibility compliance |
+| Operational responsibilities | Preserve private configuration, monitor hosting/backup jobs, rehearse recovery and keep media cleanup scoped/dry-run until separately reviewed |
 
-Absence is not always a missing requirement: anonymous verification and unrestricted role selection have security/product trade-offs, and administrator closure now requires a reason and confirmation while preserving public history and role restrictions. No source TODO/FIXME/HACK markers were found in the searched backend/frontend source at review; concrete remaining work is recorded mainly in assessment and verification notes.
+Anonymous verification identity and arbitrary public role registration are
+intentionally unsupported. A maintained service still needs routine monitoring;
+this does not reopen completed acceptance checks. Historical proposals and their
+dated evidence remain available through the historical index below.
 
-## 11. What We Are Currently Working On
+## 11. Release and Handover History
 
 ### What the history shows
 
 | Date | Commit evidence | Meaning |
 |---|---|---|
+| 2026-11-13 | `0e32539`, `4b2a04c` | Acceptance fixes released and verified; real uploads/strict local closure workflow, deployed role/draft checks and recorded limitations |
 | 2026-11-10 | `935a30f`, `d684390`, `a728d35` | Patiala/map release, deploy-profile email deferral and deterministic evidence ordering; final CI green and real deployed photo/report verified |
 | 2026-10-27 | `011ecb5`, `afe7ce4` | Cross-browser CI verification and non-mail production closeout |
 | 2026-10-26 | `10481bf`, `71d93a3`, `19893be` | Mail diagnostics, separating SMTP health from HTTPS mail and adding HTTPS transactional delivery |
@@ -827,9 +743,10 @@ Absence is not always a missing requirement: anonymous verification and unrestri
 
 November interface/workflow changes have now been released. Remaining evidence gaps concern physical-phone browser use and individually untested operational/accessibility cases. Native installation is excluded by the user's browser-only scope decision; email delivery/recovery stays deferred.
 
-These are observed areas of activity. **Not confirmed:** the team's exact active assignment, owner, deadline or approved immediate priority. A Git diff proves files changed, not what a developer is currently doing.
-
-The November 6 assessment lists SLA rearm preservation and parent-owner permissions first among its proposals. Some later source changes supersede its list-size concerns: My reports, My work, assignment board and review now have page controls. The online composer now refreshes on expiry and preserves its original submission identity, verified in the workflow follow-up. Keep those findings separate rather than repeating the older assessment as an unchanged backlog.
+The agreed browser release is complete. The [handover runbook](docs/DEMO-RUNBOOK.md)
+provides the demonstration path and maintenance duties. Older assessments are
+historical evidence, not an unchanged backlog or a statement of current owner,
+deadline or priority.
 
 ## 12. Future Roadmap
 
@@ -840,28 +757,18 @@ Retain their source implementation and setup notes; provider configuration, real
 delivery/reset-link checks and any further integration work resume in a future
 update, not as a condition of current completion.
 
-### Current operator follow-ups
+### Maintenance after handover
 
-1. Review Cloudinary dry-run logs before enabling destructive orphan cleanup. Keep the age/deletion bounds.
-2. Complete physical-phone browser and screen-reader checks where required; installed-PWA checks are excluded.
-3. Record the final demo using `docs/DEMO-RUNBOOK.md` if a submission video is required.
+Use the responsibilities in the [runbook](docs/DEMO-RUNBOOK.md#maintenance-responsibilities).
+Keep Cloudinary dry-run deletion protection, monitor backup artifacts and expiry,
+and test restoration into a separate target when operationally needed. Phone and
+spoken screen-reader checks remain explicitly unverified; email delivery/recovery
+are deferred and native installation excluded. There is no new acceptance audit
+or feature backlog implied by this handover.
 
-The assessment also records proposed engineering improvements. These are documented proposals, not evidence of scheduled implementation.
-
-### Recommended next engineering sequence
-
-| Order | Recommended work | Dependency and useful completion evidence |
-|---|---|---|
-| 1 — completed locally | Preserve rearmed deadlines across ingest/moderation rescoring | Real ingest, recategorisation, split and scheduled-priority regressions passed; see workflow checks |
-| 2 — completed locally | Align escalation ownership, guards, queue scope and assignee validity | Current valid municipal escalation owners gain access only to their assigned complaint; dual-scope, role, active-status and ward regressions passed |
-| 3 — completed locally | Renew authenticated online report submission after token expiry | 401 retry and failed-renewal/sign-in browser flows passed with the same body/key; changed-account and anonymous-fallback regressions passed |
-| 4 | Keep verification wording and counters consistent | Retain clear fixed-vote, partial-vote and zero-vote distinctions; decide any quorum policy change before changing data semantics |
-| 5 — photo complete; device/restore follow-ups remain | Real deployed photo/report passed on 10 November | Installation excluded by user decision; phone unavailable; backup/restore evidence remains dated; email delivery/recovery deferred |
-| 6 | Improve evaluation gates and output provenance | Separate Python/Java/HTTP plot names, fail incorrect concurrency/HTTP runs, record hardware/config and broaden datasets |
-| 7 | Improve operator onboarding and policy language | Decide provisioning requirements before adding new create flows; explain technical settings in municipal terms |
-| 8 — complete | Reconcile documentation and release reviewed application | `a728d35` pushed, final CI/Vercel status green; live health, Patiala data and photo/report verified |
-
-Do not change applied migrations or rewrite retained complaint history merely to simplify terminology. Schema changes need new migrations. Better official boundaries, identity assurance and field evaluation would improve real-world suitability, but they are recommendations rather than completed or scheduled deliverables.
+Applied migrations and retained complaint history must not be rewritten. Any
+future schema change needs a new migration. Production municipal adoption would
+need its own scope and evidence; academic/demo completion does not certify it.
 
 ## 13. Setup and Installation
 
@@ -892,16 +799,15 @@ cd backend
 mvn spring-boot:run
 ```
 
-This uses realistic base timings and password authentication. For the workshop/demo account bootstrap, use the `demo` profile and supply your own local demo password. The command below deliberately reads your environment variable rather than documenting a password value:
+This uses realistic base timings and password authentication. For the workshop/demo account bootstrap, use the `demo` profile and supply your own local demo password. Supply `CIVICTRACK_DEMO_STAFFPASSWORD` privately in the backend environment; no password value is part of the command:
 
 ```bash
 cd backend
-mvn spring-boot:run \
-  -Dspring-boot.run.profiles=demo \
-  -Dspring-boot.run.arguments="--civictrack.demo.staff-password=${LOCAL_DEMO_PASSWORD} --civictrack.media.verify-evidence=false --civictrack.cors.allowed-origins=http://localhost:3000"
+mvn spring-boot:run -Dspring-boot.run.profiles=demo \
+  -Dspring-boot.run.arguments="--civictrack.cors.allowed-origins=http://localhost:3000"
 ```
 
-Set `LOCAL_DEMO_PASSWORD` in that terminal first, using a local-only value. `civictrack.demo.staff-password` is an actual bootstrap property. The media override is appropriate only for local synthetic/placeholder evidence. Real evidence mode needs the application's Cloudinary cloud and must stay enabled for production. Current repair-proof UI still requires real configured photo upload; disabling backend verification does not make its placeholder proof acceptable.
+`CIVICTRACK_DEMO_STAFFPASSWORD` binds to `civictrack.demo.staff-password`; the deployed service uses that same environment name. For isolated synthetic placeholder fixtures only, an explicit `VERIFY_PHOTO_EVIDENCE=false` environment override is available. Real evidence mode needs the application's Cloudinary cloud and must stay enabled for real-upload demonstrations and deployment. Current repair-proof UI still requires real configured photo upload; disabling backend verification does not make its placeholder proof acceptable.
 
 Seeded account identifiers include the administrator `commissioner@civictrack.example`, supervisor `head.roads@civictrack.example` and staff `crew.roads@civictrack.example`. Their password comes from your bootstrap setting, not this guide. Register a citizen through the app, or use a privately recorded synthetic citizen from the separate [Thapar v2 dataset](docs/THAPAR_DATASET.md), for verification demonstrations.
 
@@ -918,14 +824,13 @@ The default API listens on 8080; `PORT` can override it. Swagger is at `http://l
 
 `application-seed.yml` configures 250 reports, random seed 42 and a fixed reference time of `2026-10-01T00:00:00Z`. `SeedDataGenerator` ingests through the real clustering service and writes labels. It is guarded against populating an already populated application database; `force` is not a supported way to append/reset a working corpus.
 
-On an intentionally empty disposable database, the existing Spring profile mechanism can start with `seed` (or `demo,seed` for harness fixtures). CI's command uses:
+On an intentionally empty disposable database, the existing Spring profile mechanism can start with `seed` (or `demo,seed` for harness fixtures). A fixture-only invocation (with `CIVICTRACK_DEMO_STAFFPASSWORD` supplied privately in the environment) is:
 
 ```bash
 cd backend
 mvn -B --no-transfer-progress -DskipTests package
 java -jar target/civictrack-backend-0.1.0-SNAPSHOT.jar \
   --spring.profiles.active=demo,seed \
-  --civictrack.demo.staff-password="${LOCAL_DEMO_PASSWORD}" \
   --civictrack.media.verify-evidence=false \
   --civictrack.seed.labels-file-path=/tmp/verification-labels.csv
 ```
@@ -956,7 +861,7 @@ Never place server secrets in a `NEXT_PUBLIC_` variable: those values are bundle
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` | Frontend | Cloud name and unsigned upload preset for real uploads |
 | `DATABASE_URL` | Backend/scripts | JDBC PostgreSQL URL for Spring and the seed/backup scripts; use an appropriate plain PostgreSQL DSN for Python/psql tools instead |
 | `DATABASE_USER`, `DATABASE_PASSWORD` | Backend/scripts | Database account configuration |
-| `JWT_SECRET` | Backend | Signing key; at least 32 bytes required by code, unique production value supplied outside source |
+| `JWT_SECRET` | Backend | Private signing key, at least 32 UTF-8 bytes; `deploy` rejects missing/blank and known public development/test/seed defaults, including mixed profiles |
 | `REQUIRE_PRIVILEGED_MFA` (retired) | Backend | No effect; authenticator support is removed from all profiles |
 | `CORS_ALLOWED_ORIGINS` | Backend | Exact comma-separated frontend origins |
 | `PORT` | Backend | Server listen port; default 8080 |
@@ -964,12 +869,17 @@ Never place server secrets in a `NEXT_PUBLIC_` variable: those values are bundle
 | `CLOUDINARY_CLOUD_NAME` | Backend | Must match the application's upload cloud |
 | `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Backend | Private admin credentials for orphan sweep; not browser upload credentials |
 | `CLOUDINARY_DRY_RUN` | Backend | Defaults true; keeps orphan deletion disabled |
+| `CLOUDINARY_CLEANUP_PREFIX` | Backend | Reviewed application-owned media scope; empty skips cleanup |
+| `SPRING_PROFILES_ACTIVE` | Backend | `deploy` on Render; never activate compressed `demo` or corpus `seed` in production |
+| `RENDER_DEPLOY_MODE` | GitHub repository variable | Currently `external`; policy job reports host-managed deployment |
+| `RENDER_DEPLOY_HOOK_URL` | GitHub secret, optional | Only used if a separately approved future setup selects `hook` mode |
+| `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP_DATABASE_PASSWORD` | GitHub secrets | Database source for scheduled encrypted backup/restore verification |
 | `MAIL_ENABLED`, `MAIL_PROVIDER` | Backend | Mail delivery/provider binding; disabled by default, and the current `deploy` profile explicitly forces mail off for the deferred-email release |
 | `MAIL_FROM`, `MAIL_FROM_NAME`, `PUBLIC_APP_URL` | Backend | Sender identity and user-facing URL used in mail/recovery links |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_AUTH`, `SMTP_STARTTLS` | Backend | SMTP transport settings; local defaults target port 1025 |
 | `SMTP_HEALTH_ENABLED` | Backend | SMTP-specific health probe; normally false for HTTPS mail |
 | `BREVO_API_KEY`, `BREVO_API_URL` | Backend | Private HTTPS mail key and optional endpoint override |
-| `civictrack.demo.staff-password` | Spring property/argument | Demo/deploy bootstrap password setting; supply outside source |
+| `CIVICTRACK_DEMO_STAFFPASSWORD` / `civictrack.demo.staff-password` | Backend environment / Spring property | Demo/deploy bootstrap password setting; supply outside source |
 | `BACKUP_PASSPHRASE` | Backup workflow | Encrypts the uploaded backup artifact |
 
 Spring does not automatically load `backend/.env.seed` as an application-wide dotenv file. `scripts/seed-remote.sh` and the backup script explicitly source it. Ordinary server startup needs exported environment variables, Spring configuration or command-line properties.
@@ -1044,21 +954,21 @@ python3 -m venv .venv-evaluation
 
 ### Deployment and operations
 
-The application uses Vercel for `frontend/`, Render for the backend Docker image and Supabase PostgreSQL/PostGIS. Health and database-backed public reads passed on 10 November, as did a real deployed photo/report journey. This dated observation is not an uptime guarantee or an instruction to recreate credentials.
+The application uses Vercel for `frontend/`, Render for the backend Docker image and Supabase PostgreSQL/PostGIS. The exact verified 13 November revisions are recorded at the top and in the completion record. The real deployed photo/report journey on 10–11 November, backup checks on 12 November and acceptance follow-up on 13 November retain separate dates and boundaries. No uptime guarantee or credential recreation is implied.
 
 1. Configure a PostGIS-capable database and backend environment. With the documented Render/Supabase setup, use the IPv4-reachable **session pooler host on port 5432**, not transaction pooling. `application.yml` and decision DD-040 explain the tested choice. A legacy Compose comment says “never a pooler”; that wording does not capture the later session-pooler fix.
 2. Build/deploy from `backend/Dockerfile`. Its Maven build, Class Data Sharing training and runtime stages package the application for Java 21. Supply runtime configuration/secrets through the host.
 3. Configure both frontend API bases for the hosted API and real Cloudinary public settings before building `frontend/`. Configure the backend CORS origin to match the frontend.
 4. For real reporting, match frontend/backend Cloudinary clouds and configure the unsigned upload preset appropriately. Keep backend evidence verification on.
 5. If using `deploy` bootstrap, supply its password property securely. Use strong account passwords and realistic timings.
-6. GitHub CI tests backend, frontend and running-app/browser journeys. The Render deploy job depends on those gates and uses secret `RENDER_DEPLOY_HOOK_URL` on pushes to `main`. Vercel uses its separate Git integration; the backend gate does not by itself prove synchronized frontend release timing.
+6. Both hosts track `main`. Render uses root `backend`, Docker and **On Commit** auto-deploy; Vercel uses root `frontend` and its independent Git integration. GitHub CI tests backend/frontend/API-browser journeys, then `RENDER_DEPLOY_MODE=external` reports that CI did not deploy. `RENDER_DEPLOY_HOOK_URL` is not used in this mode. Host-managed rollout may begin before CI finishes; inspect CI, deployment completion and live readiness separately. Documentation-only publication uses established `[skip ci] [skip render]` conventions when appropriate; Vercel can still produce a docs-only revision with identical application code. No host setting needs changing for handover.
 7. Mail setup is reserved for the future email/password-recovery update: SMTP or Brevo, sender/public URL and appropriate health setting. It is not required for the current milestone. Source implementation does not establish actual provider delivery.
 
 `.github/workflows/keep-alive.yml` pings the recorded API every ten minutes. Its comments explicitly say scheduled runs can be delayed or disabled after inactivity; this is not a cold-start guarantee.
 
 Backups use `scripts/backup.sh` and `scripts/restore.sh`. With the required database environment configured, the documented local command is `./scripts/backup.sh`; the restore verification form is `./scripts/restore.sh --self-test <dump.gz>`. The latter restores into a throwaway PostGIS container and checks expected nonempty tables. Target restore syntax and extension setup are in the script; choose an intentionally separate target.
 
-The weekly workflow reads `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP_DATABASE_PASSWORD` and `BACKUP_PASSPHRASE` from GitHub secrets, tests restoration, encrypts with GPG AES256 and uploads only the encrypted artifact. Local backup-script output is not automatically encrypted. The configured artifact retention is 56 days. This review did not perform a backup or restore.
+The weekly workflow reads `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP_DATABASE_PASSWORD` and `BACKUP_PASSPHRASE` from GitHub secrets, tests restoration, encrypts with GPG AES256 and uploads only the encrypted artifact. Local backup-script output is not automatically encrypted. The configured artifact retention is 56 days. The 12 November verified workflow restored 53 issues / 93 reports / 31 users and checked encryption/decryption equality; its exact artifact references are in the completion record. This documentation-only closeout did not repeat that operation.
 
 ### Common setup problems
 
@@ -1090,7 +1000,7 @@ The weekly workflow reads `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP
 | `open-in-view=false`, eight database connections | Avoid holding connections through response rendering and bound hosted usage | Database pool limits concurrency despite virtual threads |
 | In-memory access token plus HttpOnly refresh cookie | Avoid durable JavaScript-readable credentials | Requires refresh round trips and tab coordination; already issued tokens outlive session revocation |
 | Transactional notifications/mail outbox | Civic writes do not depend on successful external email | At-least-once transport can duplicate mail around a send/commit failure; delivery still needs operation/monitoring |
-| System-only resolve/close | Crews cannot directly certify and close their own fix | Timeout resolution is weaker than citizen confirmation and must be disclosed |
+| System settlement plus reasoned administrator closure | Crews cannot directly certify/close their own repair; administrators may close with reason and confirmation | Early administrative closure is not a verified repair; timeout resolution is disclosed |
 | SSE invalidates normal API reads | One server definition of dashboard metrics | Not every metric streams immediately; polling and reconnection still matter |
 | Shared work/settings/admin screens | Reduce competing destinations while retaining actions | URL state, return navigation, scrolling and role-specific tabs need coordinated checks |
 | Real PostGIS tests and injected clock | Test spatial and time-dependent rules without waiting days | Container runtime required; local tests are not production field evidence |
@@ -1104,12 +1014,12 @@ The weekly workflow reads `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP
 
 | Finding | Evidence and practical effect | Confidence |
 |---|---|---|
-| Escalation deadlines — fixed locally, 7 November | Ingest/moderation and the scheduler preserve the existing escalation grant while updating priority | Full backend suite; four new deadline regressions |
-| Parent-owner access — fixed locally, 7 November | Shared IssueScope admits the current escalation owner to that complaint; ownership changes revoke the extra grant | Real escalation, private-read, queue and work-action regressions |
-| Queue/action scope — fixed locally, 7 November | Supervisor department OR ward; staff department AND optional ward; explicit current escalation ownership; same SQL used before pagination/counting | Dual-scope, review totals, paging and staff boundary regressions |
-| Assignee eligibility — fixed locally, 7 November | API and contextual picker require active staff/supervisor, owning department and permitted staff ward; invalid legacy escalation references are skipped | Inactive/citizen/cross-ward/cross-department and member-lookup regressions |
-| Online session renewal — fixed locally, 7 November | One refresh/retry with original owner, body and submission key; failed renewal/account mismatch preserves the draft | 115 frontend tests and isolated browser expiry/sign-in retries |
-| Trimmed message length has a broad error path | The controller validates the original string, but `IssueEngagementService.post` trims it and throws `IllegalArgumentException` if it is then shorter than three characters. A value such as a single letter padded with spaces can pass the original length check and reach the generic 500 handler | Source-supported edge case; no fresh invalid-message request run |
+| Escalation deadlines — fixed 7 November; released and subsequently verified | Ingest/moderation and the scheduler preserve the existing escalation grant while updating priority | Full backend suite; four new deadline regressions |
+| Parent-owner access — fixed 7 November; released and subsequently verified | Shared IssueScope admits the current escalation owner to that complaint; ownership changes revoke the extra grant | Real escalation, private-read, queue and work-action regressions |
+| Queue/action scope — fixed 7 November; released and subsequently verified | Supervisor department OR ward; staff department AND optional ward; explicit current escalation ownership; same SQL used before pagination/counting | Dual-scope, review totals, paging and staff boundary regressions |
+| Assignee eligibility — fixed 7 November; released and subsequently verified | API and contextual picker require active staff/supervisor, owning department and permitted staff ward; invalid legacy escalation references are skipped | Inactive/citizen/cross-ward/cross-department and member-lookup regressions |
+| Online session renewal — fixed 7 November; released and subsequently verified | One refresh/retry with original owner, body and submission key; failed renewal/account mismatch preserves the draft | 115 frontend tests and isolated browser expiry/sign-in retries |
+| Trimmed message validation — superseded finding | `IssueEngagementService.post` trims Unicode surrounding whitespace and returns HTTP 400 for fewer than three or over 2,000 remaining characters | Current source plus retained acceptance coverage; no new request was run for this documentation pass |
 
 Do not continue to describe My reports as fixed at 50 total or the work queue/assignment board as inaccessible beyond a single page. Current source contains pagination. Page-size caps still exist intentionally, and offset paging can shift when records change concurrently.
 
@@ -1121,17 +1031,17 @@ Do not continue to describe My reports as fixed at 50 total or the work queue/as
 - Photo hashes and capture-time/profanity checks are lightweight screening signals. They do not prove a photo is current, truthful or free of private information.
 - Anonymous identities contribute to distinct-report counts but cannot vote. Municipal reporters also cannot cast citizen-only verification votes. A high reporter count therefore does not imply the same number of eligible voters.
 - Zero-vote timeout, partial-majority timeout and full citizen quorum are different outcomes. Only the zero-vote case sets the explicit without-verification flag. A “resolved” total alone cannot establish independent inspection.
-- `NotificationService` uses “The people who reported this confirmed the fix” for every resolution not marked zero-vote/unverified. That wording can overstate a positive-majority timeout below quorum. Its zero-vote notification also says “closed” even though the immediate state is `RESOLVED`; automatic closure is later. Current work-panel copy is more precise, but these notification strings still need alignment.
+- Resolution notifications reuse the recorded settlement note and distinguish timeout from citizen confirmation; the older overclaiming-copy finding is superseded. Full quorum, partial-majority timeout and zero-vote outcomes still differ and remain visible in history.
 - The seven-day closure period can end recurrence eligibility even where a category's reopen window is longer. The current public API has no general user-triggered reopen-closed-ticket action.
 - Public DTOs hide account identifiers, but public descriptions/photos/precise locations can disclose personal information. Description redaction is not face/license-plate/image redaction.
 
 ### Security and operational limits
 
-The base configuration contains a development signing-key fallback; deployment must supply a separate secret. Token minimum length is a startup validation, not evidence that the actual hosted value was reviewed. Refresh revocation prevents renewal but does not invalidate every already issued access token before its short expiry. Some login/registration/security throttles are process-local, so replicas/restarts do not share those buckets; report-history quotas are separately durable.
+The base configuration keeps a development-only signing-key fallback. `DeploySigningKeyGuard` rejects absent/blank, known fixture and undersized keys whenever `deploy` is active. Before the acceptance push, the Render profile and private key length/default checks were verified privately; no key was printed or changed. Refresh revocation prevents renewal but does not invalidate every already issued access token before its short expiry. Some login/registration/security throttles are process-local, so replicas/restarts do not share those buckets; report-history quotas are separately durable.
 
-Cloudinary deletion is intentionally dry-run until reviewed. A configured real photo pipeline and mail provider were not exercised during this review. Email notifications and email-based password recovery are now explicitly deferred to a future update, so their activation/live checks are not current completion gates. Mail retry code can stop after eight failures and has no demonstrated operator resend workflow here. The outbox decouples civic writes from delivery but does not prove reliable receipt or eliminate duplicate external sends.
+Cloudinary deletion is intentionally dry-run until reviewed. Real Cloudinary uploads and strict evidence hashing were verified in the dated closeout; mail delivery was not activated or claimed. Email notifications and email-based password recovery are now explicitly deferred to a future update, so their activation/live checks are not current completion gates. Mail retry code can stop after eight failures and has no demonstrated operator resend workflow here. The outbox decouples civic writes from delivery but does not prove reliable receipt or eliminate duplicate external sends.
 
-Backups protect database records, not automatically browser drafts or the full Cloudinary asset library. Current remote backup execution, restore freshness, credentials, privacy retention and unattended-job behavior are **Not confirmed**. Free-tier sleep and scheduler delay remain deployment concerns documented by the repository.
+Backups protect database records, not automatically browser drafts or the full Cloudinary asset library. The 12 November backup/restore/encryption round-trip was verified. Later scheduled execution, ongoing restore freshness and long-term privacy retention remain the operator's responsibility; a past successful run does not establish future unattended success. Free-tier sleep and scheduler delay remain deployment concerns documented by the repository.
 
 The PWA manifest/install prompt is not proof of all offline behavior. There is no whole-app cache in the worker. Background delivery, browser storage availability, quota and installed-app behavior vary by browser/device. Physical device and screen-reader validation remain recorded follow-ups.
 
@@ -1221,11 +1131,11 @@ The application release baseline is `a728d3500383e602fd064a284c2405a31851516f`; 
 
 ### Current progress
 
-The reviewed application changes are released at `482e3be`, with green CI, the exact live Render revision observed, a real deployed offline photo/report delivered once, and a fresh encrypted GitHub backup restored and round-trip verified. See [the current closeout record](docs/NON_PHONE_CLOSEOUT.md) for evidence, counts and backup details. Email delivery and email-based password recovery are deferred. Browser-only use is the agreed scope; native installation is excluded. Physical-phone checks are postponed and manual spoken screen-reader review remains unverified. Destructive media cleanup is still scoped and opt-in.
+The acceptance application is released at `0e32539`, with Vercel documentation snapshot `4b2a04c` containing identical application code. Green application CI, 18 deployed municipal checks/six layouts, strict local real-photo lifecycle and the separately dated encrypted backup/restore are recorded in the completion record. See [the current closeout record](docs/NON_PHONE_CLOSEOUT.md) for evidence, counts and backup details. Email delivery and email-based password recovery are deferred. Browser-only use is the agreed scope; native installation is excluded. Physical-phone checks are postponed and manual spoken screen-reader review remains unverified. Destructive media cleanup is still scoped and opt-in.
 
-### Most important remaining tasks
+### Completion boundaries
 
-The deadline, owner/queue scope, assignee eligibility and online renewal fixes,
+The agreed academic/demo browser scope is complete. The deadline, owner/queue scope, assignee eligibility and online renewal fixes,
 the principal deployed role journey and the five D01–D05 audit defects are
 complete. Use the [current closeout record](docs/NON_PHONE_CLOSEOUT.md) for
 non-phone follow-up results and precise remaining boundaries. Physical-phone
@@ -1242,3 +1152,44 @@ retained. Runtime routes, tests, academic documents, supplied briefs, credential
 database backups, dependencies and active builds were preserved.
 
 To keep this guide useful, update the review date, Git baseline, route/feature tables, unresolved findings and evidence table whenever behavior changes. Record the exact checks actually run and preserve the distinction between source implementation, recorded verification and proposed work.
+
+## Historical evidence index
+
+These 19 overlapping audit/status/screen reports were removed from the active
+document set, not from Git history. Their dated measurements, security
+assessments, fixture setup and screenshots remain historical evidence. Current
+operation belongs in this guide, the runbook, screen map and completion record.
+The archived results do not override later authenticator removal, light-only
+design, browser-only scope or verified acceptance fixes.
+
+| Archived report | Reason for retiring the working copy |
+|---|---|
+| [FINAL_AUDIT.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/FINAL_AUDIT.md) | Overlapping dated audit/status/milestone record; current results in the completion record |
+| [docs/END_TO_END_TEST_REPORT.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/END_TO_END_TEST_REPORT.md) | Overlapping dated audit/status/milestone record; current results in the completion record |
+| [docs/MONTH-2-WORK-DONE.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/MONTH-2-WORK-DONE.md) | Overlapping dated audit/status/milestone record; current results in the completion record |
+| [docs/PASSWORD_AUTHENTICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/PASSWORD_AUTHENTICATION.md) | Overlapping dated audit/status/milestone record; current results in the completion record |
+| [docs/PROGRESS.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/PROGRESS.md) | Overlapping dated audit/status/milestone record; current results in the completion record |
+| [docs/PROJECT_ASSESSMENT.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/PROJECT_ASSESSMENT.md) | Overlapping dated audit/status/milestone record; current results in the completion record |
+| [docs/RELEASE_READINESS.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/RELEASE_READINESS.md) | Overlapping dated audit/status/milestone record; current results in the completion record |
+| [docs/WORKFLOW_FIXES.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/WORKFLOW_FIXES.md) | Overlapping dated audit/status/milestone record; current results in the completion record |
+| [frontend/ADMIN_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/ADMIN_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/CITIZEN_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/CITIZEN_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/DENSITY_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/DENSITY_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/DESIGN_RESTORATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/DESIGN_RESTORATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/PUBLIC_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/PUBLIC_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/QUALITY_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/QUALITY_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/STAFF_OVERVIEW_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/STAFF_OVERVIEW_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/STAFF_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/STAFF_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/SUPERVISOR_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/SUPERVISOR_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/TEAM_PERFORMANCE_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/TEAM_PERFORMANCE_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+| [frontend/TICKET_DETAILS_VERIFICATION.md](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/frontend/TICKET_DETAILS_VERIFICATION.md) | Superseded individual screen/layout review; current routes in the screen map |
+
+Retained local evidence links under `artifacts/` are intentionally Git-ignored;
+they refer to the verification computer, not files shipped by a fresh clone.
+Public CI links, committed evaluation tables and immutable reports preserve the
+review trail without publishing credential/session/database artifacts. Backups
+remain under ignored `backups/` or the encrypted Actions artifact retention
+policy. Nothing in this cleanup deletes backups, evidence, media or production
+data. Historical dependency/security advisories and experimental-provenance
+limitations remain in the archived audit/assessment and retained manuscript
+sources; they are not new acceptance tasks.

@@ -1,242 +1,90 @@
 # NagrikSetu
 
-See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for the complete project guide, architecture, setup and current limitations.
-
-**Current non-phone closeout — 12 November:** [the completion record](docs/NON_PHONE_CLOSEOUT.md)
-supersedes older pending-work lists. It records the restore-readiness race,
-supervisor bulk-retry count, warm-offline navigation and verification-link fixes;
-390 backend passes/2 optional skips, 115 frontend passes, lint/types/build and
-focused failure/accessibility checks. Deployment is explicitly host-managed;
-Cloudinary cleanup requires reviewed ownership scope and remains non-destructive.
-Physical-phone testing is postponed; spoken screen-reader review remains
-unverified because the user could not perform it. Email/reset delivery stays deferred.
-
-**Thapar dataset refresh — 11 November:** the deployed database now includes
-**50 synthetic sample issue records / 90 reports**, replacing only the identified
-40-issue/40-report Thapar sample. Two separate QA complaints and all 19 existing
-accounts were preserved; totals at verification were **52 issues / 92 reports**.
-All ten categories and nine workflow states are covered around Thapar/Patiala,
-with actual clustering, verification, moderation and labelled hosted evidence.
-The [dataset report and repeatable procedure](docs/THAPAR_DATASET.md) records
-distributions, backups, preservation checks, 387 backend passes/2 optional skips,
-15 deployed functional groups and 30 desktop/mobile layouts. Data is applied;
-the generator/tool changes are published as
-[`6b94dda`](https://github.com/vanshnanda08/NagrikSetu/commit/6b94dda832ca6faeba0f242df1a3b25d6215a382).
-[CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43229835855).
-The 12 November release follow-up in the dataset report distinguishes the
-user-confirmed live Render revision from the skipped optional CI deploy hook.
-
-**Deployed verification — 11 November:** application `6846b1b` is pushed;
-[CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42888337244). The live citizen → supervisor → staff → citizen confirmation
-→ administrator closure journey passed: **16 workflow groups and 30 layouts**,
-with labelled QA complaint [CT-2026-000919](https://nagrik-setu-vn.vercel.app/issues/d30419d1-9755-45a7-bb85-a1e58f7a7727) now closed. All roles use
-password sign-in. See [the current report and screenshots](docs/DAILY_USAGE_VERIFICATION.md)
-for exact checks, retry observations and remaining physical-device boundaries.
-Earlier dated entries below retain their historical scope.
-
-**Password-only scope — 10 November:** authenticator setup, login codes and
-municipal MFA requirements are removed at the user's request. Password changes,
-role/scope guards and session controls remain. [Verification](docs/PASSWORD_AUTHENTICATION.md):
-386 backend passes/2 optional skips, 115 frontend passes, lint/types/build and
-24 Security layouts passed locally. Publication and the live complaint journey
-are tracked separately; historical MFA descriptions below are not current scope.
-
-**Daily-use rehearsal — 10 November:** the citizen photo report → supervisor
-assignment → staff proof → rejected/repaired → citizen confirmation → admin
-closure journey passed in a disposable environment with real hosted photos.
-20 workflow/continuity checks and 30 layouts passed. A staff singular-count label
-was corrected locally. See [the final daily-use report](docs/DAILY_USAGE_VERIFICATION.md)
-for screenshots, fresh checks and the deployed WebKit rapid-navigation limitation.
-This record describes the local rehearsal; subsequent publication and deployed
-verification are tracked in [release readiness](docs/RELEASE_READINESS.md).
-
-**Verified release — 10 November 2026:** application commit
-`a728d3500383e602fd064a284c2405a31851516f` is pushed; [CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/42686876733)
-and Vercel reports a successful deployment. Live API health and the Patiala/Thapar
-ward data passed. One explicitly approved, labelled synthetic complaint,
-**CT-2026-000918**, completed a real Cloudinary upload and report submission
-(HTTP 201), with loaded evidence and map tiles on the deployed site.
-
-The release includes map zoom/keyboard fixes, deterministic evidence ordering
-and enforced email deferral in the `deploy` profile. Checks: **381 backend tests
-passed, 2 optional evaluations skipped; 115 frontend tests**, lint, types, build,
-API contracts and browser journeys passed. **Browser-only scope, agreed
-10 November:** use the site in a normal browser; Chrome/PWA installation and
-standalone installed-app checks are excluded from completion requirements.
-Physical-phone browser checks remain unavailable. See [release readiness](docs/RELEASE_READINESS.md) for evidence,
-screenshots and the remaining platform/operational limits. Earlier dated reports
-describe their own snapshots, not current unreleased work.
-
 Municipal issue reporting with bounded incremental geo-clustering, SLA-driven
-escalation, and public accountability.
+escalation and public accountability. Citizens submit a photo and location;
+related reports become one work item, municipal teams record repairs, and
+eligible citizens verify the outcome. Public dashboards expose progress.
 
-Citizens report a civic problem with a photo and location. The system merges
-spatially and categorically similar reports into a single
-prioritised work item in real time, so twenty people reporting one pothole
-produce one urgent ticket rather than twenty low-priority ones. Every issue
-carries a deadline that escalates automatically when breached, and staff
-submit fixes for citizen verification. Silent timeout resolutions are disclosed.
-A public dashboard publishes the resulting numbers without a login.
+## Documentation
+
+- [Complete project guide](PROJECT_DOCUMENTATION.md): architecture, features,
+  database, setup and configuration.
+- [Screen map](frontend/SCREENS.md) and [frontend setup](frontend/README.md).
+- [Current completion and operational checks](docs/NON_PHONE_CLOSEOUT.md):
+  deployed revision, test results, encrypted backup, media review and limitations.
+- [Verified daily-use journey](docs/DAILY_USAGE_VERIFICATION.md): citizen reporting,
+  supervisor assignment, staff repair, verification and administrator closure.
+- [Thapar sample dataset](docs/THAPAR_DATASET.md): 50 synthetic issues containing
+  90 reports, generation, scoped refresh, evidence and backup procedures.
+- [Verification tools](tools/README.md), [evaluation](evaluation/README.md),
+  [design decisions](docs/DESIGN-DECISIONS.md), [demo runbook](docs/DEMO-RUNBOOK.md)
+  and [final project report](docs/FINAL-PROJECT-REPORT.md).
+- [Academic manuscript](paper/README.md), including its evidence and licensing.
 
 ## Current interface
 
-The frontend uses one light theme and **two municipal workspaces**:
+The application uses one light theme, with internal desktop panels and natural
+mobile scrolling. Public/citizen destinations are Dashboard, Explore issues
+(List/Map), Report a problem and My reports; notifications and account settings
+are utility controls.
 
-- **Complaints** (`/work`): staff and supervisors share a queue/detail screen.
-  Staff use My work; supervisors also get Assignments, Needs review and Team
-  performance. Administrators use those three oversight views, including closure. Repair proof and permitted status updates
-  stay beside the selected complaint. Moderation and split/merge are contextual tools.
-- **Administration** (`/admin`): Configuration and Audit log tabs, including CSV export.
+Staff and supervisors share **Complaints** (`/work`). Staff get scoped queues,
+progress actions and repair proof; their `/dashboard` shows Department overview.
+Supervisors get assignments, grouping review, team performance and contextual
+moderation/split–merge tools. Administrators get complaint oversight and
+**Administration** (`/admin`) with configuration, audit logs and CSV export.
+Administrator closure requires a public reason and confirmation; early closure
+is explicitly disclosed and excluded from successful-repair/SLA figures.
 
-Staff’s existing overview link now opens **Department overview** (`/dashboard`),
-with personal assignments/overdue/ready/in-progress counts and department open,
-overdue, assignment and citizen-verification totals. A single detail panel switches
-between personal priorities, department priorities and workload by status. Figures
-respect the account’s department and optional ward restriction; complaint links
-open the existing work screen. Other roles retain the city dashboard. See the
-[staff overview verification](frontend/STAFF_OVERVIEW_VERIFICATION.md).
-The subsequent [staff dry run](frontend/STAFF_VERIFICATION.md) adds complete queue
-pagination, stable priority ties, safe handling of repair-upload failures and
-denial of unscoped staff queues, with desktop/mobile and workflow checks.
-Supervisor [Team performance](frontend/TEAM_PERFORMANCE_VERIFICATION.md) now keeps
-department metrics alongside tabbed crew records and charts, with responsive
-mobile cards and the existing administrator department selector.
-Assignment ticket numbers and explicit **View ticket details** links open the full
-record, with report descriptions, photos, location and history. **Open work
-actions** retains the assignment/progress pane, and the full record can return
-to the selected queue. See [ticket detail access checks](frontend/TICKET_DETAILS_VERIFICATION.md).
-The [supervisor dry run](frontend/SUPERVISOR_VERIFICATION.md) adds paged assignments
-and grouping review, recoverable cluster loading, and independent work-panel scrolling.
-It records live read-only checks, isolated write exercises and the checks actually run.
-The [administrator review](frontend/ADMIN_VERIFICATION.md) adds audited administrator
-closure inside Assignments, searchable configuration, complete configuration history,
-CSV session recovery and mobile record editing. Admin navigation omits personal
-reporting shortcuts and the separate My work tab.
-
-Complaint details use a compact desktop summary and three panels for evidence/fix,
-location/grouping and activity. Photos open full-size; long histories and forms
-remain in internal panels. Shared viewport sizing also tightens navigation,
-metrics and configuration/profile forms without changing their data or actions.
-
-Public/citizen navigation remains Dashboard, Explore issues (List/Map), Report a
-problem and My reports, with notifications/account settings as utilities. Existing
-staff/supervisor URLs redirect to the shared workspace without changing backend
-API paths or role permissions. Desktop panels scroll internally; mobile focuses
-on the selected complaint with a Back to queue control.
-
-See [the complete screen map](frontend/SCREENS.md), [frontend setup](frontend/README.md),
-[the general public frontend review](frontend/PUBLIC_VERIFICATION.md), and the
-local screenshots under `artifacts/unified-workspace/`. These interface changes
-are included in the released application; the dated checks below are historical.
-The [citizen dry-run review](frontend/CITIZEN_VERIFICATION.md) records the current
-citizen checks, pagination/feedback fixes and evidence-photo dialogs.
-
-## Current assessment and cleanup
-
-See [the implementation assessment](docs/PROJECT_ASSESSMENT.md) for the architecture,
-feature decisions, completed cleanup, fresh local checks, and remaining workflow
-gaps. Earlier deployment checks and benchmark results below are dated evidence,
-not a fresh verification of production. Administrators can close any nonterminal
-complaint with a required 20–2000-character reason and confirmation. Early closure
-is labelled closed before resolution, not counted as a repair or SLA success,
-and notifies reporters/followers according to their preferences. Evidence and
-public history remain. Citizen verification and the automatic settlement/closure
-jobs remain for the normal repair workflow. Review-queue category/rejection
-edits use the existing moderation screen; no migrations or complaint history were removed.
-
-The [workflow fixes](docs/WORKFLOW_FIXES.md) complete escalation deadline/owner
-consistency, queue and assignment scope, and identity-preserving report retries
-when a login expires. That earlier workflow-fix run had **332 passing tests and
-2 opt-in evaluation tests skipped**; all **115 frontend tests**, lint, TypeScript
-and the production build passed. Browser writes used an isolated fixture.
-
-The subsequent [full end-to-end audit](docs/END_TO_END_TEST_REPORT.md) completed
-the real cross-role complaint journey and service-outage recovery. Its five
-confirmed findings are now corrected in [audit follow-up fixes](docs/AUDIT_FIXES.md):
-CSV protection, stable audit pagination, concurrent-update conflicts, Unicode
-configuration names and verification wording. The fresh combined suite passed
-**377 backend tests (2 optional skips)** and **115 frontend tests**,
-plus lint, TypeScript and production build. These local checks do not replace
-the audit’s blocked/untested browser and physical-device checks.
-
-The [7–8 November quality checks](frontend/QUALITY_VERIFICATION.md) cover message
-validation, truthful verification notifications, a real Cloudinary upload with
-strict server evidence checks, offline queue recovery, keyboard/VoiceOver checks
-and twelve desktop/mobile layout inspections. Chrome now offers installation,
-but native installation did not complete on the available laptop. Physical-phone
-checks were unavailable. The later full role-by-role journey is recorded in
-[the end-to-end report](docs/END_TO_END_TEST_REPORT.md). Native installation was
-subsequently excluded from scope; remaining browser/device limits still apply.
+All roles use password sign-in, with password changes and device/session
+management. Authenticator setup is retired. Signed-in citizens track through
+My reports; anonymous tracking is shown only when signed out. Logout returns
+every role to the general dashboard. Existing deep links retain compatible
+redirects and role restrictions.
 
 ## Project status
 
-**Phases 0–9 implemented; email delivery and email-based password recovery are deferred to a future update.**
-The application, evaluation, hardening, demo profile, and final write-up are
-built and tested. CI, the live frontend/API, and encrypted backup recovery have
-been verified. Cloudinary deletion remains deliberately disabled until its dry
-run is reviewed. Email notifications and email-based password recovery are outside
-the current milestone, including provider setup and live delivery/reset testing.
-Existing code/routes are retained for that future update. In-app notifications
-and password changes while signed in remain in scope. Deployment evidence below
-refers to the earlier release; current release evidence is linked above.
-See [the audit](FINAL_AUDIT.md) for security fixes, fresh verification and the
-remaining operational/accessibility checks.
+**Verified for academic/demo browser use — 13 November 2026.** The acceptance
+release rejects missing/public-default/undersized deploy signing keys and keeps
+administrator closure drafts through queue loading, refresh and cancellation.
+Switching complaints does not transfer the reason into another ticket.
 
-The 2026-10-11 frontend verification below records the earlier NagrikSetu
-glass theme and dashboard layout. The current interface retains its light
-appearance and uses the consolidated screen structure described above.
-
-| | |
+| Verified deployment snapshot | Revision |
 |---|---|
-| Frontend | https://nagrik-setu-vn.vercel.app (historical 2026-11-08 check; current checks are in the closeout report) |
+| Render application | `0e32539162a33d354924e3b560e18f2688a76208` |
+| Vercel documentation-only follow-up | `4b2a04c1e17a9aa56cab0da795aaeb7163ed2005` |
+
+Both revisions contain identical application code. [Application CI is green](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43307995444).
+The 12 November local acceptance checks recorded **401 backend passes / two
+optional skips, 115 frontend passes**, lint/types/production build, Firefox/WebKit
+checks and 19 axe scans. The 13 November deployed closeout passed **18 municipal
+checks and six desktop/mobile layouts**, including scopes, permission denials,
+refresh/logout and closure-draft isolation. Strict real Cloudinary integration
+and the complete closure workflow passed in a disposable local database. The
+current closeout changed no production complaints. [Dated verification and real
+versus mocked boundaries](docs/NON_PHONE_CLOSEOUT.md) remain explicit.
+
+The synthetic Thapar/Patiala dataset has **50 issue records / 90 reports**.
+The 12 November backup snapshot included three separate QA records, for totals
+of **53 issues / 93 reports / 31 users**. These are dated counts, not live totals.
+
+| Service | Address |
+|---|---|
+| Live demo | https://nagrik-setu-vn.vercel.app/dashboard |
+| Repository | https://github.com/vanshnanda08/NagrikSetu |
 | API | https://civictrack-api.onrender.com |
-| API docs (Swagger) | https://civictrack-api.onrender.com/swagger-ui/index.html |
-| Backend tests | **277 total: 275 passed, 2 opt-in evaluation tests skipped, 0 failures/errors**, against real PostGIS via Testcontainers |
-| Frontend tests | **82** passing, plus lint, typecheck and production build |
-| CI | GitHub Actions run #54 passed on commit `afe7ce4`; backend, frontend and Chrome/Firefox/WebKit gates completed before the Render deploy hook |
-| Deployed corpus | 113 issues / 254 reports in the verified backup taken 2026-10-07; counts change with usage |
+| API documentation | https://civictrack-api.onrender.com/swagger-ui/index.html |
 
-> The API runs on Render's free tier and sleeps after 15 minutes idle. The
-> first request after a quiet spell takes up to about a minute; the application
-> itself starts in ~3.5 s.
+Physical-phone and full spoken screen-reader testing remain unverified. Email
+delivery/password recovery is deferred; native installation is excluded. These
+boundaries do not prevent completion of the agreed academic/demo browser scope.
+Loaded-tab offline delivery is supported; cold offline reopening and delivery
+while the browser is closed are not guaranteed. Media deletion stays dry-run
+and scoped. This is not a municipal production-readiness or bug-free claim.
 
-### Done
-
-✅ done · 🟡 implemented, remote checks pending · ⏳ not started
-
-| Phase | Deliverable | Status |
-|---|---|---|
-| 1 | Flyway schema, PostGIS wired, health check, `GeoFactory`, ward-containment canary | ✅ done |
-| 2 | Clustering engine: candidate query, accuracy-weighted centroid, adaptive radius, extent cap, advisory lock, post-lock re-read, concurrency test; seed corpus with ground-truth labels | ✅ done |
-| 3 | State machine and `TransitionPolicy`, status history, staff queue, SLA clock, escalation ladder, ShedLock sweep, priority ageing, JWT auth and RBAC | ✅ done |
-| 4 | Public read API; Next.js frontend: report composer, map, issue detail, **cluster inspector**, staff queue and work view, public dashboard, auth with httpOnly refresh cookie | ✅ done |
-| 5 | Deployment: Docker image with CDS, Supabase, Render, Vercel, GitHub Actions CI, keep-alive, backup with a tested restore, Swagger UI, Cloudinary photo upload and nightly orphan sweep | ✅ done; destructive orphan deletion remains opt-in |
-| 6 | Citizen verification: quorum, one vote per citizen per fix, timeout sweep, auto-close, reopen on rejection, `/me/verify`, notification centre, resolved-without-verification rate per department | ✅ done |
-| 7 | Supervisor tools (assignment board, review queue, split/merge with full recomputation and a permanent log, recategorise), full dashboard aggregates behind expandable headings, SSE live updates | ✅ done |
-| 8 | Evaluation: labelled clustering quality, radius sweep, latency at 1k/10k/50k issues, extent-cap ablation, and live concurrency cohorts | ✅ done; reproducible scripts and CSV/PDF results are in `evaluation/` and `artifacts/evaluation/` |
-| 9 | Rate limiting, anti-abuse screening, privacy redaction, demo scenario, remaining blueprint screens, and final report | ✅ done |
-| Extended scope | Refresh-token rotation and reuse detection, audited admin configuration, persistent drafts, and background offline submission | ✅ done |
-| Future update | Email notifications and email-based password recovery; existing implementation retained | Deferred by user decision; excluded from current completion requirements |
-| Production essentials | Password authentication, active-session revocation, issue following, private clarification threads and security headers; authenticator support retired by user decision on 10 November | ✅ implemented |
-| UI | Frontend refresh (not a numbered phase): NagrikSetu branding and logo, glass theme with a navy / orange / sky palette, one-screen desktop layout for every page, root redirect to the dashboard, accessibility fixes | ✅ done, verified locally 2026-10-11 |
-
-### Remaining operator checks
-
-- Use the [current closeout checklist](docs/NON_PHONE_CLOSEOUT.md), including
-  exact backup/deployment evidence and explicit test boundaries. The main
-  deployed role-by-role journey is complete.
-- Physical-phone checks are postponed; a full spoken screen-reader traversal
-  remains unverified. Native installation is out of scope.
-- Keep destructive media cleanup disabled unless a separately reviewed,
-  application-owned scope and retention decision justify enabling it.
-- A demonstration video is optional submission material if requested.
-
-### Deferred to a future update
-
-Email delivery and email-based password recovery will resume in a future update.
-Provider setup, real reset-link delivery, notification delivery and related live
-checks are not current blockers. Existing implementation and historical test
-evidence are retained; no application code was removed or disabled by this decision.
+For the practical handover, existing synthetic tickets and maintenance duties,
+use the [demo and handover runbook](docs/DEMO-RUNBOOK.md). Historical documents
+removed by cleanup are indexed in the [project guide](PROJECT_DOCUMENTATION.md#historical-evidence-index).
 
 ## Features
 
@@ -297,18 +145,18 @@ evidence are retained; no application code was removed or disabled by this decis
   and a breaching list that updates itself over server-sent events. Chart
   colours checked for colour-blind separation, every chart with a table view.
 - **Accessible status display.** Every status is encoded by colour, shape and
-  word, never colour alone. Light and dark themes.
+  word, never colour alone, in the fixed light theme.
 - **Audited administration.** An administrator screen manages category/SLA
   policy, account roles and scopes, department hierarchy and ward officers.
   It prevents the last administrator from being removed, rejects hierarchy
   cycles, revokes affected sessions, and records before/after values.
-- **One-screen desktop layout.** On a window of 1280 x 600 or larger the page
-  never scrolls: the header stays, tiles and maps take the available height,
+- **One-screen desktop layout.** Core desktop screens target a viewport of 1280 x 600 or larger:
+  the header stays, tiles and maps take the available height,
   and only long content (the issue list, a timeline) scrolls inside its own
   panel. Smaller windows and phones use the normal flowing layout.
-- **Installable and hardened web client.** A web-app manifest, responsive app
-  icons and install prompt make the existing offline-capable frontend
-  installable. Browser responses include HSTS, frame denial, MIME-sniffing,
+- **Hardened browser client.** Manifest/icons and offline reporting remain in
+  source; native installation is excluded from the agreed scope. Browser
+  responses include HSTS, frame denial, MIME-sniffing,
   referrer, permissions and opener-isolation headers.
 
 ## Tech stack
@@ -374,75 +222,59 @@ Docker Desktop.
 
 ## Running it locally
 
-```bash
-docker compose up -d                     # PostGIS on 5432
-
-cd backend && mvn spring-boot:run \
-  -Dspring-boot.run.profiles=demo \
-  -Dspring-boot.run.arguments="--civictrack.demo.staff-password=demo1234 \
-                               --civictrack.media.verify-evidence=false \
-                               --civictrack.cors.allowed-origins=http://localhost:3000"
-
-cd frontend && npm install && npm run dev     # http://localhost:3000 (/ redirects to /dashboard)
-```
-
-Flyway applies the schema on first boot. Verify:
+Run each terminal from the repository root. See the
+[full setup/environment reference](PROJECT_DOCUMENTATION.md#13-setup-and-installation)
+and [frontend setup](frontend/README.md).
 
 ```bash
-curl -s localhost:8080/actuator/health    # {"status":"UP", ...}
+# Terminal 1: local database only; preserve the existing volume.
+docker compose up -d db
 ```
 
-The `demo` profile is what enables login for the seeded staff accounts: they
-ship from the migration **without** a password hash, deliberately, because a
-migration is the wrong place to put credentials (V4). It also compresses SLAs to
-about three minutes and runs the sweep every twenty seconds, so a breach and an
-escalation happen while a slide is still on screen — which means nearly every
-seeded issue reads as overdue. Run without the profile for realistic deadlines,
-at the cost of not being able to log in.
+Supply your own local-only `CIVICTRACK_DEMO_STAFFPASSWORD` privately in the backend
+terminal, then start the workshop profile (compressed deadlines):
 
-All roles use password authentication. `/me/settings?tab=security` provides
-password changes and signed-in device management. Authenticator setup and login
-challenges are retired in every profile; the former `REQUIRE_PRIVILEGED_MFA`
-setting no longer enables them. Existing account passwords are unchanged.
+```bash
+# Terminal 2
+cd backend
+mvn spring-boot:run -Dspring-boot.run.profiles=demo \
+  -Dspring-boot.run.arguments="--civictrack.cors.allowed-origins=http://localhost:3000"
+```
 
-`verify-evidence=false` is only for the local placeholder-photo demo. Production
-must leave verification enabled and set the same Cloudinary cloud in
-`CLOUDINARY_CLOUD_NAME` and `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`; the API then
-downloads and hashes the actual uploaded pixels.
+```bash
+# Terminal 3: create frontend/.env.local from frontend/.env.example if absent,
+# then set API_BASE and NEXT_PUBLIC_API_BASE to http://localhost:8080/api/v1.
+cd frontend
+npm ci
+npm run dev
+```
 
-The following mail setup is retained for the future email/password-recovery
-update; it is not required for the current milestone. To exercise email locally,
-run Mailpit on ports 1025/8025 and set `MAIL_ENABLED=true` without the `deploy`
-profile. The current `deploy` profile explicitly forces mail off; a future mail
-release must deliberately restore its environment binding and verify delivery.
-Production mail also
-needs `SMTP_HOST`, `SMTP_PORT`, optional SMTP credentials/TLS, `MAIL_FROM`, and
-`PUBLIC_APP_URL`. With mail disabled, messages remain in the outbox and issue work
-continues normally.
+Open http://localhost:3000/dashboard. API readiness is at
+http://localhost:8080/actuator/health/readiness. Flyway owns schema creation and
+reference accounts; bootstrap sets only missing municipal password hashes.
+Existing passwords are not reset. Obtain authorized credentials privately;
+self-registration creates citizens only.
 
-On hosting plans that block SMTP, set `MAIL_PROVIDER=brevo`, `MAIL_ENABLED=true`,
-`BREVO_API_KEY`, `MAIL_FROM` (a verified Brevo sender), `MAIL_FROM_NAME`, and
-`PUBLIC_APP_URL`. The Brevo integration uses HTTPS; the API key belongs only in
-the backend environment and must never use a `NEXT_PUBLIC_` name. Leave
-`SMTP_HEALTH_ENABLED=false` for HTTPS delivery; enable it only for SMTP.
+Real reporting/repair demonstrations require `CLOUDINARY_CLOUD_NAME` in the
+backend and matching `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` plus
+`NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` in the frontend. Keep
+`VERIFY_PHOTO_EVIDENCE=true`. Spring does not load frontend environment files.
+An explicit `VERIFY_PHOTO_EVIDENCE=false` override is only for isolated synthetic
+placeholder fixtures; it does not establish real-upload verification and does
+not make a placeholder acceptable to the repair-proof UI.
 
-Seeded logins, all with the password passed above:
-
-| Role | Email |
-|---|---|
-| ADMIN | `commissioner@civictrack.example` |
-| SUPERVISOR | `head.roads@civictrack.example` (and one per department, plus four ward officers) |
-| STAFF | `crew.roads@civictrack.example`, `crew.water@`, `crew.sanitation@` |
-
-The original evaluation corpus has no usable seeded citizen password. The
-separate [Thapar v2 demonstration dataset](docs/THAPAR_DATASET.md) adds 12 synthetic
-citizen logins with credentials saved privately outside Git. Otherwise register
-in the app to exercise `/me/reports`. Reporting itself needs no account at all.
+For realistic local timing with municipal bootstrap, use `deploy` instead of
+`demo` and supply a private `JWT_SECRET` of at least 32 bytes, distinct from all
+public fixture defaults. Keep production `demo`/`seed` profiles off. Email stays
+disabled in `deploy`; password changes and session controls remain available.
+Corpus generation is optional and belongs in a new disposable database; it is
+not a prerequisite for opening the app. Use the runbook for either a read-only
+hosted demonstration or an isolated writable rehearsal.
 
 ## Testing
 
 ```bash
-cd backend  && mvn clean test    # latest local closeout: 390 passed, 2 optional skips
+cd backend  && mvn clean test    # 12 November acceptance: 401 passed, 2 optional skips
 cd frontend && npm run test      # 115 unit tests
 cd frontend && npm run lint      # includes the Leaflet import boundary rule
 ```
@@ -457,7 +289,7 @@ two false diagnoses of a working query. Likewise, restart `next start` after
 `npm run build` — a stale server serves old chunks and the failure looks like an
 application bug.
 
-The clustering and stream mutation checks are recorded in the month-two report.
+Historical clustering and stream mutation checks are indexed in the project guide's [historical evidence index](PROJECT_DOCUMENTATION.md#historical-evidence-index).
 The seed regression compares the complete report and issue records and label files
 across two runs with different wall-clock dates.
 
@@ -495,29 +327,32 @@ present as bugs somewhere else entirely.
 
 ## Deployment
 
-Backend on Render (Docker, free tier), database on Supabase, frontend on
-Vercel. GitHub Actions runs the full backend suite and the frontend lint,
-typecheck, tests and build on every push; a push to `main` that passes both
-runs the API/browser verification job against a fresh PostGIS database, then
-triggers the Render deploy hook if that also passes. Vercel deploys the frontend
-from its own Git integration. A scheduled keep-alive workflow pings the API every ten
-minutes.
+Render builds `backend/Dockerfile` from `main`, using root `backend`, profile
+`deploy` and existing **On Commit** auto-deployment. Vercel independently builds
+root `frontend` from `main`; Supabase provides PostgreSQL/PostGIS and Cloudinary
+stores evidence. CI tests backend, frontend and API/browser journeys, then its
+`RENDER_DEPLOY_MODE=external` policy job reports that deployment is host-managed.
+It does not call a Render hook or prove rollout completion. Hosts can deploy
+before CI finishes; synchronized CI-gated deployment is not configured.
 
-The current demo service area is Patiala around Thapar Institute on Bhadson
-Road. The default map centres on 30.355833 N, 76.365 E. Migration V11 moves
-the four illustrative ward sectors to this area, preserving their IDs and
-officer assignments; these are demo sectors, not official municipal wards.
-New seed runs place reports near the campus. Existing complaints retain their
-original GPS locations and audit evidence, so an existing Ludhiana corpus
-will still appear at its recorded locations. The seed runner intentionally
-does not replace populated databases. Apply the normal backend deployment
-to run V11, and deploy the frontend for the new map defaults; no manual
-Flyway repair or edits to applied migrations are needed.
+Documentation-only commits use the established `[skip ci] [skip render]`
+conventions when appropriate. These skip that commit's CI/backend rollout;
+they do not change workflow or hosting policy. Vercel may still publish a
+documentation-only revision with identical application code. The table above is
+the **verified 13 November snapshot**, not a permanently current hosting SHA.
+Later documentation publication is not a new application release.
 
-The deployed corpus is the seeded 250 reports across ~110 issues. It was 2,000
-reports and ~800 issues originally; the smaller corpus is deliberate — 800
-issues buried the handful that actually illustrate a breach, an escalation and
-a merge.
+The current illustrative service area and synthetic data are around Thapar
+Institute/Patiala. V11 preserves the ward IDs while moving the four demo sectors;
+they are not official municipal ward boundaries. The old 250-report evaluation
+corpus and its earlier Ludhiana locations are historical, not the current hosted
+demo. The [Thapar record](docs/THAPAR_DATASET.md) separates its 50 issue records
+from 90 reports and documents scoped, atomic refresh and preservation checks.
+Do not reseed a populated hosted database for a presentation.
+
+A keep-alive workflow pings the API every ten minutes; free-tier cold starts and
+scheduler delays remain possible. Hosting configuration and secrets are managed
+by the owner; no real values belong in this repository.
 
 Two things about that stack that are not obvious and have both bitten once:
 
@@ -536,8 +371,9 @@ container.
 Photos are compressed in the browser and uploaded straight to Cloudinary with
 an unsigned, size- and format-restricted preset. The nightly cleanup protects
 both report photos and resolution proof; it defaults to dry-run until deployed
-credentials and a reviewed dry-run establish that deletion is appropriate. Seeded demo reports deliberately point at
-Cloudinary's public sample image.
+credentials and a reviewed dry-run establish that deletion is appropriate. The
+current Thapar samples use labelled synthetic hosted illustrations; the older
+evaluation seed's public sample images are historical fixture evidence.
 
 ## Security notes
 
@@ -596,16 +432,16 @@ encrypts it with GPG, and retains only the encrypted artifact for 56 days.
 Configure these GitHub Actions secrets before running the workflow:
 `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP_DATABASE_PASSWORD`, and
 `BACKUP_PASSPHRASE` (a strong passphrase also kept in your password manager).
-The scheduled workflow completed successfully on 2026-10-24: it created a dump,
-restored it into a temporary database, uploaded only the encrypted artifact, and
-the downloaded artifact was decrypted locally with GPG exit code 0.
+The latest verified run, 12 November 2026, restored **53 issues / 93 reports /
+31 users**, verified encryption by decrypting and comparing the output, and
+uploaded an encrypted artifact. Exact backup locations, checksums and retention
+are in the [completion record](docs/NON_PHONE_CLOSEOUT.md).
 
 For a local backup, use `backend/.env.seed` or the `DATABASE_*` environment
 variables, then run `./scripts/backup.sh` and
 `./scripts/restore.sh --self-test <dump.gz>`. Backups use restricted permissions,
 TLS, a connection timeout and an atomic final rename. Interrupted dumps are removed.
-The latest production backup and the older stored backup both restored successfully
-on 2026-10-07. Never commit a dump or a passphrase.
+Never commit a dump or a passphrase.
 
 To recover an encrypted workflow artifact:
 
@@ -615,50 +451,11 @@ gpg --output restored.dump.gz --decrypt civictrack-<timestamp>.dump.gz.gpg
 ```
 
 Cloudinary cleanup needs `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and
-`CLOUDINARY_API_SECRET` in the backend deployment. Inspect its dry-run log before
-setting `CLOUDINARY_DRY_RUN=false`. Those management credentials are not configured
-in the available local environment, so production deletion remains unverified.
-
-Verification on 2026-10-27: backend tests, frontend tests, typecheck and lint pass.
-The production frontend builds with `npm run build -- --webpack`; this environment
-rejects the local worker port used by Turbopack. The normal build command is unchanged.
-
-Deployment follow-up on 2026-10-27: CI run #54 passed at `afe7ce4`, the Render
-health endpoint returned `UP`, and the Vercel dashboard returned HTTP 200.
-Firefox and WebKit each passed the 10-route responsive/keyboard smoke suite;
-Firefox uses an isolated temporary home on macOS 27 to avoid an upstream
-Playwright/Firefox profile-access defect. Production email delivery is deferred.
-
-
-Phase 7 verification follow-up (2026-10-07): all 224 backend tests and 68
-frontend tests pass, along with lint, typecheck and the Webpack production
-build. Expanded API field-contract checks and the lifecycle browser walk pass;
-135 route checks pass across anonymous, citizen, staff, supervisor and admin
-sessions. The harnesses now fail on mismatches and unexpected HTTP/runtime
-errors, and CI includes them before the Render deploy hook. These CI changes
-were pushed on 2026-10-11; the resulting GitHub Actions runs have not been checked
-from this environment.
-
-Frontend refresh verification (2026-10-11), against a local scratch database: 68
-frontend tests, lint, typecheck and the Webpack production build pass; the API
-contract check, the transition table, the lifecycle UI walk and the route sweep
-(0 failing route checks) pass. All 17 pages were measured at 1280x600, 1366x700,
-1440x790 and 1920x1080 in light and dark: the window never scrolls and there are
-no runtime errors. An axe accessibility scan reports no issues on the pages it
-covered, apart from the map markers, whose touch targets are under 24px (an
-existing Leaflet marker limitation). On windows of 1280px or wider, controls are
-40px high rather than 48px.
-
-Final closeout verification (2026-10-24): 270 backend tests recorded against
-PostGIS 17: 268 passed, 2 opt-in evaluations skipped, 0 failures/errors.
-All 79 frontend tests, lint, TypeScript, and the Webpack production
-build pass. Phase-8 clustering, concurrency, cap-ablation, and latency artifacts
-were regenerated from disposable databases. This verification includes MFA,
-session revocation, issue following and private clarification-thread coverage.
-The final project report and demo runbook are in `docs/`.
-
-See [the current progress record](docs/PROGRESS.md) for the completed scope,
-verification boundaries, migration state and outstanding operator checks.
+`CLOUDINARY_API_SECRET` in the backend deployment. Set a reviewed application-owned `CLOUDINARY_CLEANUP_PREFIX`; an empty prefix
+skips the sweep. Keep `CLOUDINARY_DRY_RUN=true` until a scoped retention review
+authorizes deletion. The latest GET-only review found 109 protected assets and
+zero deletion candidates; no real deletion was performed. See the
+[completion record](docs/NON_PHONE_CLOSEOUT.md) for evidence.
 
 ## License
 

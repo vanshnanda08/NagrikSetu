@@ -1,11 +1,17 @@
 # NagrikSetu — Final Project Report
 
+This academic report retains its **26 October 2026** measurement snapshot.
+The [13 November completion record](NON_PHONE_CLOSEOUT.md) and
+[handover runbook](DEMO-RUNBOOK.md) govern current deployment, capabilities and
+limitations; older numbers below are not newly rerun results.
+
 ## Abstract
 
 NagrikSetu is an end-to-end municipal complaint system that turns repeated
 citizen observations into accountable civic work. Reports are grouped by
 category and geography in real time, prioritised, assigned an SLA, escalated
-when overdue, and resolved only after citizen verification. The implementation
+when overdue, and settled through citizen verification or a disclosed timeout rule.
+Reasoned administrative early closure is distinguished from successful repair. The implementation
 combines a Spring Boot/PostGIS backend with a Next.js public and staff client.
 Its main technical contribution is a bounded incremental clustering pipeline
 that remains correct under concurrent submission and exposes every grouping
@@ -18,8 +24,8 @@ the remaining administrative screens. The 2026-10-26 backend run plus the final
 mail-diagnostics regression records 277 tests: 275 passed, 2 opt-in evaluations
 skipped, and zero failures/errors. All 82
 frontend tests, lint, TypeScript, and the production build pass. See
-[PROGRESS.md](PROGRESS.md) and [FINAL_AUDIT.md](../FINAL_AUDIT.md) for current
-verification, security changes and the conditional production-readiness verdict.
+[the current completion record](NON_PHONE_CLOSEOUT.md) for current
+verification, security changes and the academic/demo browser-use verdict.
 
 ## Problem and objectives
 

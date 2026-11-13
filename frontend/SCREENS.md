@@ -55,12 +55,9 @@ Priority/deadline ties use a stable issue-ID ordering. Missing department scope
 is denied for staff; ward officers retain their cross-department ward queue.
 Repair-photo failures clear progress, show an actionable error and retain the
 photo/note for retry. A demo photo placeholder cannot be submitted as repair proof.
-See the [staff dry-run report](STAFF_VERIFICATION.md) for checks and limitations.
-The [Team performance sizing review](TEAM_PERFORMANCE_VERIFICATION.md) records
-the compact metrics/detail layout, accessible chart views, responsive crew records
-and retained supervisor/administrator department restrictions.
-The [ticket details access fix](TICKET_DETAILS_VERIFICATION.md) distinguishes full
-ticket records from work controls. Assignment ticket numbers and View ticket
+Team performance retains accessible chart views, responsive crew records and
+supervisor/administrator department restrictions. Full ticket records remain
+distinct from work controls. Assignment ticket numbers and View ticket
 details open the existing full-record screen; Open work actions opens the pane
 with assignment/progress controls. No additional screen was introduced.
 
@@ -89,7 +86,8 @@ These remain reachable from a relevant parent rather than occupying the main men
 - Ward details `/dashboard/wards/[id]`: Dashboard ward summaries.
 - Grouping explanation `/issues/[id]/cluster`: complaint details.
 - Sign-in/registration: the existing shared dialog and deep-link entry routes.
-- Password recovery/reset: the existing account recovery flow.
+- Password recovery/reset: retained entry routes show an unavailable notice;
+  email delivery and recovery remain deferred.
 
 ## Compatibility and preservation
 
@@ -113,13 +111,8 @@ Redirects retain query parameters and use temporary 307 responses. Old
 review/performance view directly. Current page
 bodies were moved into components, with duplicate page implementations removed.
 All current fields, actions, API contracts, authentication, lifecycle rules,
-verification, clustering and offline data remain. The original screen-consolidation
-pass changed no backend code and removed or transitioned no civic records. The
-subsequent staff overview adds a read-only scoped endpoint. Pre-edit frontend files and
-the working-tree diff are retained under
-`/tmp/nagriksetu-before-screen-consolidation/`. The shared-workspace pass also
-retains its pre-edit frontend/tools archive and tracked diff under
-`/tmp/nagriksetu-before-unified-workspace/`.
+verification, clustering and offline data remain. These routes preserve existing civic records and role restrictions. Staff overview
+uses a read-only scoped endpoint.
 
 Long content scrolls internally on desktop. The public list has a compact heading
 and visible pagination; mobile uses natural scrolling and the existing menu.
@@ -132,9 +125,8 @@ The viewport sizing pass keeps essential complaint information visible together
 and reduces oversized maps/media, repeated headings and vertical gaps across core
 screens. Long timelines, optional views and large forms remain accessible through
 internal panels and keyboard-operable tabs. Mobile retains natural scrolling.
-See [current sizing verification and screenshots](DENSITY_VERIFICATION.md).
-The subsequent [citizen review](CITIZEN_VERIFICATION.md) records pagination,
-feedback, evidence-dialog fixes and the current dry-run results and limitations.
+Current checks and their boundaries are recorded in the
+[completion record](../docs/NON_PHONE_CLOSEOUT.md).
 
 ## Screenshots
 
@@ -153,62 +145,21 @@ Screenshots and machine-readable measurements are local and gitignored under
 `artifacts/unified-workspace/`. The wider public/citizen/role audit retains its
 evidence under `artifacts/screens-consolidation/`.
 
-## Verification completed (2026-11-07)
+## Verification
 
-- `npm run build`, `npm run lint`, `npx tsc --noEmit`, and all **88 unit tests
-  in 13 files** passed. Navigation tests cover citizen tasks, shared role homes,
-  restricted supervisor tabs, contextual navigation, list/map state and queue
-  selection/filter retention.
-- `node tools/unified-workspace.mjs`: **43 layout/screenshot checks** and **24
-  interaction checks** passed. The shared staff/supervisor views and administrator
-  configuration/audit were checked at **1280×600, 1366×768, 1440×900,
-  1920×1080, 390×844 and 768×1024**. Zero application runtime errors or
-  accessibility findings were recorded in this workspace audit.
-- The focused audit checks desktop queue/detail visibility, mobile list/detail
-  switching and focus return, staff denial of supervisor views, proof validation,
-  upload/payload and failed-transition fixtures, department assignee selection,
-  assignment payload, detail-action refresh of the visible assignment queue,
-  old work deep links and actual administrator CSV download.
-- `node tools/screen-consolidation.mjs`: **78 page/layout checks** and **21
-  interaction/redirect checks** passed across public, citizen, staff, supervisor
-  and administrator contexts. This covers shared navigation, all earlier grouped
-  screens, legacy redirects, settings validation/session fixtures and internal scroll.
-  No runtime errors or actionable accessibility findings. Two spatial-marker
-  target-size scans are recorded as equivalent-control exceptions only when the
-  selector or element markup identifies a map marker and the corresponding
-  same-page list controls measure at least 44×44 pixels; list selection is also
-  tested. Other findings are not exempted.
-- `node tools/complaint-tracking.mjs` passed anonymous real lookup, normalization,
-  repeat/blank lookup, loading/404/failure/retry, merged-complaint history, five
-  viewport sizes and accessibility.
-- Manual screenshot review covered staff queue/detail and mobile, supervisor
-  assignment/review/performance, and administrator configuration/audit. A separate
-  [assignment-form screenshot](../artifacts/unified-workspace/supervisor-assignment-form-1440.png)
-  shows the real department picker after scrolling the detail pane; no assignment
-  was submitted during capture.
-- Existing API/auth/domain files and the backend working-tree diff match the
-  pre-edit snapshot. The original proof form validation/upload/transition block
-  is unchanged apart from also invalidating the visible supervisor queue after
-  a successful work action. `git diff --check` passed for edited frontend/tools/docs.
-
-Browser verification used Chrome and a temporary production server on port 3003
-with the existing local demo API. The secondary-port CORS bridge is browser-only;
-backend CORS, authentication and rate limits were not changed. The harnesses honor
-login Retry-After responses. Screenshots use real demo data; sensitive write and
-upload checks use browser fixtures, so no complaint records were transitioned.
-
-This pass did not rerun Firefox/WebKit, physical-device, screen-reader, installed
-PWA, real upload/mail delivery or backend tests. Nothing was committed, pushed
-or deployed. The ordinary development app remains on localhost:3000.
+The [current completion record](../docs/NON_PHONE_CLOSEOUT.md) contains the latest
+CI, focused failure/accessibility and deployed offline results.
+[Daily-use verification](../docs/DAILY_USAGE_VERIFICATION.md) records the actual
+citizen-to-administrator lifecycle and dated responsive checks. Individual
+historical screen reviews were removed to avoid competing status lists; committed
+versions remain in Git history. These references do not claim physical-phone or
+full spoken screen-reader coverage.
 
 Supervisor assignments use 50-row pages with a lookahead; grouping review uses
 25-row pages with the server total. Page/filter changes clear bulk selection.
 Full ticket links retain the selected queue and page. Long work regions scroll
-independently, and a different selected complaint starts at the top of its details.
-See [the supervisor dry run](SUPERVISOR_VERIFICATION.md) for verification boundaries.
+independently; selecting another complaint starts at its summary.
 
-
-Administrator review keeps existing records and API workflows, with no additional
-screen for closure. Personal reporting shortcuts are absent from the admin menu.
-Configuration search, full history paging, CSV refresh/retry, mobile/tablet record
-selection and administrator closure are recorded in [ADMIN_VERIFICATION.md](ADMIN_VERIFICATION.md).
+Administration keeps record search, history paging, CSV refresh/retry and a
+mobile/tablet editor. Closure stays inside Assignments; it adds no separate
+screen. Personal reporting shortcuts are absent from the administrator menu.

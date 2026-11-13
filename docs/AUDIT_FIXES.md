@@ -3,7 +3,7 @@
 Verified **8 November 2026 (Asia/Kolkata)** against the current local working tree;
 Git baseline `74c76ec155a2ad8b354ae35b27540c8e58030b9d`. Existing uncommitted work was preserved.
 These changes address the five confirmed categories in
-[the original end-to-end audit](END_TO_END_TEST_REPORT.md). That report's failures
+[the original end-to-end audit](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/END_TO_END_TEST_REPORT.md). That report's failures
 remain historical evidence; its browser/device limitations are not converted
 into passes by these fixes. No commit, push or deployment was performed.
 

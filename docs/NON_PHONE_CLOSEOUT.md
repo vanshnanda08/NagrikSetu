@@ -1,9 +1,40 @@
-# Non-phone completion review — 12 November 2026
+# Non-phone verification and handover — 13 November 2026
 
-This is the current completion checklist. Older dated audits retain their own
-results; their unresolved lists are superseded only by the evidence mapped here.
+This is the current completion checklist. Superseded status reports and individual
+screen-review notes were removed during documentation cleanup; their committed
+versions remain in Git history. Retained dated evidence keeps its original scope.
 Physical-phone testing is postponed. Email delivery/password recovery remain
 deferred, authenticator support is retired, and native installation is excluded.
+
+## Final handover status — 13 November 2026
+
+**Verified for academic/demo browser use.** Application verification is complete
+within that scope; this documentation-only handover does not reopen the audit.
+
+| Exact verified snapshot | Revision / evidence |
+|---|---|
+| Render application | `0e32539162a33d354924e3b560e18f2688a76208`, observed Live |
+| Vercel docs-only snapshot | `4b2a04c1e17a9aa56cab0da795aaeb7163ed2005`, successful Production deployment; identical application code |
+| Application CI | [43307995444](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43307995444), all four jobs passed |
+| Final deployed coverage | 18 municipal checks and six desktop/mobile layouts; no production complaint writes |
+
+Later documentation-only Git pushes can yield a newer Vercel metadata SHA;
+this table deliberately preserves the exact **verified baseline** rather than
+claiming a permanent live revision. The retained release observations below
+separate CI, rollout, real integrations, mocks and verification dates.
+
+The [README](../README.md), [project guide](../PROJECT_DOCUMENTATION.md),
+[handover/demo runbook](DEMO-RUNBOOK.md) and [screen map](../frontend/SCREENS.md)
+are canonical. The guide's [historical evidence index](../PROJECT_DOCUMENTATION.md#historical-evidence-index)
+links all 19 retired reports at an immutable pre-cleanup commit. Local artifact
+links refer to retained, ignored files on the verification computer; they are
+not promised as assets of a fresh clone. No backup, evidence, existing media or
+production record is removed by this documentation cleanup.
+
+Physical-phone and full spoken screen-reader tests are unverified; email
+delivery/password recovery is deferred; native installation is excluded. Those
+boundaries do not prevent completion of the agreed browser scope. Operational
+monitoring remains a maintenance responsibility, not a new acceptance backlog.
 
 ## Confirmed defects corrected
 
@@ -191,7 +222,9 @@ off-device copy; artifact retention is finite, not permanent archival storage.
 
 ## Remaining boundaries
 
-No confirmed defect from this closeout remains unresolved. Physical-phone
+The subsequent acceptance audit identified two additional defects, addressed
+and verified locally and after deployment in the follow-ups below.
+Physical-phone
 camera/GPS/permission/offline testing is postponed. The requested manual spoken
 screen-reader review could not be performed and remains unverified. Native
 installation is excluded, and email delivery/password recovery are deferred.
@@ -268,8 +301,9 @@ observations and verification boundaries follow below.
 Application commit [`0e32539162a33d354924e3b560e18f2688a76208`](https://github.com/vanshnanda08/NagrikSetu/commit/0e32539162a33d354924e3b560e18f2688a76208)
 was pushed normally to `main`. Nine explicitly scoped files contain the two
 fixes, regressions and related notes. All six application/test/tool source hashes
-match the retained local verification. The unrelated documentation cleanup
-remains uncommitted, including the 19 proposed documentation deletions.
+match the retained local verification. The unrelated documentation cleanup was excluded from that application
+commit; the final documentation handover retires the 19 overlapping reports
+with immutable historical references.
 
 - [Release CI](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43307995444):
   all four jobs passed, including backend, frontend, API/browser journeys and
@@ -391,3 +425,50 @@ No production complaint was created, assigned, repaired, verified or closed for
 this release. Strict real-photo lifecycle writes were confined to the disposable
 local database described above. Three labelled synthetic hosted integration
 assets remain retained; no existing Cloudinary media was deleted.
+
+### Post-publication hosting observation
+
+The documentation-only closeout commit
+`4b2a04c1e17a9aa56cab0da795aaeb7163ed2005` was pushed normally. Render retained
+the verified application revision
+`0e32539162a33d354924e3b560e18f2688a76208`. Vercel's existing Git integration
+also completed Production deployment `7761271942` for the documentation commit:
+[deployment details](https://vercel.com/bro-code17/civic-track/DBz637MrcYsLaNsAWhb8MUtdqhsN).
+The entire frontend and backend Git trees are identical between those commits;
+no application retest was invalidated. Public dashboard/issue-list availability
+and API readiness were checked again after that publication and passed. The
+application CI remains the green run linked above; the documentation-only
+commit used the repository's existing CI/Render skip conventions, without
+changing workflow or hosting policy. Exact post-publication metadata is retained
+in `documentation-host-status.json` and `release-state.json` in the ignored
+release artifacts. This is the post-publication **baseline observation**, now retained in the
+final handover. A subsequent documentation-only Vercel revision does not alter
+application code or rerun the historical verification.
+
+The temporary municipal QA credential input file was removed after the checks,
+and retained artifacts were scanned for its value. Existing credentials,
+accounts and application configuration were left unchanged.
+
+## Documentation closeout checks — 13 November 2026
+
+The remaining documentation cleanup and post-publication metadata annotation
+were reviewed together. Only Markdown and the documentation-related ignore
+allowlist are in scope. Application source, dependency locks, migrations and
+workflow/hosting configuration are unchanged. Appropriate checks are local
+Markdown targets/anchors, immutable history targets, whitespace, staged-path
+and credential/private-artifact exclusions, and source-equivalence checks.
+Application suites and benchmarks are reused from the verified release rather
+than rerun for prose changes. The handover commit follows the existing
+`[skip ci] [skip render]` documentation convention; a skipped CI invocation is
+not described as a new application test pass. Vercel may build the docs-only
+commit through its existing Git integration. No backend redeployment or hosting
+setting change is requested.
+
+The final prose checks on 13 November passed: **119 local Markdown targets/anchors**
+with zero broken retained-document links (35 targets are explicitly documented
+ignored local artifact references), all **19 archived Git objects** verified at
+the pinned pre-cleanup commit, **10 private/build ignore probes**, retained env
+templates, whitespace checks and an added-line credential-pattern scan. Only
+31 reviewed documentation/ignore paths are included. Application/workflow diffs
+are empty and the retained acceptance-source hashes still match. These are
+documentation/hygiene checks, not a fresh application or full-history secret audit.

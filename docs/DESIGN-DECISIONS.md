@@ -1,6 +1,6 @@
 # CivicTrack — Design Decision Log
 
-Current progress and verification totals: [PROGRESS.md](PROGRESS.md).
+Current progress and verification totals: [NON_PHONE_CLOSEOUT.md](NON_PHONE_CLOSEOUT.md).
 Historical decisions retain their original context; DD-070 and DD-072 record
 the accepted account, administration, offline, security and engagement additions.
 
@@ -2757,7 +2757,8 @@ making public descriptions a channel for personal information.
 - Automatic SYSTEM closure still observes its configured quiet period (seven days in production). Manual closure explicitly ends the remaining reopening window; the confirmation explains that later reports start a new complaint.
 - Staff and supervisors cannot close; pending/open complaints retain the citizen-verification workflow. This does not add an administrator resolve override or a generic status editor.
 - Administrators use Ready to close inside the existing Assignments pane. No extra page/window was introduced. My work/personal-reporting shortcuts were removed from admin navigation, with shared routes/API access retained for other roles and existing links.
-- See [administrator verification](../frontend/ADMIN_VERIFICATION.md) for role, validation, evidence/history and UI checks.
+- See [the screen map](../frontend/SCREENS.md) for current administrator functions; the
+  [daily-use report](DAILY_USAGE_VERIFICATION.md) records executed role and closure checks.
 
 
 ## DD-074 — Administrative early closure is not a successful resolution
@@ -2789,7 +2790,7 @@ references remain visible as unstaffed rungs instead of receiving work.
 Online report retries renew once on 401 and retain the original account, body and
 submission key. Failed renewal or an account switch preserves the draft for
 sign-in/retry. Anonymous submission and owner-bound offline delivery remain.
-See [verification and limits](WORKFLOW_FIXES.md); no production integration or
+See [historical verification and limits](https://github.com/vanshnanda08/NagrikSetu/blob/e0b4cedbfb5c2b475dc557532e19130e6549a913/docs/WORKFLOW_FIXES.md); no production integration or
 deployment claim follows from these local checks.
 
 
