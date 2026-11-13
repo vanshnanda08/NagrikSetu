@@ -325,16 +325,17 @@ function Aggregates({ m, selected }: { m: DashboardMetrics; selected: DetailView
     <>
       <DashboardSection title="Complaint trends" selected={selected}>
         <p className="mt-1 text-dense text-ink-muted" style={{ maxWidth: "var(--measure-prose)" }}>
-          Daily new and resolved issues. The backlog grows when gray is above green.
+          Compare new complaints with resolved complaints each day. When the dashed line is higher,
+          more complaints arrived than were resolved that day.
         </p>
         <div className="mt-3">
           {m.reportedVsResolved ? (
             <TrendChart
-              title="New issues and resolved issues per day, last 90 days"
+              title="New and resolved complaints per day, last 90 days"
               height={shortDesktop && !session ? 144 : 220}
               series={[
-                { key: "reported", label: "New issues", color: "var(--chart-context)" },
-                { key: "resolved", label: "Resolved", color: "var(--st-resolved)" },
+                { key: "reported", label: "New complaints", color: "var(--chart-context)", lineStyle: "dashed" },
+                { key: "resolved", label: "Resolved", color: "var(--st-resolved)", lineStyle: "solid" },
               ]}
               rows={m.reportedVsResolved}
             />

@@ -87,14 +87,14 @@ export function ScopeOverview({ m, charts = true, compact = false }: { m: ScopeM
 export function ScopeCharts({ m, view, height }: { m: ScopeMetrics; view?: "trends" | "backlog"; height?: number }) {
   return <div className={`scope-charts${view ? "" : " mt-6 grid grid-cols-1 xl:grid-cols-2 gap-6"}`}>
     {view !== "backlog" && <section>
-      <h2 className="text-heading">Reported against resolved, last 90 days</h2>
+      <h2 className="text-heading">New vs resolved complaints, last 90 days</h2>
       <div className="mt-3">
         <TrendChart
           height={height}
-          title="New issues and resolved issues per day, last 90 days"
+          title="New and resolved complaints per day, last 90 days"
           series={[
-            { key: "reported", label: "New issues", color: "var(--chart-context)" },
-            { key: "resolved", label: "Resolved", color: "var(--st-resolved)" },
+            { key: "reported", label: "New complaints", color: "var(--chart-context)", lineStyle: "dashed" },
+            { key: "resolved", label: "Resolved", color: "var(--st-resolved)", lineStyle: "solid" },
           ]}
           rows={m.reportedVsResolved}
         />

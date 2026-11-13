@@ -22,6 +22,7 @@ export interface TrendSeries<K extends string> {
   label: string;
   /** A CSS colour, normally a token: var(--st-resolved). */
   color: string;
+  lineStyle?: "solid" | "dashed";
 }
 
 export interface TrendChartProps<K extends string> {
@@ -34,7 +35,14 @@ export interface TrendChartProps<K extends string> {
 
 // Right padding holds the end labels ("12 new issues"). At 72px the longest
 // was clipped mid-word, which the browser walk's screenshot showed.
-const PAD = { top: 12, right: 108, bottom: 28, left: 36 };
+const PAD = { top: 28, right: 128, bottom: 28, left: 36 };
+
+function SeriesKey({ series }: { series: TrendSeries<string> }) {
+  return <svg width="32" height="10" aria-hidden="true" className="shrink-0">
+    <line x1="1" x2="31" y1="5" y2="5" stroke={series.color} strokeWidth="2.5"
+      strokeDasharray={series.lineStyle === "dashed" ? "8 5" : undefined} />
+  </svg>;
+}
 
 export function TrendChart<K extends string>({ title, series, rows, height = 220 }: TrendChartProps<K>) {
   const [ref, width] = useWidth<HTMLDivElement>();
@@ -42,11 +50,12 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
   const tableId = useId();
 
   const compact = width < 480;
-  const rightPad = compact ? 16 : PAD.right;
+  const rightPad = compact ? 28 : PAD.right;
   const plotW = Math.max(0, width - PAD.left - rightPad);
   const plotH = height - PAD.top - PAD.bottom;
   const max = Math.max(1, ...rows.flatMap((r) => series.map((s) => r[s.key])));
-  const ticks = niceTicks(max);
+  // Complaint counts are whole numbers, including on quiet days with a max of one.
+  const ticks = niceTicks(max).filter(Number.isInteger);
   const top = ticks[ticks.length - 1];
   const x = (i: number) => PAD.left + (rows.length <= 1 ? plotW / 2 : (i / (rows.length - 1)) * plotW);
   const y = (v: number) => PAD.top + plotH - (v / top) * plotH;
@@ -69,15 +78,20 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
   };
 
   const active = hover === null ? null : rows[hover];
+  // Draw dashes above solid lines so equal counts still show both line styles.
+  const drawSeries = [...series].sort((a, b) => Number(a.lineStyle === "dashed") - Number(b.lineStyle === "dashed"));
 
   return (
     <figure className="chart-figure m-0">
+      {rows.length > 0 && <figcaption className="mb-2 text-meta text-ink-muted">
+        {shortDay(rows[0].day)} – {shortDay(rows[rows.length - 1].day)} · Daily counts
+      </figcaption>}
       {/* Legend: always present for two or more series, line keys to match the marks. */}
       {series.length > 1 && (
         <ul className="flex flex-wrap gap-x-5 gap-y-1 list-none p-0 m-0 mb-2 text-meta text-ink-muted">
           {series.map((s) => (
             <li key={s.key} className="flex items-center gap-2">
-              <span aria-hidden="true" style={{ width: 14, height: 2, background: s.color, borderRadius: 1 }} />
+              <SeriesKey series={s} />
               {s.label}
             </li>
           ))}
@@ -90,13 +104,14 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
             width={width}
             height={height}
             role="img"
-            aria-label={`${title}. Use the left and right arrow keys to read each day.`}
+            aria-label={`${title}. ${series.map(s => `${s.label}: ${s.lineStyle === "dashed" ? "dashed" : "solid"} line`).join(". ")}. Use the left and right arrow keys to read each day.`}
             aria-describedby={tableId}
             tabIndex={0}
             className="block outline-none focus-visible:ring-2 focus-visible:ring-ink"
             style={{ borderRadius: "var(--radius)" }}
             onPointerMove={(e) => onMove(e.clientX, e.currentTarget.getBoundingClientRect())}
-            onPointerLeave={() => setHover(null)}
+            onPointerDown={(e) => onMove(e.clientX, e.currentTarget.getBoundingClientRect())}
+            onPointerLeave={(e) => { if (e.pointerType !== "touch") setHover(null); }}
             onBlur={() => setHover(null)}
             onKeyDown={(e) => {
               if (rows.length === 0) return;
@@ -107,6 +122,7 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
               }
             }}
           >
+            <text x={PAD.left} y={12} className="text-meta" fill="var(--ink-muted)">Complaints per day</text>
             {/* Recessive grid: solid hairlines, one step off the surface. */}
             {ticks.map((t) => (
               <g key={t}>
@@ -122,12 +138,13 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
               </text>
             ))}
 
-            {series.map((s) => (
+            {drawSeries.map((s) => (
               <polyline
                 key={s.key}
                 fill="none"
                 stroke={s.color}
-                strokeWidth={2}
+                strokeWidth={2.5}
+                strokeDasharray={s.lineStyle === "dashed" ? "8 5" : undefined}
                 strokeLinejoin="round"
                 strokeLinecap="round"
                 points={rows.map((r, i) => `${x(i)},${y(r[s.key])}`).join(" ")}
@@ -164,15 +181,15 @@ export function TrendChart<K extends string>({ title, series, rows, height = 220
             className="absolute pointer-events-none bg-surface-raised border border-rule px-3 py-2 text-meta shadow-sm"
             style={{
               top: PAD.top,
-              left: Math.min(Math.max(0, x(hover) + 12), Math.max(0, width - 170)),
+              left: Math.min(Math.max(0, x(hover) + 12), Math.max(0, width - 210)),
               borderRadius: "var(--radius)",
-              minWidth: 150,
+              width: Math.min(210, width),
             }}
           >
             <div className="text-ink-muted">{shortDay(active.day)}</div>
             {series.map((s) => (
               <div key={s.key} className="flex items-center gap-2 mt-1">
-                <span aria-hidden="true" style={{ width: 10, height: 2, background: s.color }} />
+                <SeriesKey series={s} />
                 <strong className="text-ink tabular-nums">{fmt(active[s.key])}</strong>
                 <span className="text-ink-muted">{s.label.toLowerCase()}</span>
               </div>
