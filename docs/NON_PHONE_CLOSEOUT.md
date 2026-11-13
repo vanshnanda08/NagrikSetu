@@ -256,9 +256,138 @@ Before publication, authenticated hosting settings confirmed Render uses the
 known development/test/seed defaults. The value was not recorded or changed.
 Both hosts track `main`: Render uses its existing On Commit Git deployment;
 Vercel uses its Next.js integration rooted at `frontend`. No deployment policy
-or credential was changed. CI, rollout and live checks are separate outstanding
-observations until recorded below. The previous observed live backend revision
+or credential was changed. CI, rollout and live checks are recorded separately
+in the observations below. The previous observed live backend revision
 is `482e3be01d39fd8f8f21f4e7645e79ebdf027115`.
 
-Release publication, exact deployed revisions, focused live checks and strict
-real-photo integration are pending; this entry does not assert completion.
+The initial prerequisite entry preceded publication; the completed release
+observations and verification boundaries follow below.
+
+## Controlled release observations — 13 November 2026
+
+Application commit [`0e32539162a33d354924e3b560e18f2688a76208`](https://github.com/vanshnanda08/NagrikSetu/commit/0e32539162a33d354924e3b560e18f2688a76208)
+was pushed normally to `main`. Nine explicitly scoped files contain the two
+fixes, regressions and related notes. All six application/test/tool source hashes
+match the retained local verification. The unrelated documentation cleanup
+remains uncommitted, including the 19 proposed documentation deletions.
+
+- [Release CI](https://github.com/vanshnanda08/NagrikSetu/actions/runs/43307995444):
+  all four jobs passed, including backend, frontend, API/browser journeys and
+  deployment-policy reporting. Hosting rollout is verified separately.
+- [Vercel deployment](https://vercel.com/bro-code17/civic-track/5RoCpje2Xs9fSsfcjWR1gFWqnRys):
+  GitHub reports success for the exact application revision above. Production
+  branch `main`, automatic domain assignment and root `frontend` were observed
+  in authenticated project settings.
+- [Render rollout](https://dashboard.render.com/web/srv-dafvv20n74is73btq5o0/deploys/dep-dbr2njvb9u1s738ipp50):
+  source is the exact application revision above, triggered by Auto-Deploy.
+  The initial rollout was observed waiting for its internal health check.
+  On 13 November, authenticated Render Deploys showed **Live** and the last
+  successfully deployed commit `0e32539`, matching the exact application
+  revision above; the owner also confirmed rollout completion.
+- **Live read-only checks passed:** API health/readiness UP; dashboard, issue
+  list and report at 1280×600, 1366×768, 1440×900, 1920×1080, 390×844 and 768×1024
+  (18 layouts, no horizontal overflow); existing QA citizen password sign-in,
+  authenticated reload/refresh, reports/profile/security reads, administrator
+  UI access denial and logout to the public dashboard. No page runtime errors,
+  unexpected server failures or production business writes were observed.
+  A first test assertion omitted the actual denial wording; correcting the
+  assertion confirmed the existing denial, without an application change.
+- **Strict real-photo integration passed:** the release source ran under
+  `deploy` against a new disposable PostgreSQL database, with
+  `VERIFY_PHOTO_EVIDENCE=true` and the configured real unsigned Cloudinary
+  preset. Three clearly labelled synthetic JPEGs uploaded successfully.
+  A foreign evidence URL was refused (422); actual hosted report and repair
+  images were accepted and server-computed 16-character hashes persisted.
+  Assignment, scoped staff work, repair submission, citizen rejection and
+  reopening, a second repair, confirmation and reasoned administrator closure
+  passed through normal services. Four identical report submissions persisted
+  exactly **one issue / one report**; a changed replay was refused (409).
+  There was one closure event, and all three images remained accessible after
+  closure. They are retained as synthetic integration assets; no existing media
+  or production business data was modified or deleted. The initial local API
+  startup preceded final PostgreSQL readiness; its recorded failure is separate
+  from the successful restart and workflow. This check replaces no historical
+  mocked-browser evidence and does not claim a new deployed citizen submission.
+
+Evidence: ignored local `artifacts/controlled-release-20261112/`, including
+`ci-status.json`, `public-live.json`, `real-photo-results.json` and screenshots.
+Only the integration's dedicated API/container and VM were removed after verification,
+along with its temporary source and credentials. Other environments were untouched.
+
+### Deployed administrator follow-up — 13 November
+
+Render now confirms the release is Live. A separate temporary Chrome for Testing
+context authenticated the existing administrator through normal password sign-in
+and session refresh. The real deployed assignment-queue response was fetched and
+held until a synthetic closure reason had been typed, then released unchanged.
+At **1280×600 and 390×844**, the reason survived queue arrival, dialog Cancel,
+and Escape. A real stale-queue refresh after an isolated browser reconnect also
+preserved it at both sizes. No closure POST was sent; a transport guard blocks
+all non-authentication production writes. Desktop screenshot review showed the
+queue and work form within the viewport; mobile uses readable natural scrolling.
+
+Evidence is `municipal-queue-groups-passed.json`, `admin-draft-1280.png` and
+`admin-draft-390.png` in the release artifact directory. Earlier harness attempts
+used an incorrect board-row ID field and an exact ticket URL selector which
+omitted the return-to query. A later mobile attempt tried Back to queue after
+a queue-tab action had already cleared selection. Those harness assumptions
+were corrected against the current component/DTO contracts; they do not establish
+an application defect, and their failed attempts remain separately recorded.
+
+### Final municipal verification and release verdict — 13 November
+
+The owner supplied the existing municipal QA password through an owner-only,
+Git-ignored local input file. A new isolated headless browser used normal UI
+sign-in against the deployed frontend; it did not attach to the owner's browser
+profile, mint tokens, change credentials or alter role permissions.
+
+- The administrator's draft clears on a **direct desktop switch** to another
+  complaint. On mobile, Back to queue followed by selecting another complaint
+  also opens an empty closure reason. No reason transfers into the wrong ticket.
+- Administrator, supervisor and staff password sign-in and authenticated
+  reload/refresh passed. All three roles explicitly signed out through their
+  mobile navigation controls and returned to the public dashboard.
+- The existing roads supervisor's assignment queue and roads staff member's
+  work queue contained only `POTHOLE`, `ROAD_DAMAGE` and `SIGNAGE` work. Both
+  municipal roles received **403** on administrator audit reads; staff also
+  received **403** on supervisor queue reads. The administrator audit read
+  succeeded through the same normal authenticated API integration.
+- Administrator, supervisor and staff layouts passed at **1280×600 and 390×844**
+  without horizontal overflow. Desktop staff/administrator and mobile
+  supervisor/administrator screenshots were visually reviewed: the desktop
+  shell fits its viewport with internal list/form scrolling, while mobile
+  preserves readable natural scrolling and usable navigation. Public pages'
+  earlier six-size checks remain valid for the same application revision.
+- The completed focused groups recorded **zero page runtime errors, zero
+  unexpected server failures and zero attempted production business writes**.
+  A request guard allowed only read requests and ordinary authentication POSTs.
+  Normal authentication audit/session records are the expected side effects.
+
+The final browser run's results are `municipal-live.json`; delayed queue groups
+remain in `municipal-queue-groups-passed.json`. The two records distinguish
+previously passing groups from the completed complaint-switch and role checks.
+Harness-only corrections also accounted for mobile account controls and waited
+for authenticated navigation before logout. Earlier failed/time-out attempts
+remain retained and are not described as application regressions or clean runs.
+No additional application change was needed during deployed closeout.
+
+**Verified application revision on both hosts:**
+`0e32539162a33d354924e3b560e18f2688a76208`. Backend evidence is the authenticated
+Render Live revision and deployment above; frontend evidence is Vercel's
+successful deployment tied to that exact SHA, its production `main` settings
+and the live UI checks. Release CI is green; rollout completion and functional
+verification were observed separately. The documentation-only follow-up does
+not replace the verified application revision.
+
+**Verdict: the two-fix controlled release is verified for academic/demo browser
+use, with the recorded conditions.** Physical-phone camera/GPS/permission/offline
+testing and full spoken screen-reader review remain unverified. Email delivery
+and password recovery remain deferred; native installation is excluded. Cold
+offline reopening/background delivery, production capacity and universal
+accessibility compliance are not certified. Lower-priority dependency/tooling
+recommendations remain outside this acceptance-fix release.
+
+No production complaint was created, assigned, repaired, verified or closed for
+this release. Strict real-photo lifecycle writes were confined to the disposable
+local database described above. Three labelled synthetic hosted integration
+assets remain retained; no existing Cloudinary media was deleted.
