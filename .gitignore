@@ -34,15 +34,15 @@ backend/.env.seed
 # have no business in version control.
 backups/
 
-# Historical working documents stay local. Retain the final closeout evidence.
-docs/*
-!docs/DEMO-RUNBOOK.md
-!docs/DESIGN-DECISIONS.md
-!docs/AUDIT_FIXES.md
-!docs/DAILY_USAGE_VERIFICATION.md
-!docs/THAPAR_DATASET.md
-!docs/NON_PHONE_CLOSEOUT.md
-!docs/FINAL-PROJECT-REPORT.md
+# Local historical working copies. New canonical documentation stays trackable.
+/docs/ARCHITECTURE.md
+/docs/MONTH-1-PROJECT-REPORT.md
+/docs/MONTH-1-STATUS.md
+/docs/PHASE-5-VERIFICATION.md
+/docs/civictrack-app-blueprint.md
+/docs/civictrack-claude-code-prompts.md
+/docs/civictrack-java-blueprint.md
+/docs/civictrack-project-report.md
 
 # Local verification screenshots and walk output (large, regenerable). Keep
 # the small, reproducible phase-8 result tables and vector plots.
@@ -53,3 +53,62 @@ artifacts/*
 
 # Optional dataset refresh tools.
 scripts/__pycache__/
+
+# Nested development/build output and Python environments
+**/node_modules/
+**/target/
+**/.next/
+**/coverage/
+**/__pycache__/
+*.py[cod]
+.venv/
+.venv-*/
+*.tsbuildinfo
+.cache/
+
+# Private environment variants; sanitized templates remain trackable
+.env.*
+*.env
+*.env.*
+!**/.env.example
+!**/.env.seed.example
+
+# Local logs, temporary/editor files and database exports
+*.log
+*.tmp
+*.temp
+*.swp
+*~
+*.dump
+*.dump.gz
+*.dump.gz.gpg
+*.backup
+*.sql.gz
+
+# Browser auth/network state is private, including outside artifacts/
+.auth/
+playwright/.auth/
+storage-state*.json
+*.har
+.vercel/
+
+# LaTeX scratch output; keep the intentional manuscript QA inputs/results
+/paper/build/*
+!/paper/build/QA.md
+!/paper/build/artifact-hashes.json
+!/paper/build/compile-console.log
+!/paper/build/fonts.txt
+!/paper/build/main.bbl
+!/paper/build/main.blg
+!/paper/build/main.log
+!/paper/build/pdfinfo.txt
+!/paper/build/qa.json
+/paper/*.aux
+/paper/*.bbl
+/paper/*.blg
+/paper/*.log
+/paper/*.out
+/paper/*.fls
+/paper/*.fdb_latexmk
+/paper/*.synctex.gz
+/paper/main.pdf

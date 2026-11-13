@@ -980,6 +980,7 @@ The weekly workflow reads `BACKUP_DATABASE_URL`, `BACKUP_DATABASE_USER`, `BACKUP
 | Photo storage unavailable or verification refused | Backend cloud setting, frontend cloud/preset agreement and evidence URL requirements |
 | Repair cannot submit with placeholder | Intentional `uploadRepairProof()` check; configure real uploads |
 | Browser requests blocked by CORS | Exact origin/port in backend allowed origins |
+| Database files are incompatible with server | Preserve the volume. Use the PostgreSQL major version that created it, or plan a backup/restore into a separate new-major target; do not delete data to bypass the error |
 | Hosted database cannot connect | JDBC URL, session-pooler hostname, credentials and the documented IPv4 constraints |
 | Seed refuses to run | Nonempty application corpus; preserve it and use a separate disposable database |
 | Reset email never arrives | Email recovery is intentionally deferred; its frontend forms are unavailable by default. Signed-in password change remains available |
