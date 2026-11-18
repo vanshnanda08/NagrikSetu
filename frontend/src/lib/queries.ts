@@ -1,3 +1,4 @@
+import { workflowRefresh } from "./workflowRefresh";
 import { useEffect, useState } from "react";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiBase, query, request } from "./api";
@@ -21,7 +22,7 @@ import type {
  * The stale times are the blueprint's and each one is a claim about how fast
  * the underlying fact changes:
  *
- *   lists            30s      a queue that is half a minute stale is fine
+ *   lists            30s      cached between visits; visible workflow polls every 15s
  *   issue detail      0       the page somebody opened to check a status
  *   categories/wards  ∞       reference data; it changes by migration
  *
@@ -66,6 +67,7 @@ export interface IssueFilters {
 
 export function useIssues(filters: IssueFilters) {
   return useQuery({
+    ...workflowRefresh,
     queryKey: keys.issues(filters),
     queryFn: () => request<PublicIssuePage>(`/public/issues${query({ ...filters })}`),
     staleTime: LIST_STALE,
@@ -75,6 +77,7 @@ export function useIssues(filters: IssueFilters) {
 
 export function useIssue(id: string) {
   return useQuery({
+    ...workflowRefresh,
     queryKey: keys.issue(id),
     queryFn: () => request<PublicIssue>(`/public/issues/${id}`),
     staleTime: 0,
@@ -83,6 +86,7 @@ export function useIssue(id: string) {
 
 export function useIssueReports(id: string) {
   return useQuery({
+    ...workflowRefresh,
     queryKey: keys.issueReports(id),
     queryFn: () => request<PublicReport[]>(`/public/issues/${id}/reports`),
     staleTime: 0,
@@ -91,6 +95,7 @@ export function useIssueReports(id: string) {
 
 export function useIssueHistory(id: string) {
   return useQuery({
+    ...workflowRefresh,
     queryKey: keys.issueHistory(id),
     queryFn: () => request<PublicHistoryEntry[]>(`/public/issues/${id}/history`),
     staleTime: 0,
@@ -108,6 +113,7 @@ export interface BboxParams {
 
 export function useBbox(params: BboxParams | null) {
   return useQuery({
+    ...workflowRefresh,
     queryKey: keys.bbox(params),
     queryFn: () => request<BboxResult>(`/public/issues/bbox${query({ ...params! })}`),
     // Null until the map reports its first viewport. Fetching a guessed

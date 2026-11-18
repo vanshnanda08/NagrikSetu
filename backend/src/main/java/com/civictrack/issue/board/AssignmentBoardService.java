@@ -3,6 +3,7 @@ package com.civictrack.issue.board;
 import com.civictrack.issue.IssueLifecycleService;
 import com.civictrack.issue.IssueRepository;
 import com.civictrack.issue.QueueTab;
+import com.civictrack.issue.QueueSort;
 import com.civictrack.issue.dto.QueueRowDto;
 import com.civictrack.user.Actor;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,8 @@ public class AssignmentBoardService {
      * page rather than two per row.
      */
     @Transactional(readOnly = true)
-    public List<BoardRowDto> board(Actor actor, QueueTab tab, int limit, int offset) {
-        List<IssueRepository.QueueRow> rows = lifecycle.queue(actor, tab, limit, offset);
+    public List<BoardRowDto> board(Actor actor, QueueTab tab, QueueSort sort, int limit, int offset) {
+        List<IssueRepository.QueueRow> rows = lifecycle.queue(actor, tab, sort, limit, offset);
         if (rows.isEmpty()) {
             return List.of();
         }

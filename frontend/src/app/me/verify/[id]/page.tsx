@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import Link from "next/link";
 import { use, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -42,11 +44,11 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
   const { openSignIn } = useSignIn();
   const qc = useQueryClient();
 
-  const [choice, setChoice] = useState<Verdict | null>(null);
-  const [reason, setReason] = useState("");
-  const [result, setResult] = useState<VoteResult | null>(null);
+  const [draft, setDraft] = useState<{ key: string; choice: Verdict; reason: string } | null>(null);
+  const [submitted, setSubmitted] = useState<{ key: string; result: VoteResult } | null>(null);
 
   const view = useQuery({
+    ...workflowRefresh,
     queryKey: keys.myVerification(session?.userId, id),
     queryFn: () => authed((token) => request<VerificationView>(`/me/verifications/${id}`, { token })),
     enabled: Boolean(session),
@@ -55,12 +57,21 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
     staleTime: 0,
   });
 
+  // A refreshed repair round needs a new answer. Keep a draft through polls of
+  // the same round, but never reuse its choice or result for a later repair.
+  const roundKey = `${session?.userId}:${id}:${view.data?.round}`;
+  const choice = draft?.key === roundKey ? draft.choice : null;
+  const reason = draft?.key === roundKey ? draft.reason : "";
+  const result = submitted?.key === roundKey ? submitted.result : null;
+
   const vote = useMutation({
-    mutationFn: (body: { verdict: Verdict; reason?: string }) =>
-      authed((token) =>
+    mutationFn: ({ key, ...body }: { key: string; verdict: Verdict; reason?: string }) => {
+      void key;
+      return authed((token) =>
         request<VoteResult>(`/issues/${id}/verify`, { method: "POST", token, body }),
-      ),
-    onSuccess: (r) => setResult(r),
+      );
+    },
+    onSuccess: (result, variables) => setSubmitted({ key: variables.key, result }),
     onSettled: () => {
       // DD-057: a vote can change the issue's status, so it invalidates every
       // view that status appears in -- not only this one. That includes the
@@ -103,7 +114,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  if (view.isError) {
+  if (view.isError && (!view.data || [401, 403, 404].includes((view.error as ApiError).status))) {
     const err = view.error as ApiError;
     return (
       <PageShell>
@@ -126,13 +137,13 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  const v = view.data;
+  const v = view.data!;
   const i = v.issue;
   const pending = i.status === "PENDING_VERIFICATION";
   // A 409 already-verified carries the recorded verdict, so the screen can
   // show it even before the refetch lands.
   const conflictVerdict =
-    vote.error instanceof ApiError && vote.error.status === 409
+    vote.variables?.key === roundKey && vote.error instanceof ApiError && vote.error.status === 409
       ? ((vote.error.problem?.verdict as Verdict | undefined) ?? null)
       : null;
   const recorded = result?.verdict ?? v.myVerdict ?? conflictVerdict;
@@ -141,7 +152,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
   const submit = () => {
     if (!choice) return;
     const trimmed = reason.trim();
-    vote.mutate(choice === "NOT_FIXED" && trimmed ? { verdict: choice, reason: trimmed } : { verdict: choice });
+    vote.mutate({ key: roundKey, verdict: choice, ...(choice === "NOT_FIXED" && trimmed ? { reason: trimmed } : {}) });
   };
 
   return (
@@ -153,6 +164,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
 
       <AdministrativeClosureNotice status={i.status} resolvedAt={i.resolvedAt} />
       <h1 className="mt-3 text-display">Is it fixed?</h1>
+      {view.isError && <ErrorState action="Refreshing this complaint" problem={(view.error as ApiError)?.problem} onRetry={() => void view.refetch()} />}
       <p className="mt-1 text-body text-ink-muted">
         {i.categoryName} · {i.wardName}
         {i.departmentName ? ` · ${i.departmentName}` : ""}
@@ -193,7 +205,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
               <Button
                 variant="secondary"
                 aria-pressed={choice === "FIXED"}
-                onClick={() => setChoice("FIXED")}
+                onClick={() => setDraft({ key: roundKey, choice: "FIXED", reason })}
                 className={choice === "FIXED" ? SELECTED : ""}
               >
                 Fixed
@@ -201,7 +213,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
               <Button
                 variant="secondary"
                 aria-pressed={choice === "NOT_FIXED"}
-                onClick={() => setChoice("NOT_FIXED")}
+                onClick={() => setDraft({ key: roundKey, choice: "NOT_FIXED", reason })}
                 className={choice === "NOT_FIXED" ? SELECTED : ""}
               >
                 Not fixed
@@ -215,7 +227,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
                   hint="One line. The department sees this."
                   value={reason}
                   maxLength={280}
-                  onChange={(e) => setReason(e.target.value)}
+                  onChange={(e) => setDraft({ key: roundKey, choice: "NOT_FIXED", reason: e.target.value })}
                 />
               </div>
             )}
@@ -228,7 +240,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
               </div>
             )}
 
-            {vote.isError && !conflictVerdict && (
+            {vote.isError && vote.variables?.key === roundKey && !conflictVerdict && (
               <ErrorState action="Sending your answer" problem={(vote.error as ApiError)?.problem} />
             )}
           </>

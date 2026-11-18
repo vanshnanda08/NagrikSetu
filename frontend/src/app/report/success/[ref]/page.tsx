@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { workflowRefresh } from "@/lib/workflowRefresh";
 import { PageShell } from "@/components/PageShell";
 import { TicketRef } from "@/components/TicketRef";
 import { StatusRule } from "@/components/StatusRule";
@@ -48,46 +50,27 @@ export default function ReportSuccessPage({ params }: { params: Promise<{ ref: s
       return null;
     }
   });
-  const [issue, setIssue] = useState<PublicIssue | null>(null);
-  const [notFound, setNotFound] = useState(false);
-  const [lookupError, setLookupError] = useState<Error | null>(null);
-  const [lookupAttempt, setLookupAttempt] = useState(0);
+  const lookup = useQuery({
+    ...workflowRefresh,
+    queryKey: ["public-complaint-tracking", ref],
+    queryFn: ({ signal }) => request<PublicIssue>(`/public/issues/by-ref/${encodeURIComponent(ref)}`, { signal, cache: "no-store" }),
+    retry: false,
+  });
+  const issue = lookup.data;
+  const notFound = lookup.error instanceof ApiError && lookup.error.status === 404 && !result && !issue;
+  const lookupError = lookup.isError && !notFound ? lookup.error : null;
+  const cleared = useRef<string | null>(null);
 
   useEffect(() => {
-    let live = true;
+    if (!issue || cleared.current === ref) return;
+    cleared.current = ref;
+    // Clear the delivered draft once, never a new draft created during polling.
+    reset();
+  }, [issue, ref, reset]);
 
-    // Refetched regardless of the hand-over, so a shared or refreshed link
-    // renders fully and the page shows the issue's LIVE status rather than its
-    // status at the moment of submission.
-    request<PublicIssue>(`/public/issues/by-ref/${encodeURIComponent(ref)}`)
-      .then((fetched) => {
-        if (!live) return;
-        setIssue(fetched);
-        // The report is durably on the server; the held draft is no longer
-        // needed. Cleared here, in an async callback, rather than in the effect
-        // body -- clearing another component's state synchronously during an
-        // effect is the cascading render the lint rule exists to prevent.
-        reset();
-      })
-      .catch((error: unknown) => {
-        if (!live) return;
-        if (error instanceof ApiError && error.status === 404) {
-          if (!result) setNotFound(true);
-        } else {
-          setLookupError(error instanceof Error ? error : new Error("Could not load the report status."));
-        }
-      });
+  const retryStatus = () => { void lookup.refetch(); };
 
-    return () => {
-      live = false;
-    };
-    // Runs for the reference and explicit retries; the saved hand-over is initial state.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref, lookupAttempt]);
-
-  const retryStatus = () => { setLookupError(null); setLookupAttempt(attempt => attempt + 1); };
-
-  if (lookupError && !result) return (
+  if (lookupError && !result && !issue) return (
     <PageShell>
       <h1 className="text-display">Report status unavailable</h1>
       <ErrorState action="Loading the report status" problem={lookupError instanceof ApiError ? lookupError.problem : undefined} onRetry={retryStatus} />

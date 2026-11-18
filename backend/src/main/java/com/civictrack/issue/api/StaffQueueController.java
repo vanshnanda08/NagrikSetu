@@ -2,6 +2,7 @@ package com.civictrack.issue.api;
 
 import com.civictrack.issue.IssueLifecycleService;
 import com.civictrack.issue.QueueTab;
+import com.civictrack.issue.QueueSort;
 import com.civictrack.issue.dto.QueueRowDto;
 import com.civictrack.user.auth.Actors;
 import lombok.RequiredArgsConstructor;
@@ -41,11 +42,12 @@ public class StaffQueueController {
     @GetMapping("/queue")
     @PreAuthorize("hasAnyRole('STAFF','SUPERVISOR','ADMIN')")
     public List<QueueRowDto> queue(@RequestParam(required = false) String tab,
+                                   @RequestParam(required = false) String sort,
                                    @RequestParam(defaultValue = "50") int limit,
                                    @RequestParam(defaultValue = "0") int offset,
                                    @AuthenticationPrincipal Jwt jwt) {
         int bounded = Math.min(Math.max(limit, 1), MAX_PAGE);
-        return lifecycle.queue(Actors.from(jwt), QueueTab.parse(tab),
+        return lifecycle.queue(Actors.from(jwt), QueueTab.parse(tab), QueueSort.parse(sort),
                                bounded, Math.max(offset, 0))
                 .stream().map(QueueRowDto::from).toList();
     }

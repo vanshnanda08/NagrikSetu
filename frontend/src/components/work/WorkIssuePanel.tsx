@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import { AdministrativeClosureNotice } from "@/components/AdministrativeClosureNotice";
 
 import Link from "next/link";
@@ -72,6 +74,7 @@ function IssueWork({ id }: { id: string }) {
   const wards = useWards();
 
   const issue = useQuery({
+    ...workflowRefresh,
     queryKey: ["staff", "issue", id, session?.userId],
     queryFn: () => authed((token) => request<StaffIssue>(`/issues/${id}`, { token })),
     enabled: Boolean(session),
@@ -159,7 +162,7 @@ function IssueWork({ id }: { id: string }) {
     );
   }
 
-  if (issue.isError) {
+  if (issue.isError && (!issue.data || [401, 403, 404].includes((issue.error as ApiError).status))) {
     const err = issue.error as ApiError;
     return (
       <>
@@ -192,6 +195,7 @@ function IssueWork({ id }: { id: string }) {
 
   return (
     <>
+      {issue.isError && <ErrorState action="Refreshing this complaint" problem={(issue.error as ApiError)?.problem} onRetry={() => void issue.refetch()} />}
       {closedNotice && <p role="status" className="mt-3 text-dense">Complaint closed. The reason is recorded in its history and audit log.</p>}
       <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2">
         <TicketRef publicRef={i.publicRef} />

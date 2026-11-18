@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WorkIssuePanel } from "@/components/work/WorkIssuePanel";
@@ -43,6 +45,7 @@ export default function ReviewQueuePage() {
   const isSupervisor = session?.role === "SUPERVISOR" || session?.role === "ADMIN";
 
   const page = useQuery({
+    ...workflowRefresh,
     queryKey: ["supervisor", "review", session?.userId, offset],
     queryFn: () => authed((token) => request<ReviewPage>(`/supervisor/review?limit=${PAGE}&offset=${offset}`, { token })),
     enabled: Boolean(isSupervisor),

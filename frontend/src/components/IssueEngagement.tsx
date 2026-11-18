@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "./Button";
@@ -18,6 +20,7 @@ export function IssueEngagement({ issueId }: { issueId: string }) {
   const citizen = session?.role === "CITIZEN";
 
   const follow = useQuery({
+    ...workflowRefresh,
     queryKey: ["issue", issueId, "follow", session?.userId],
     queryFn: () => authed((token) => request<{ following: boolean }>(`/issues/${issueId}/follow`, { token })),
     enabled: Boolean(session && citizen),
@@ -27,6 +30,7 @@ export function IssueEngagement({ issueId }: { issueId: string }) {
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["issue", issueId, "follow"] }),
   });
   const messages = useQuery({
+    ...workflowRefresh,
     queryKey: ["issue", issueId, "messages", session?.userId],
     queryFn: () => authed((token) => request<Message[]>(`/issues/${issueId}/messages`, { token })),
     enabled: Boolean(session),

@@ -28,7 +28,7 @@ Signing out from any screen returns every role to the public Dashboard.
 
 | Workspace | Route / role views | Functionality |
 |---|---|---|
-| Complaints | `/work` — Staff | My work combines the scoped queue and selected complaint's work form. Queue filters retain assigned-to-me, unassigned and all-open work. Status, priority, category, ward, landmark, reporter count and deadline remain visible in queue entries. The right pane retains permitted acknowledgement/start/proof actions and private clarification. |
+| Complaints | `/work` — Staff | My work combines the scoped queue and selected complaint's work form. Queue filters retain assigned-to-me, unassigned and all-open work. Staff and assignment queues default to newest first, with date-added oldest-first and priority/deadline sorting available; sorting applies before pagination and is retained in the URL. Each row shows its original report date. Status, priority, category, ward, landmark, reporter count and deadline remain visible in queue entries. The right pane retains permitted acknowledgement/start/proof actions and private clarification. |
 | Department overview | `/dashboard` — Staff | The existing overview destination now shows the signed-in staff member’s department and optional ward scope. Eight cards separate personal open/overdue/ready/in-progress work from department open/overdue/assignment/verification totals. My priorities, Department priorities and Workload by status share one detail panel, with direct links into the existing complaint work screen. |
 | Complaints | `/work?view=assignments` — Supervisor / Admin | Assignments combines bulk acknowledgement, the assignment queue and selected complaint details. The existing department-member picker, workload hints, assignment note and Assign action now live in the detail pane. Work actions refresh both the detail and queue. Administrators also get a Ready to close filter for resolved complaints, with a reasoned, confirmed closure action in this same pane. Administrators can also close open/pending work with a reason; early closure is explicitly disclosed and never counts as a successful repair. |
 | Complaints | `/work?view=review` — Supervisor / Admin | Needs review keeps grouping reasons, maps, confirmation, selected work details and links to contextual moderation/split–merge. |
@@ -74,6 +74,13 @@ available directly in the work pane as well as through the public detail view.
 Server guards remain the authority for roles, department/ward scope, assignments
 and lifecycle rules. A staff member opening a supervisor view URL sees a guard
 message and can return to My work; supervisor panels are not mounted.
+
+Complaint workflow lists, details, evidence/history, private questions, citizen reports,
+verification, notifications and complaint-number tracking refresh every 15 seconds
+while visible, and refresh when the tab regains focus or the connection returns.
+Polling preserves the selected ticket, sort/filter/page and form drafts. Temporary
+refresh failures keep the last loaded complaint visible; access-denied responses
+still block protected details. A new verification round requires a fresh answer.
 
 ## Supporting flows
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -53,9 +55,10 @@ export function SiteHeader() {
   });
   const displayName = identity.data?.fullName ?? session?.fullName;
   const unread = useQuery({
+    ...workflowRefresh,
     queryKey: keys.myUnread(session?.userId),
     queryFn: () => authed(token => request<{ unread: number }>("/me/notifications/unread-count", { token })),
-    enabled: Boolean(session), refetchInterval: 60_000, staleTime: 30_000,
+    enabled: Boolean(session), staleTime: 30_000,
   });
   const unreadCount = unread.data?.unread ?? 0;
 

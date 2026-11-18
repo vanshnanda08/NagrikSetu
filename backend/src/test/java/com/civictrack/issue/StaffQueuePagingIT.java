@@ -75,6 +75,46 @@ class StaffQueuePagingIT extends IntegrationTestBase {
                 .andExpect(status().isForbidden());
     }
 
+    @Test void dateSortingPrecedesPaginationForStaffAndSupervisors() throws Exception {
+        Instant now = clock.instant();
+        var oldest = fixtures.issue("POTHOLE", now.minusSeconds(300), now.plusSeconds(3600));
+        var middleA = fixtures.issue("POTHOLE", now.minusSeconds(200), now.plusSeconds(3600));
+        var middleB = fixtures.issue("POTHOLE", now.minusSeconds(200), now.plusSeconds(3600));
+        var newest = fixtures.issue("POTHOLE", now.minusSeconds(100), now.plusSeconds(3600));
+        // Neither a newer issue in another department nor a high priority may
+        // change the chronological order of this department's date-sorted queue.
+        fixtures.issue("WATER_LEAK", now, now.plusSeconds(3600));
+        jdbc.update("UPDATE issues SET priority_score = 99 WHERE id = ?", oldest.getId());
+        var tied = List.of(middleA.getId().toString(), middleB.getId().toString()).stream().sorted().toList();
+        var supervisor = user(Role.SUPERVISOR, roads, null);
+        for (var account : List.of(crew, supervisor)) {
+            String endpoint = account == crew ? "/api/v1/staff/queue" : "/api/v1/supervisor/queue";
+            for (String sort : List.of("newest", "oldest")) {
+                var visited = new ArrayList<String>();
+                for (int offset : new int[]{0, 2}) {
+                    var response = mvc.perform(get(endpoint).param("tab", "all").param("sort", sort)
+                                    .param("limit", "2").param("offset", String.valueOf(offset))
+                                    .header(HttpHeaders.AUTHORIZATION, fixtures.bearer(account)))
+                            .andExpect(status().isOk()).andReturn().getResponse();
+                    var rows = json.readTree(response.getContentAsString());
+                    assertThat(rows.size()).isEqualTo(2);
+                    for (var row : rows) visited.add((account == crew ? row : row.get("row")).get("id").asText());
+                }
+                var expected = new ArrayList<String>();
+                expected.add((sort.equals("newest") ? newest : oldest).getId().toString());
+                expected.addAll(tied);
+                expected.add((sort.equals("newest") ? oldest : newest).getId().toString());
+                assertThat(visited).containsExactlyElementsOf(expected);
+            }
+            for (String sort : List.of("priority", "invalid")) {
+                mvc.perform(get(endpoint).param("tab", "all").param("sort", sort)
+                                .header(HttpHeaders.AUTHORIZATION, fixtures.bearer(account)))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath(account == crew ? "$[0].id" : "$[0].row.id").value(oldest.getId().toString()));
+            }
+        }
+    }
+
     @Test void wardOfficersAndAdministratorsKeepTheirExistingScope() throws Exception {
         Instant now = clock.instant();
         fixtures.breachedIssue("POTHOLE", now);

@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import Link from "next/link";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -38,6 +40,7 @@ export default function MyReportsPageRoute() {
   const [offset, setOffset] = useState(0);
 
   const reports = useQuery({
+    ...workflowRefresh,
     queryKey: ["me", "reports", session?.userId, offset],
     queryFn: () => authed((token) => request<MyReportsPage>(`/me/reports?limit=${PAGE}&offset=${offset}`, { token })),
     enabled: Boolean(session),
@@ -49,6 +52,7 @@ export default function MyReportsPageRoute() {
   // server's list, not `status === PENDING_VERIFICATION` here: it also knows
   // whether this user has already answered the current round.
   const awaiting = useQuery({
+    ...workflowRefresh,
     queryKey: keys.myVerifications(session?.userId),
     queryFn: () => authed((token) => request<AwaitingVerdict[]>("/me/verifications", { token })),
     enabled: Boolean(session),

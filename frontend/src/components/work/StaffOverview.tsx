@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import Link from "next/link";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -28,10 +30,10 @@ export function StaffOverview() {
   const { session, authed } = useAuth();
   const [selection, setSelection] = useState<View | null>(null);
   const overview = useQuery({
+    ...workflowRefresh,
     queryKey: ["staff", "overview", session?.userId],
     queryFn: () => authed(token => request<Overview>("/staff/overview", { token })),
     enabled: session?.role === "STAFF",
-    refetchInterval: 60_000,
     retry: 1,
   });
   const data = overview.data;

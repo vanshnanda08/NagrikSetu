@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/Button";
@@ -18,6 +20,7 @@ export function AssigneePicker({ issueId, departmentId }: { issueId: string; dep
   const [note, setNote] = useState("");
 
   const members = useQuery({
+    ...workflowRefresh,
     queryKey: ["supervisor", "members", departmentId, issueId, session?.userId],
     queryFn: () => authed((token) => request<Member[]>(`/supervisor/departments/${departmentId}/members?issueId=${issueId}`, { token })),
     staleTime: 30_000,

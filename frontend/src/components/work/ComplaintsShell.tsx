@@ -17,6 +17,7 @@ export function ComplaintsShell({ view, children, className = "" }: { view: Work
   }, [selected]);
   return (
     <WorkspaceShell title="Complaints" links={workViews(session?.role)} current={`/work?view=${view}`} className={`complaints-workspace ${className}`} compactHeader>
+      {view !== "performance" && <p className="text-meta text-ink-muted mt-2">Updates automatically every 15 seconds.</p>}
       {children}
     </WorkspaceShell>
   );

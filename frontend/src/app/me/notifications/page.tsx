@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import Link from "next/link";
 import { useState } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -36,6 +38,7 @@ export default function NotificationsPage() {
   const [offset, setOffset] = useState(0);
 
   const list = useQuery({
+    ...workflowRefresh,
     queryKey: [...keys.myNotifications(session?.userId), offset],
     queryFn: () =>
       authed((token) => request<NotificationPage>(`/me/notifications?limit=${PAGE}&offset=${offset}`, { token })),

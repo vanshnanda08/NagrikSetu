@@ -110,7 +110,7 @@ public class IssueLifecycleService {
      * "everything".
      */
     @Transactional(readOnly = true)
-    public List<IssueRepository.QueueRow> queue(Actor actor, QueueTab tab, int limit, int offset) {
+    public List<IssueRepository.QueueRow> queue(Actor actor, QueueTab tab, QueueSort sort, int limit, int offset) {
         IssueScope.requireQueueScope(actor);
         // Administrators see the whole city; everybody else sees their own
         // scope, applied in SQL rather than by filtering afterwards so that
@@ -125,7 +125,7 @@ public class IssueLifecycleService {
             throw new org.springframework.security.access.AccessDeniedException("Only administrators can access the closure queue.");
         }
         return issues.findQueueRows(departmentId, wardId, actor.isAdmin(), actor.role() == com.civictrack.user.Role.SUPERVISOR, actor.id(), assignedTo, unassignedOnly,
-                                    toAssignOnly, readyToCloseOnly, limit, offset);
+                                    toAssignOnly, readyToCloseOnly, sort.value(), limit, offset);
     }
 
     @Transactional(readOnly = true)

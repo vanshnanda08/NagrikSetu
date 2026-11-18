@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -19,6 +21,8 @@ import { ApiError, request } from "@/lib/api";
 import { invalidateAfterModeration } from "@/lib/moderation";
 import { isOverdue } from "@/lib/status";
 import { WorkIssuePanel } from "@/components/work/WorkIssuePanel";
+import { QueueSortControl, workQueueSort } from "@/components/work/QueueSortControl";
+import { absoluteDateTime } from "@/lib/format";
 import { ticketDetailsHref, workHref } from "@/lib/navigation";
 import { useSignIn } from "@/lib/signInDialog";
 import type { BoardRow } from "@/lib/types";
@@ -60,13 +64,14 @@ export function AssignmentBoardPage() {
 /** Page changes also reset bulk selection when navigating with browser history. */
 function BoardPage() {
   const params = useSearchParams();
-  return <Board key={`${params.get("tab")}:${params.get("boardOffset")}`} />;
+  return <Board key={`${params.get("tab")}:${params.get("boardOffset")}:${params.get("sort")}`} />;
 }
 
 function Board() {
   const router = useRouter();
   const params = useSearchParams();
   const selectedIssue = params.get("issue");
+  const sort = workQueueSort(params.get("sort"));
   const requestedTab = params.get("tab");
 
   const requestedOffset = Number(params.get("boardOffset"));
@@ -83,8 +88,9 @@ function Board() {
   const [summary, setSummary] = useState<string | null>(null);
 
   const board = useQuery({
-    queryKey: ["supervisor", "board", tab, session?.userId, offset],
-    queryFn: () => authed((token) => request<BoardRow[]>(`/supervisor/queue?tab=${tab}&limit=${PAGE + 1}&offset=${offset}`, { token })),
+    ...workflowRefresh,
+    queryKey: ["supervisor", "board", tab, session?.userId, offset, sort],
+    queryFn: () => authed((token) => request<BoardRow[]>(`/supervisor/queue?tab=${tab}&limit=${PAGE + 1}&offset=${offset}&sort=${sort}`, { token })),
     enabled: Boolean(isSupervisor),
     staleTime: 30_000,
   });
@@ -155,7 +161,7 @@ function Board() {
   return (
     <ComplaintsShell view="assignments">
       <h2 className="text-heading">Assignment board</h2>
-      <p className="mt-1 text-dense text-ink-muted">{tab === "ready_to_close" ? "Resolved complaints awaiting closure. Review the repair and verification outcome before closing." : "Most urgent first. Acknowledge new work, then assign it to a crew member."}</p>
+      <p className="mt-1 text-dense text-ink-muted">{tab === "ready_to_close" ? "Resolved complaints awaiting closure. Review the repair and verification outcome before closing." : "Sort by date added or priority. Acknowledge new work, then assign it to a crew member."}</p>
 
       <div className="segmented-control mt-4 flex flex-wrap gap-1 border-b border-rule">
         {tabs.map((t) => (
@@ -182,6 +188,8 @@ function Board() {
         ))}
       </div>
 
+      <QueueSortControl disabled={bulkAck.isPending} />
+
       {board.isPending && <LoadingState label="Loading the board" />}
       {board.isError && (
         <ErrorState action="Loading the board" problem={(board.error as ApiError)?.problem} onRetry={() => void board.refetch()} />
@@ -191,7 +199,7 @@ function Board() {
         offset > 0 ? (
           <EmptyState message="No complaints on this page." actionLabel="Back to first page" actionHref={workHref(params.toString(), { boardOffset: null, issue: null })} />
         ) : tab === "to_assign" ? (
-          <EmptyState message="Nothing is waiting to be acknowledged or assigned." actionLabel="See all open work" actionHref="/work?view=assignments&tab=all" />
+          <EmptyState message="Nothing is waiting to be acknowledged or assigned." actionLabel="See all open work" actionHref={workHref(params.toString(), { view: "assignments", tab: "all", boardOffset: null, issue: null })} />
         ) : (
           <EmptyState message={tab === "ready_to_close" ? "No resolved complaints are waiting to be closed." : "No open work in your scope."} />
         )
@@ -334,6 +342,7 @@ function Row({
               resolvedAt={null}
             />
           </div>
+          <p className="mt-1 text-meta text-ink-muted"><time dateTime={r.firstReportedAt}>Added {absoluteDateTime(r.firstReportedAt)}</time></p>
           <p className="mt-1 text-body">
             {r.categoryName} · {r.wardName}
             {r.landmark ? ` · ${r.landmark}` : ""}

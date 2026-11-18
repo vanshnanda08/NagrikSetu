@@ -52,7 +52,7 @@ export default function IssueDetailPage({ params, searchParams }: { params: Prom
     );
   }
 
-  if (issue.isError) {
+  if (issue.isError && (!issue.data || [401, 403, 404].includes((issue.error as ApiError).status))) {
     const err = issue.error as ApiError;
     // A missing ticket renders the not-found screen with a way onward, never
     // a redirect (blueprint §3.6). A redirect would destroy the URL somebody
@@ -80,12 +80,13 @@ export default function IssueDetailPage({ params, searchParams }: { params: Prom
     );
   }
 
-  const i = issue.data;
+  const i = issue.data!;
   const overdue = isOverdue(i.status, i.effectiveDeadline);
 
   const mapQuery = new URLSearchParams({ view: "map", status: i.status, c: `${i.lat - .002},${i.lng - .002},${i.lat + .002},${i.lng + .002}`, z: "17" });
   return (
     <PageShell wide className="issue-overview-page">
+      {issue.isError && <ErrorState action="Refreshing this complaint" problem={(issue.error as ApiError)?.problem} onRetry={() => void issue.refetch()} />}
       <header className="issue-summary">
         <BackToWork href={backToWork} />
         <div className="issue-reference-row">

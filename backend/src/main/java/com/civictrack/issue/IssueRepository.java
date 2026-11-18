@@ -622,7 +622,12 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
               AND (CAST(:assignedTo AS uuid) IS NULL OR i.assigned_to = CAST(:assignedTo AS uuid))
               AND (:unassignedOnly = FALSE OR i.assigned_to IS NULL)
               AND (:toAssignOnly = FALSE OR i.status IN ('NEW','ACKNOWLEDGED'))
-            ORDER BY i.priority_score DESC, i.due_at ASC, i.id ASC
+            ORDER BY
+                CASE WHEN :queueSort = 'newest' THEN i.first_reported_at END DESC,
+                CASE WHEN :queueSort = 'oldest' THEN i.first_reported_at END ASC,
+                CASE WHEN :queueSort = 'priority' THEN i.priority_score END DESC,
+                CASE WHEN :queueSort = 'priority' THEN i.due_at END ASC,
+                i.id ASC
             LIMIT :limit OFFSET :offset
             """, nativeQuery = true)
     List<QueueRow> findQueueRows(@Param("departmentId") UUID departmentId,
@@ -634,6 +639,7 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
                                  @Param("unassignedOnly") boolean unassignedOnly,
                                  @Param("toAssignOnly") boolean toAssignOnly,
                                  @Param("readyToCloseOnly") boolean readyToCloseOnly,
+                                 @Param("queueSort") String queueSort,
                                  @Param("limit") int limit,
                                  @Param("offset") int offset);
 

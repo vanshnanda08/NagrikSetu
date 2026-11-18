@@ -1,6 +1,7 @@
 package com.civictrack.issue.board;
 
 import com.civictrack.issue.QueueTab;
+import com.civictrack.issue.QueueSort;
 import com.civictrack.issue.IssueRepository;
 import com.civictrack.issue.IssueScope;
 import com.civictrack.user.Actor;
@@ -43,10 +44,11 @@ public class AssignmentBoardController {
     @GetMapping("/queue")
     @PreAuthorize("hasAnyRole('SUPERVISOR','ADMIN')")
     public List<BoardRowDto> queue(@RequestParam(required = false) String tab,
+                                   @RequestParam(required = false) String sort,
                                    @RequestParam(defaultValue = "100") int limit,
                                    @RequestParam(defaultValue = "0") int offset,
                                    @AuthenticationPrincipal Jwt jwt) {
-        return board.board(Actors.from(jwt), QueueTab.parse(tab),
+        return board.board(Actors.from(jwt), QueueTab.parse(tab), QueueSort.parse(sort),
                 Math.min(Math.max(limit, 1), MAX_PAGE), Math.max(offset, 0));
     }
 

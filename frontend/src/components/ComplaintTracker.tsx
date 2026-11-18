@@ -1,5 +1,7 @@
 "use client";
 
+import { workflowRefresh } from "@/lib/workflowRefresh";
+
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +19,7 @@ export function ComplaintTracker() {
   const [submittedRef, setSubmittedRef] = useState("");
   const [validation, setValidation] = useState<string | null>(null);
   const lookup = useQuery({
+    ...workflowRefresh,
     queryKey: ["public-complaint-tracking", submittedRef],
     queryFn: ({ signal }) => request<PublicIssue>(
       `/public/issues/by-ref/${encodeURIComponent(submittedRef)}`,
@@ -24,7 +27,6 @@ export function ComplaintTracker() {
     ),
     enabled: Boolean(submittedRef),
     retry: false,
-    refetchInterval: 60_000,
   });
   const busy = Boolean(submittedRef) && lookup.isFetching;
   const issue = lookup.data;

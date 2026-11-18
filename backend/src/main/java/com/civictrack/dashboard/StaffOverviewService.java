@@ -86,9 +86,9 @@ public class StaffOverviewService {
                 .map(status -> stageRows.stream().filter(s -> s.status().equals(status.name())).findFirst()
                         .orElse(new StaffOverviewDto.Stage(status.name(), 0, 0))).toList();
         return new StaffOverviewDto(department, ward, totals.personal(), totals.department(), stages,
-                issues.findQueueRows(actor.departmentId(), actor.wardId(), false, false, actor.id(), actor.id(), false, false, false, PREVIEW, 0)
+                issues.findQueueRows(actor.departmentId(), actor.wardId(), false, false, actor.id(), actor.id(), false, false, false, "priority", PREVIEW, 0)
                         .stream().map(QueueRowDto::from).toList(),
-                issues.findQueueRows(actor.departmentId(), actor.wardId(), false, false, null, null, false, false, false, PREVIEW, 0)
+                issues.findQueueRows(actor.departmentId(), actor.wardId(), false, false, null, null, false, false, false, "priority", PREVIEW, 0)
                         .stream().map(QueueRowDto::from).toList(), PREVIEW, now);
     }
 
